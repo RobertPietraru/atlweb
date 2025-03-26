@@ -8,17 +8,6 @@
 
 	const navMain = [
 		{
-			title: 'Navigare',
-			url: '/',
-			items: [
-				{
-					title: 'Home',
-					icon: House,
-					url: '/'
-				}
-			]
-		},
-		{
 			title: 'Users',
 			url: 'admin/users',
 			items: [
