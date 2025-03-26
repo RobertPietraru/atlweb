@@ -39,6 +39,7 @@ export const course = pgTable('course', {
 export const chapter = pgTable('chapter', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
+	description: text('description').notNull(),
 	order: integer('order').notNull(),
 	course: uuid('course_id')
 		.notNull()

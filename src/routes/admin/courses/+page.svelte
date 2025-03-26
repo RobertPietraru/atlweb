@@ -34,7 +34,7 @@
 						<td class="p-4 align-middle">{course.chapterCount}</td>
 						<td class="p-4 align-middle">
 							<div class="flex justify-end gap-2">
-								<Button href="/admin/courses/{course.id}" variant="outline" size="sm">View</Button>
+								<Button href="/admin/course/{course.id}" variant="outline" size="sm">View</Button>
 							</div>
 						</td>
 					</tr>

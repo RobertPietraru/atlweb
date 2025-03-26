@@ -119,6 +119,13 @@ export class AdminService {
         return permissions.some(p => p.permission === permission);
     }
 
+    async hasPermissions(userId: table.Id, permissions: table.Permission[]): Promise<boolean> {
+        const userPermissions = await this.db.select({
+            permission: table.user_permissions.permission
+        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
+        return permissions.every(p => userPermissions.some(up => up.permission === p));
+    }
+
     async updateUser(userId: table.Id, { email, username }: { email: string, username: string }): Promise<table.Id | 'unknown' | 'emailAlreadyExists' | 'usernameAlreadyExists'> {
         const oldUsers = await this.db.select().from(table.user).where(eq(table.user.id, userId)).limit(1);
         if (oldUsers.length === 0) {
@@ -128,7 +135,7 @@ export class AdminService {
         if (oldUser.email === email && oldUser.username === username) {
             return userId;
         }
-        
+
         if (oldUser.email !== email) {
             const existingEmail = await this.db.select().from(table.user).where(eq(table.user.email, email));
             if (existingEmail.length > 0) {
@@ -170,10 +177,10 @@ export class AdminService {
             order: table.course.order,
             chapterCount: sql<number>`count(${table.chapter.id})`
         })
-        .from(table.course)
-        .leftJoin(table.chapter, eq(table.course.id, table.chapter.course))
-        .groupBy(table.course.id)
-        .orderBy(table.course.order);
+            .from(table.course)
+            .leftJoin(table.chapter, eq(table.course.id, table.chapter.course))
+            .groupBy(table.course.id)
+            .orderBy(table.course.order);
 
         return courses;
     }
@@ -182,6 +189,7 @@ export class AdminService {
         const course = await this.db.select({
             id: table.course.id,
             name: table.course.name,
+            description: table.course.description,
             order: table.course.order,
         }).from(table.course).where(eq(table.course.id, courseId)).limit(1);
         if (course.length === 0) {
@@ -199,6 +207,34 @@ export class AdminService {
         };
     }
 
+    async createChapter(courseId: table.Id, data: { name: string; description: string }) {
+        const [course] = await this.db.select({
+            chapterCount: sql<number>`count(${table.chapter.id})`
+        })
+            .from(table.course)
+            .leftJoin(table.chapter, eq(table.course.id, table.chapter.course))
+            .where(eq(table.course.id, courseId))
+            .groupBy(table.course.id)
+            .limit(1);
+
+        const [chapter] = await this.db.insert(table.chapter).values({
+            name: data.name,
+            description: data.description,
+            course: courseId,
+            order: course.chapterCount
+        }).returning({ id: table.chapter.id });
+        return chapter.id;
+    }
+
+    async reorderAllChapters(chapters: string[]) {
+        await this.db.transaction(async (tx) => {
+            for (let i = 0; i < chapters.length; i++) {
+                await tx.update(table.chapter)
+                    .set({ order: i + 1 })
+                    .where(eq(table.chapter.id, chapters[i]));
+            }
+        });
+    }
 }
 
 
