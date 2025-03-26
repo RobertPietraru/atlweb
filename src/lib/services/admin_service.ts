@@ -65,7 +65,7 @@ export class AdminService {
             const permissions = await this.db.select({
                 permission: table.user_permissions.permission
             }).from(table.user_permissions).where(eq(table.user_permissions.user, user.id));
-            
+
             return {
                 ...user,
                 permissions: permissions.map(p => p.permission)
@@ -74,13 +74,29 @@ export class AdminService {
         return usersWithPermissions;
     }
 
-    async getUser(userId: table.Id): Promise<table.User | null> {
+    async getUser(userId: table.Id): Promise<(table.User & { permissions: table.Permission[] }) | null> {
         const user = await this.db.select({
             id: table.user.id,
             username: table.user.username,
             email: table.user.email,
-        }).from(table.user).where(eq(table.user.id, userId));
-        return user.at(0) ?? null;
+        }).from(table.user).where(eq(table.user.id, userId)).limit(1);
+
+        if (user.length === 0) {
+            return null;
+        }
+
+        const permissions = await this.db.select({
+            permission: table.user_permissions.permission
+        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
+
+        const result = {
+            id: user[0].id,
+            username: user[0].username,
+            email: user[0].email,
+            permissions: permissions.map(p => p.permission as table.Permission)
+        };
+
+        return result;
     }
 
     async deleteUser(userId: table.Id): Promise<void> {
@@ -89,6 +105,43 @@ export class AdminService {
             await tx.delete(table.user).where(eq(table.user.id, userId));
         });
     }
+
+    async updateUser(userId: table.Id, { email, username }: { email: string, username: string }): Promise<table.Id | 'unknown' | 'emailAlreadyExists' | 'usernameAlreadyExists'> {
+        const oldUsers = await this.db.select().from(table.user).where(eq(table.user.id, userId)).limit(1);
+        if (oldUsers.length === 0) {
+            return 'unknown';
+        }
+        const oldUser = oldUsers[0];
+        if (oldUser.email === email && oldUser.username === username) {
+            return userId;
+        }
+        
+        if (oldUser.email !== email) {
+            const existingEmail = await this.db.select().from(table.user).where(eq(table.user.email, email));
+            if (existingEmail.length > 0) {
+                return 'emailAlreadyExists';
+            }
+        }
+
+        if (oldUser.username !== username) {
+            const existingUsername = await this.db.select().from(table.user).where(eq(table.user.username, username));
+            if (existingUsername.length > 0) {
+                return 'usernameAlreadyExists';
+            }
+        }
+
+        await this.db.update(table.user).set({ email, username }).where(eq(table.user.id, userId));
+        return userId;
+    }
+
+    async updateUserPermissions(userId: table.Id, permissions: table.Permission[]) {
+        await this.db.transaction(async (tx) => {
+            await tx.delete(table.user_permissions).where(eq(table.user_permissions.user, userId));
+            await tx.insert(table.user_permissions).values(permissions.map(p => ({ user: userId, permission: p })));
+        });
+    }
+
+
 }
 
 
