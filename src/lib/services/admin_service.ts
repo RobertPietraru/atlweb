@@ -101,9 +101,22 @@ export class AdminService {
 
     async deleteUser(userId: table.Id): Promise<void> {
         await this.db.transaction(async (tx) => {
+            // sessions
+            await tx.delete(table.session).where(eq(table.session.userId, userId));
+            // submissions
+            await tx.delete(table.submission).where(eq(table.submission.userId, userId));
+            // user permissions
             await tx.delete(table.user_permissions).where(eq(table.user_permissions.user, userId));
+            // user
             await tx.delete(table.user).where(eq(table.user.id, userId));
         });
+    }
+
+    async hasPermission(userId: table.Id, permission: table.Permission): Promise<boolean> {
+        const permissions = await this.db.select({
+            permission: table.user_permissions.permission
+        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
+        return permissions.some(p => p.permission === permission);
     }
 
     async updateUser(userId: table.Id, { email, username }: { email: string, username: string }): Promise<table.Id | 'unknown' | 'emailAlreadyExists' | 'usernameAlreadyExists'> {
