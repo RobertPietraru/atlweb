@@ -10,11 +10,6 @@
 	const { form, message, errors } = superForm(data.form);
 </script>
 
-<main class="min-h-[100vh] w-full px-8 py-4">
-	<nav class="flex items-center justify-between">
-		<a class="text-3xl font-bold" href="/">ATLWEB</a>
-	</nav>
-
 	<div class="flex min-h-screen items-center justify-center bg-background">
 		<Card class="w-[350px]">
 			<CardHeader>
@@ -74,4 +69,3 @@
 			</CardFooter>
 		</Card>
 	</div>
-</main>

@@ -18,6 +18,12 @@ export const permissionsList = [
 	'course.edit',
 	'course.delete',
 	'course.view',
+
+	'course.create',
+	'course.edit',
+	'course.delete',
+	'course.view',
+
 	'user.create',
 	'user.edit',
 	'user.delete',
@@ -26,6 +32,7 @@ export const permissionsList = [
 export const course = pgTable('course', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
+	description: text('description').notNull(),
 	order: integer('order').notNull(),
 });
 
@@ -33,6 +40,9 @@ export const chapter = pgTable('chapter', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	order: integer('order').notNull(),
+	course: uuid('course_id')
+		.notNull()
+		.references(() => course.id),
 });
 
 export const lesson = pgTable('lesson', {

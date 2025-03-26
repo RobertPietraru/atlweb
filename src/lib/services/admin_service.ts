@@ -1,5 +1,5 @@
 import { hash, verify } from '@node-rs/argon2';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -154,6 +154,50 @@ export class AdminService {
         });
     }
 
+    async createCourse(name: string, description: string): Promise<table.Id> {
+        const [course] = await this.db.insert(table.course).values({
+            name,
+            description,
+            order: 0
+        }).returning({ id: table.course.id });
+        return course.id;
+    }
+
+    async getCourses() {
+        const courses = await this.db.select({
+            id: table.course.id,
+            name: table.course.name,
+            order: table.course.order,
+            chapterCount: sql<number>`count(${table.chapter.id})`
+        })
+        .from(table.course)
+        .leftJoin(table.chapter, eq(table.course.id, table.chapter.course))
+        .groupBy(table.course.id)
+        .orderBy(table.course.order);
+
+        return courses;
+    }
+
+    async getCourseWithChapters(courseId: table.Id) {
+        const course = await this.db.select({
+            id: table.course.id,
+            name: table.course.name,
+            order: table.course.order,
+        }).from(table.course).where(eq(table.course.id, courseId)).limit(1);
+        if (course.length === 0) {
+            return null;
+        }
+        const chapters = await this.db.select({
+            id: table.chapter.id,
+            name: table.chapter.name,
+            order: table.chapter.order
+        }).from(table.chapter).where(eq(table.chapter.course, courseId)).orderBy(table.chapter.order);
+
+        return {
+            ...course[0],
+            chapters
+        };
+    }
 
 }
 

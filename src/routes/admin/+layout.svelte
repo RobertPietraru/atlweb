@@ -9,28 +9,28 @@
 	const navMain = [
 		{
 			title: 'Users',
-			url: 'admin/users',
+			url: '/admin/users',
 			items: [
 				{
 					title: 'Users',
 					icon: UsersRound,
-					url: 'admin/users'
+					url: '/admin/users'
 				}
 			]
 		},
 		{
 			title: 'Cursuri',
-			url: 'admin/courses',
+			url: '/admin/courses',
 			items: [
 				{
 					title: 'Cursuri',
 					icon: BookOpen,
-					url: 'admin/courses'
+					url: '/admin/courses'
 				},
 				{
 					title: 'Exercitii',
 					icon: CodeXml,
-					url: 'admin/exercises'
+					url: '/admin/exercises'
 				}
 			]
 		}
