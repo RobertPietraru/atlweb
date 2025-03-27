@@ -6,6 +6,8 @@
 	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import { toast } from 'svelte-sonner';
+	import { deserialize } from '$app/forms';
 
 	let { data } = $props();
 	let chapters = $state(data.course.chapters.map((ch) => ({ ...ch })));
@@ -33,23 +35,32 @@
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		loading = true;
-
-		const formData = new FormData(event.target as HTMLFormElement);
-
+		
 		try {
+			loading = true;
+			const formData = new FormData(event.target as HTMLFormElement);
 			const response = await fetch('?/create', {
 				method: 'POST',
 				body: formData
 			});
 
-			if (response.ok) {
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
 				dialogOpen = false;
-				// Refresh the page to show new data
-				window.location.reload();
+				hasChanges = false;
+			} else if (result.type === 'failure') {
+				console.error('Error creating chapter:', result.data?.message);
+				toast.error(
+					(result.data?.message as string | undefined | null) ?? 
+					'A apărut o eroare la crearea capitolului',
+					{
+						position: 'bottom-left' 
+					}
+				);
 			}
 		} catch (error) {
-			console.error('Error submitting form:', error);
+			console.error('Error creating chapter:', error);
+			toast.error('A apărut o eroare la crearea capitolului');
 		} finally {
 			loading = false;
 		}
@@ -58,21 +69,32 @@
 	async function saveChapterOrder() {
 		loading = true;
 		try {
-			const formData = new FormData();
-			console.log(JSON.stringify(chapters.map(ch => ch.id)));
-			formData.append('chapters', JSON.stringify(chapters.map(ch => ch.id)));
-
 			const response = await fetch('?/reorderAll', {
 				method: 'POST',
-				body: formData
+				body: JSON.stringify({
+					chapters: chapters.map(ch => ch.id)
+				})
 			});
 
-			if (response.ok) {
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
 				initialChapters = [...chapters];
-				window.location.reload();
+				hasChanges = false;
+			} else if (result.type === 'failure') {
+				console.error('Error saving chapter order:', result.data?.message);
+				toast.error(
+					(result.data?.message as string | undefined | null) ?? 
+					'A apărut o eroare la salvarea ordinii capitolelor',
+					{
+						position: 'bottom-left'
+					}
+				);
 			}
 		} catch (error) {
 			console.error('Error saving chapter order:', error);
+			toast.error('A apărut o eroare la salvarea ordinii capitolelor', {
+				position: 'bottom-left'
+			});
 		} finally {
 			loading = false;
 		}
