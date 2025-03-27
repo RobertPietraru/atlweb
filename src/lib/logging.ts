@@ -2,8 +2,10 @@ import { pino, multistream } from "pino";
 import fs from "fs";
 
 // Ensure logs directory exists
-if (!fs.existsSync('./logs')) {
-    fs.mkdirSync('./logs');
+if (process.env.NODE_ENV === 'development') {
+    if (!fs.existsSync('./logs')) {
+        fs.mkdirSync('./logs');
+    }
 }
 
 // Create a writable stream for logging to a file
