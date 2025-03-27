@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { House, UsersRound, LogOut, PersonStanding } from 'svelte-lucide';
+	import { House, UsersRound, LogOut, PersonStanding, LogIn } from 'svelte-lucide';
 	import { page } from '$app/stores';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
@@ -15,8 +15,7 @@
 					title: 'Home',
 					icon: House,
 					url: '/'
-				},
-				
+				}
 			]
 		}
 	];
@@ -80,14 +79,24 @@
 				<Sidebar.MenuItem>
 					<Sidebar.MenuButton>
 						{#snippet child({ props })}
-							<button
-								{...props}
-								onclick={logout}
-								class="flex w-full items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-destructive/10"
-							>
-								<LogOut class="h-4 w-4 text-red-500" />
-								<span class="font-medium text-red-500">Deconectare</span>
-							</button>
+							{#if data.user}
+								<button
+									{...props}
+									onclick={logout}
+									class="flex w-full items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-destructive/10"
+								>
+									<LogOut class="h-4 w-4 text-red-500" />
+									<span class="font-medium text-red-500">Deconectare</span>
+								</button>
+							{:else}
+								<a
+									href="/login"
+									class="flex w-full items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted"
+								>
+									<LogIn class="h-4 w-4" />
+									<span class="font-medium">Conectare</span>
+								</a>
+							{/if}
 						{/snippet}
 					</Sidebar.MenuButton>
 				</Sidebar.MenuItem>
