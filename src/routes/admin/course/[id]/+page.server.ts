@@ -56,7 +56,7 @@ export const actions = {
         await adminService.createChapter(params.id, form.data);
         return { form };
     },
-    reorderAll: async ({ request, locals, params }) => {
+    manageChapters: async ({ request, locals, params }) => {
         if (!locals.user) {
             redirect(302, '/login');
         }
@@ -65,11 +65,23 @@ export const actions = {
         if (!hasPermission) {
             redirect(302, '/');
         }
+        const course = await adminService.getCourseWithChapters(params.id);
+
+        if (!course) {
+            error(404, 'Course not found');
+        }
 
         const data = await request.json();
         const form = await superValidate(data, zod(reorderSchema));
         if (!form.valid) {
             return { form };
+        }
+
+        /// delete all the chapters not in the list
+        for (const chapter of course.chapters) {
+            if (!form.data.chapters.includes(chapter.id)) {
+                await adminService.deleteChapter(chapter.id);
+            }
         }
 
         await adminService.reorderAllChapters(form.data.chapters);

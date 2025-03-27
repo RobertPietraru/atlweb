@@ -69,7 +69,7 @@
 	async function saveChapterOrder() {
 		loading = true;
 		try {
-			const response = await fetch('?/reorderAll', {
+			const response = await fetch('?/manageChapters', {
 				method: 'POST',
 				body: JSON.stringify({
 					chapters: chapters.map(ch => ch.id)
@@ -98,6 +98,11 @@
 		} finally {
 			loading = false;
 		}
+	}
+
+	function deleteChapter(index: number) {
+		chapters = chapters.filter((_, i) => i !== index);
+		hasChanges = true;
 	}
 </script>
 
@@ -133,7 +138,7 @@
 
 			{#if hasChanges}
 				<Button variant="default" onclick={saveChapterOrder} disabled={loading} class="w-full">
-					Salvează ordinea
+					Salvează
 				</Button>
 			{/if}
 
@@ -173,12 +178,20 @@
 									</div>
 									<h3 class="text-lg font-medium">{chapter.name}</h3>
 								</div>
-								<Button
-									variant="outline"
-									href="/admin/course/{data.course.id}/chapters/{chapter.id}"
-								>
-									Editează
-								</Button>
+								<div class="flex gap-2">
+									<Button
+										variant="outline"
+										href="/admin/course/{data.course.id}/chapters/{chapter.id}"
+									>
+										Editează
+									</Button>
+									<Button 
+										variant="destructive"
+										onclick={() => deleteChapter(index)}
+									>
+										Șterge
+									</Button>
+								</div>
 							</CardContent>
 						</Card>
 					{/each}

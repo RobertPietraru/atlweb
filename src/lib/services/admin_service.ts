@@ -235,6 +235,10 @@ export class AdminService {
             }
         });
     }
+
+    async deleteChapter(id: string) {
+        await this.db.delete(table.chapter).where(eq(table.chapter.id, id));
+    }
 }
 
 
