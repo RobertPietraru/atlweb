@@ -16,14 +16,17 @@ const prettyStream = pino.transport({
     target: 'pino-pretty', // Pretty prints logs in the console
     options: { colorize: true } // Adds colors to console logs
 });
+const streams = [
+    { stream: prettyStream },
+];
+if (process.env.NODE_ENV === 'development') {
+    streams.push({ stream: logFile });
+}
 
 // Create a logger with multiple streams
 const log = pino(
     { level: 'info' },
-    multistream([
-        { stream: prettyStream },  // Pretty logs to console
-        { stream: logFile }        // Raw logs to file
-    ])
+    multistream(streams)
 );
 
 // Log unhandled exceptions
