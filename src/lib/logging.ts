@@ -1,13 +1,13 @@
 import { pino } from "pino";
 
-const prettyStream = pino.transport({
-    target: 'pino-pretty',
-    options: { colorize: true }
-});
-
-const log = pino(
+const log = process.env.NODE_ENV === 'development' ? pino(
     { level: 'info' },
-    prettyStream
+    pino.transport({
+        target: 'pino-pretty',
+        options: { colorize: true }
+    })
+) : pino(
+    { level: 'info' },
 );
 
 process.on('uncaughtException', (error) => {
