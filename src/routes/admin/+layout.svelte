@@ -1,10 +1,24 @@
 <script lang="ts">
-	import { House, UsersRound, LogOut, PersonStanding, BookOpen, BookOpenText, CodeXml } from 'svelte-lucide';
+	import {
+		House,
+		UsersRound,
+		LogOut,
+		PersonStanding,
+		BookOpen,
+		BookOpenText,
+		CodeXml
+	} from 'svelte-lucide';
 	import { page } from '$app/stores';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
-	let { children, data } = $props();
+	import Sun from '@lucide/svelte/icons/sun';
+	import Moon from '@lucide/svelte/icons/moon';
+
+	import { toggleMode } from 'mode-watcher';
+	import { Button } from '$lib/components/ui/button/index.js';
+
+	let { children } = $props();
 
 	const navMain = [
 		{
@@ -56,7 +70,7 @@
 </script>
 
 <Sidebar.Provider>
-	<Sidebar.Root bind:ref={sidebarRef} class="p-1">
+	<Sidebar.Root bind:ref={sidebarRef}>
 		<Sidebar.Header>
 			<a class="text-3xl font-bold transition-colors hover:text-muted" href="/"> ADMIN </a>
 		</Sidebar.Header>
@@ -66,6 +80,7 @@
 					<Sidebar.GroupLabel class="px-2 text-sm font-medium text-muted-foreground"
 						>{group.title}</Sidebar.GroupLabel
 					>
+
 					<Sidebar.GroupContent>
 						<Sidebar.Menu class="space-y-1">
 							{#each group.items as item (item.title)}
@@ -113,6 +128,16 @@
 		<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 			<Sidebar.Trigger class="-ml-1" />
 			<Separator orientation="vertical" class="mr-2 h-4" />
+			<div class="flex-1"></div>
+			<Button onclick={toggleMode} variant="ghost" size="icon" >
+				<Sun
+					class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+				/>
+				<Moon
+					class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+				/>
+				<span class="sr-only">Toggle theme</span>
+			</Button>
 		</header>
 		<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl bg-muted/50">
 			{@render children()}

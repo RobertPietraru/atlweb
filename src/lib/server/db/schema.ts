@@ -1,5 +1,8 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, uuid, integer, primaryKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, integer, primaryKey, boolean } from 'drizzle-orm/pg-core';
+
+export const blockType = ['text', 'resources', 'code'] as const;
+export type BlockType = typeof blockType[number];
 
 export const permissionsList = [
 	'exercise.create',
@@ -49,6 +52,8 @@ export const chapter = pgTable('chapter', {
 export const lesson = pgTable('lesson', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
+	teaser: text('teaser').notNull(),
+	description: text('description').notNull(),
 	chapterId: uuid('chapter_id')
 		.notNull()
 		.references(() => chapter.id),
@@ -64,12 +69,15 @@ export const lessonTextBlock = pgTable('lesson_text_block', {
 	order: integer('order').notNull(),
 });
 
-export const lessonVideoBlock = pgTable('lesson_video_block', {
+export const lessonResourcesBlock = pgTable('lesson_resources_block', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	lessonId: uuid('lesson_id')
 		.notNull()
 		.references(() => lesson.id),
+	title: text('title').notNull(),
+	content: text('content').notNull(),
 	urls: text('urls').array().notNull(),
+	urlLabels: text('url_labels').array().notNull(),
 	order: integer('order').notNull(),
 });
 
@@ -81,19 +89,10 @@ export const lessonCodeBlock = pgTable('lesson_code_block', {
 	html: text('html').notNull(),
 	css: text('css').notNull(),
 	javascript: text('javascript').notNull(),
+	showOutput: boolean('show_output').notNull().default(false),
 	order: integer('order').notNull(),
 });
 
-export const lessonCodeResultBlock = pgTable('lesson_code_result_block', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	lessonId: uuid('lesson_id')
-		.notNull()
-		.references(() => lesson.id),
-	codeblockId: uuid('codeblock_id')
-		.notNull()
-		.references(() => lessonCodeBlock.id),
-	order: integer('order').notNull(),
-});
 
 export const exercise = pgTable('exercise', {
 	id: uuid('id').primaryKey().defaultRandom(),
@@ -155,6 +154,7 @@ export type Exercise = typeof exercise.$inferSelect;
 export type Submission = typeof submission.$inferSelect;
 export type Id = string;
 
+export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' };
 
 export type Permissions = typeof permissionsList[number];
 
