@@ -8,6 +8,8 @@
 	import { deserialize } from '$app/forms';
 	import { superForm } from 'sveltekit-superforms';
 	import { marked } from 'marked';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import { PlusIcon } from 'lucide-svelte';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -51,11 +53,30 @@
 	}
 </script>
 
-<div class="p-8">
+<main class="p-8">
 	<div class="mb-6 flex items-center justify-between">
-		<h1 class="text-3xl font-bold">Editare lecție</h1>
-		<Button onclick={saveLesson} disabled={saving || isSaved}>
-			{saving ? 'Se salvează...' : isSaved ? 'Salvat' : 'Salvează'}
+		<div class="flex items-center gap-6">
+			<Button variant="ghost" href="../" class="transition-colors hover:bg-gray-100/50">
+				<span class="mr-2">←</span>
+				<span>Înapoi la capitol</span>
+			</Button>
+			<h1 class="text-3xl font-bold tracking-tight">Editare lecție</h1>
+		</div>
+		<Button
+			onclick={saveLesson}
+			disabled={saving || isSaved}
+			variant={isSaved ? 'outline' : 'default'}
+		>
+			{#if saving}
+				<span class="inline-flex items-center">
+					<span class="mr-2 animate-spin">⟳</span>
+					Se salvează...
+				</span>
+			{:else if isSaved}
+				<span>✓ Salvat</span>
+			{:else}
+				Salvează
+			{/if}
 		</Button>
 	</div>
 
@@ -113,7 +134,23 @@
 			</div>
 		</Card>
 	</div>
-</div>
+
+	<div class="relative -my-3" id="adder">
+		<div class="flex justify-center group">
+			<Button 
+				size="icon" 
+				class="z-10 h-10 rounded-full hover:bg-primary transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1"
+			>
+				<PlusIcon 
+					class="h-4 w-4 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125" 
+				/>
+			</Button>
+			<Separator 
+				class="h-[2px] absolute top-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent text-primary-foreground group-hover:via-primary/50 group-hover:h-1 transition-all duration-300 ease-in-out"
+			/>
+		</div>
+	</div>
+</main>
 
 <style>
 	:global(.markdown-content h1) {
