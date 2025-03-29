@@ -9,9 +9,18 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { BookOpenIcon, CodeIcon, EyeIcon, PlusIcon, TextIcon } from 'lucide-svelte';
+	import {
+		BookOpenIcon,
+		CodeIcon,
+		EyeIcon,
+		FileOutputIcon,
+		PlusIcon,
+		TextIcon,
+		PlayIcon
+	} from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -100,6 +109,31 @@
 			...b,
 			order: i
 		}));
+	}
+	function getCodePreview(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>) {
+		const css = block.css ?? '';
+		const html = block.html ?? '';
+		const javascript = block.javascript ?? '';
+
+		let html_content = '';
+		html_content += `<ht` + `ml>`;
+		html_content += `<he` + `ad>`;
+		html_content += `<sty` + `le>${css}</sty` + `le>`;
+		html_content += `</he` + `ad>`;
+		html_content += `<bo` + `dy>${html}</bo` + `dy>`;
+		html_content += `<sc` + `ript>`;
+		html_content += `(function() {
+    var originalLog = console.log;
+    console.log = function() {
+      originalLog.apply(console, arguments);
+      window.parent.postMessage({ type: 'log', data: [...arguments] }, '*');
+    };
+  })();
+		`;
+		html_content += `${javascript}</sc` + `ript>`;
+		html_content += `</ht` + `ml>`;
+
+		return html_content;
 	}
 </script>
 
@@ -375,12 +409,6 @@
 							<Tabs.Trigger value="css">CSS</Tabs.Trigger>
 							<Tabs.Trigger value="js">JavaScript</Tabs.Trigger>
 						</Tabs.List>
-						<Button
-							class="{block.showOutput ? 'bg-accent text-accent-foreground' : ''}"
-							onclick={() => (block.showOutput = !block.showOutput)}
-						>
-							Cu fereastra de output
-						</Button>
 					</div>
 					<Tabs.Content value="html">
 						<Textarea bind:value={block.html} />
@@ -394,7 +422,50 @@
 				</Tabs.Root>
 			</div>
 
-			<div class="flex h-full flex-col gap-4 p-4"></div>
+			<div class="flex h-full flex-col gap-4 p-4">
+				<Tabs.Root bind:value={activeTab}>
+					<div class="flex items-center justify-between">
+						<Tabs.List>
+							<Tabs.Trigger value="html">HTML</Tabs.Trigger>
+							<Tabs.Trigger value="css">CSS</Tabs.Trigger>
+							<Tabs.Trigger value="js">JavaScript</Tabs.Trigger>
+						</Tabs.List>
+					</div>
+					<Tabs.Content value="html">
+						<Textarea bind:value={block.html} disabled />
+					</Tabs.Content>
+					<Tabs.Content value="css">
+						<Textarea bind:value={block.css} disabled />
+					</Tabs.Content>
+					<Tabs.Content value="js">
+						<Textarea bind:value={block.javascript} disabled />
+					</Tabs.Content>
+				</Tabs.Root>
+				<Button
+					variant="outline"
+					onclick={() => {
+						block.showOutput = true;
+						window.addEventListener('message', (event) => {
+							if (event.data.type === 'log') {
+								alert(event.data.data);
+							}
+						});
+					}}
+				>
+					<PlayIcon class="mr-2 h-4 w-4" />
+					Run
+				</Button>
+
+				{#if block.showOutput}
+					<div class="flex h-full flex-col gap-4 p-4">
+						<iframe
+							title="Code Preview"
+							class="h-full w-full"
+							srcdoc={getCodePreview(block)}
+						></iframe>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 {/snippet}
