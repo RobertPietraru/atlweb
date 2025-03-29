@@ -173,6 +173,7 @@ export class AdminService {
         const courses = await this.db.select({
             id: table.course.id,
             name: table.course.name,
+            description: table.course.description,
             order: table.course.order,
             chapterCount: sql<number>`count(${table.chapter.id})`
         })
