@@ -535,4 +535,11 @@
 	:global(.markdown-content li) {
 		@apply mb-2;
 	}
+	:global(.markdown-content a) {
+		@apply text-blue-500;
+	}
+
+	:global(.markdown-content hr) {
+		@apply my-4;
+	}
 </style>

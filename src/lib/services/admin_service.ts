@@ -1,5 +1,5 @@
 import { hash, verify } from '@node-rs/argon2';
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, and } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -205,6 +205,28 @@ export class AdminService {
         };
     }
 
+    async getChapterPreview(chapterId: table.Id) {
+        const chapter = await this.db.select({
+            id: table.chapter.id,
+            name: table.chapter.name,
+            order: table.chapter.order,
+            description: table.chapter.description,
+        }).from(table.chapter).where(eq(table.chapter.id, chapterId)).limit(1);
+        if (chapter.length === 0) {
+            return null;
+        }
+        const lessons = await this.db.select({
+            id: table.lesson.id,
+            name: table.lesson.name,
+            teaser: table.lesson.teaser,
+            order: table.lesson.order
+        }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId)).orderBy(table.lesson.order).limit(4);
+        return {
+            ...chapter[0],
+            lessons
+        };
+    }
+
     async getCourseWithChapters(courseId: table.Id) {
         const course = await this.db.select({
             id: table.course.id,
@@ -218,8 +240,15 @@ export class AdminService {
         const chapters = await this.db.select({
             id: table.chapter.id,
             name: table.chapter.name,
-            order: table.chapter.order
-        }).from(table.chapter).where(eq(table.chapter.course, courseId)).orderBy(table.chapter.order);
+            order: table.chapter.order,
+            description: table.chapter.description,
+            lessonCount: sql<number>`count(${table.lesson.id})`
+        })
+        .from(table.chapter)
+        .leftJoin(table.lesson, eq(table.chapter.id, table.lesson.chapterId))
+        .where(eq(table.chapter.course, courseId))
+        .groupBy(table.chapter.id)
+        .orderBy(table.chapter.order);
 
         return {
             ...course[0],
@@ -275,6 +304,12 @@ export class AdminService {
     }
 
     async deleteChapter(id: string) {
+        const lessons = await this.db.select({
+            id: table.lesson.id
+        }).from(table.lesson).where(eq(table.lesson.chapterId, id));
+        for (const lesson of lessons) {
+            await this.deleteLesson(lesson.id);
+        }
         await this.db.delete(table.chapter).where(eq(table.chapter.id, id));
     }
 
@@ -288,9 +323,47 @@ export class AdminService {
         });
     }
     async deleteLesson(id: table.Id) {
-        await this.db.delete(table.lesson).where(eq(table.lesson.id, id));
+        await this.db.transaction(async (tx) => {
+            await tx.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, id));
+            await tx.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, id));
+            await tx.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, id));
+            await tx.delete(table.lesson).where(eq(table.lesson.id, id));
+        });
     }
-
+    async getPreviousAndNextLesson(lesson_id: table.Id) {
+        const lesson = await this.db.select({
+            id: table.lesson.id,
+            order: table.lesson.order,
+            chapterId: table.lesson.chapterId
+        }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+        if (lesson.length === 0) {
+            return null;
+        }
+        const lessonCount = await this.db.select({
+            lessonCount: sql<number>`count(${table.lesson.id})`
+        }).from(table.lesson).where(eq(table.lesson.chapterId, lesson[0].chapterId));
+        if (lessonCount.length === 0) {
+            return null;
+        }
+        let previousLesson = null;
+        let nextLesson = null;
+        if (lesson[0].order > 0) {
+            previousLesson = await this.db.select({
+                id: table.lesson.id,
+                name: table.lesson.name,
+            }).from(table.lesson).where(and(eq(table.lesson.chapterId, lesson[0].chapterId), eq(table.lesson.order, lesson[0].order - 1))).limit(1);
+        }
+        if (lesson[0].order < lessonCount[0].lessonCount - 1) {
+            nextLesson = await this.db.select({
+                id: table.lesson.id,
+                name: table.lesson.name,
+            }).from(table.lesson).where(and(eq(table.lesson.chapterId, lesson[0].chapterId), eq(table.lesson.order, lesson[0].order + 1))).limit(1);
+        }
+        return {
+            previous: previousLesson ? previousLesson[0] : null,
+            next: nextLesson ? nextLesson[0] : null
+        };
+    }
     async getLessonWithBlocks(lesson_id: table.Id) {
         const lesson = await this.db.select({
             id: table.lesson.id,
@@ -345,6 +418,13 @@ export class AdminService {
             ...lesson[0],
             blocks
         };
+    }
+
+    async getLessonNamesInChapter(chapter_id: table.Id) {
+        return await this.db.select({
+            name: table.lesson.name,
+            id: table.lesson.id,
+        }).from(table.lesson).where(eq(table.lesson.chapterId, chapter_id)).orderBy(table.lesson.order);
     }
     async updateLesson(lesson_id: table.Id, params: { name: string, teaser: string, description: string }) {
         await this.db.update(table.lesson).set({
