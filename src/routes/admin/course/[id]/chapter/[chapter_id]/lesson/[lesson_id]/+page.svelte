@@ -18,7 +18,8 @@
 	let isSaved = $derived(
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
 	);
-	let visiblePopupsIndexes = $state<number[]>([]);
+	let visiblePopupIndex = $state<number | null>(null);
+	$inspect(visiblePopupIndex);
 
 	let saving = $state(false);
 
@@ -55,7 +56,8 @@
 	}
 
 	function insertBlock(type: 'text' | 'video' | 'code' | 'code_result', index: number) {
-		visiblePopupsIndexes.push(index);
+		/// remove all visible popups
+		visiblePopupIndex = null;
 		let block: (typeof lesson.blocks)[0];
 
 		if (type === 'text') {
@@ -177,7 +179,7 @@
 			</div>
 		</Card>
 	</div>
-	{@render addBlock(0)}
+	{@render addBlock(-1)}
 	{#each lesson.blocks as block, index}
 		{#if block.type === 'text'}
 			{@render textBlock(block)}
@@ -190,26 +192,25 @@
 		<div class="group flex justify-center">
 			<Button
 				size="icon"
-				class="z-10 h-12 w-12 rounded-full transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:shadow-lg hover:shadow-primary/30 {visiblePopupsIndexes.includes(
-					index
-				)
+				class="z-10 h-12 w-12 rounded-full transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:shadow-lg hover:shadow-primary/30 {visiblePopupIndex === index
 					? 'translate-y-1 bg-primary shadow-lg shadow-primary/30'
 					: ''}"
-				onclick={() =>
-					visiblePopupsIndexes.includes(index)
-						? visiblePopupsIndexes.splice(visiblePopupsIndexes.indexOf(index), 1)
-						: visiblePopupsIndexes.push(index)}
+				onclick={() => {
+					if (visiblePopupIndex === index) {
+						visiblePopupIndex = null;
+					} else {
+						visiblePopupIndex = index;
+					}
+				}}
 			>
 				<PlusIcon
-					class="h-5 w-5 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125 {visiblePopupsIndexes.includes(
-						index
-					)
+					class="h-5 w-5 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125 {visiblePopupIndex === index
 						? 'rotate-90 scale-125'
 						: ''}"
 				/>
 			</Button>
 
-			{#if visiblePopupsIndexes.includes(index)}
+			{#if visiblePopupIndex === index}
 				<div
 					class="absolute bottom-full z-50 mb-2 flex items-center gap-2 rounded-lg bg-background p-2 shadow-lg"
 					transition:slide={{ duration: 200 }}

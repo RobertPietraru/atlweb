@@ -1,6 +1,5 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { adminService } from '$lib/injection';
-import { lesson } from '$lib/server/db/schema';
 import type { LessonWithBlocks } from '$lib/services/admin_service.js';
 
 export const load = async ({ locals, params }) => {
