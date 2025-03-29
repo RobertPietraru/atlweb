@@ -1,161 +1,57 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Label } from '$lib/components/ui/label';
-	import { Card, CardContent } from '$lib/components/ui/card';
-	import { toast } from 'svelte-sonner';
-	import { deserialize } from '$app/forms';
+	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
+	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
 
 	let { data } = $props();
-	let lessons = $state(data.chapter.lessons.map((l) => ({ ...l })));
-	let initialLessons = data.chapter.lessons;
-	let hasChanges = $derived(JSON.stringify(lessons) !== JSON.stringify(initialLessons));
-
-	let loading = $state(false);
-
-	function calculateNewOrder(index: number, direction: 'up' | 'down'): number {
-		if (direction === 'up' && index > 0) {
-			const temp = lessons[index];
-			lessons[index] = lessons[index - 1];
-			lessons[index - 1] = temp;
-		} else if (direction === 'down' && index < lessons.length - 1) {
-			const temp = lessons[index];
-			lessons[index] = lessons[index + 1];
-			lessons[index + 1] = temp;
-		}
-		// Recalculate all orders to be sequential
-		lessons = lessons.map((l, idx) => ({ ...l, order: idx + 1 }));
-		return lessons[index].order;
-	}
-
-	async function saveLessonOrder() {
-		loading = true;
-		try {
-			const response = await fetch('?/manageLessons', {
-				method: 'POST',
-				body: JSON.stringify({
-					lessons: lessons.map((l) => l.id)
-				})
-			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				initialLessons = [...lessons];
-				hasChanges = false;
-			} else if (result.type === 'failure') {
-				console.error('Error saving lesson order:', result.data?.message);
-				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la salvarea ordinii lecțiilor',
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			console.error('Error saving lesson order:', error);
-			toast.error('A apărut o eroare la salvarea ordinii lecțiilor', {
-				position: 'bottom-left'
-			});
-		} finally {
-			loading = false;
-		}
-	}
-
-	function deleteLesson(index: number) {
-		lessons = lessons.filter((_, i) => i !== index);
-		hasChanges = true;
-	}
 </script>
 
-<div class="container mx-auto max-w-4xl py-12">
-	<header class="mb-12">
-		<h1 class="text-4xl font-bold tracking-tight">Capitol: {data.chapter.name}</h1>
-	</header>
-
-	<div class="grid gap-12">
-		<section>
-			<h2 class="mb-6 text-2xl font-semibold tracking-tight">Informații de bază</h2>
-			<Card>
-				<CardContent class="space-y-6 pt-6">
-					<div>
-						<Label class="text-sm text-muted-foreground">Nume capitol</Label>
-						<p class="mt-1 text-lg font-medium">{data.chapter.name}</p>
-					</div>
-					<div>
-						<Label class="text-sm text-muted-foreground">Descriere</Label>
-						<p class="mt-1 text-lg leading-relaxed">{data.chapter.description}</p>
-					</div>
-				</CardContent>
-			</Card>
-		</section>
-
-		<section>
-			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">Lecții</h2>
-				<div class="flex gap-2">
-					<form action="?/create" method="post">
-						<Button type="submit">Adaugă lecție nouă</Button>
-					</form>
-				</div>
-			</div>
-
-			{#if hasChanges}
-				<Button variant="default" onclick={saveLessonOrder} disabled={loading} class="w-full">
-					Salvează
-				</Button>
-			{/if}
-
-			{#if lessons.length === 0}
-				<Card>
-					<CardContent class="pt-6">
-						<p class="text-center text-muted-foreground">Nu există lecții pentru acest capitol.</p>
-					</CardContent>
-				</Card>
-			{:else}
-				<div class="space-y-4">
-					{#each lessons as lesson, index}
-						<Card>
-							<CardContent class="flex items-center justify-between p-4">
-								<div class="flex items-center gap-4">
-									<div class="flex flex-col gap-1">
-										{#if index > 0}
-											<Button
-												variant="ghost"
-												size="icon"
-												class="h-6 w-6"
-												onclick={() => calculateNewOrder(index, 'up')}
-											>
-												↑
-											</Button>
-										{/if}
-										{#if index < lessons.length - 1}
-											<Button
-												variant="ghost"
-												size="icon"
-												class="h-6 w-6"
-												onclick={() => calculateNewOrder(index, 'down')}
-											>
-												↓
-											</Button>
-										{/if}
-									</div>
-									<h3 class="text-lg font-medium">{lesson.name}</h3>
-								</div>
-								<div class="flex gap-2">
-									<Button
-										variant="outline"
-										href="/admin/course/{data.courseId}/chapter/{data.chapter
-											.id}/lesson/{lesson.id}"
-									>
-										Editează
-									</Button>
-									<Button variant="destructive" onclick={() => deleteLesson(index)}>Șterge</Button>
-								</div>
-							</CardContent>
-						</Card>
-					{/each}
-				</div>
-			{/if}
-		</section>
+<main class="min-h-[100vh] w-full px-8 py-4">
+	<div class="mb-8 space-y-4">
+		<div class="flex items-center justify-between">
+			<h1 class="text-3xl font-bold">{data.chapter.name}</h1>
+			<Button href="/course/{data.courseId}" variant="outline" size="sm">Înapoi la capitole</Button>
+		</div>
+		<p class="text-lg text-muted-foreground">{data.chapter.description}</p>
 	</div>
-</div>
+
+	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+		{#each data.chapter.lessons as lesson}
+			<a href="/course/{data.courseId}/chapter/{data.chapter.id}/lesson/{lesson.id}" class="h-full">
+				<Card
+					class="group h-full cursor-pointer overflow-hidden border-2 transition-all hover:border-primary hover:shadow-lg hover:scale-[1.02] flex flex-col"
+				>
+					<CardContent class="p-6 flex-grow">
+						<div class="mb-4 flex items-center justify-between">
+							<div class="flex items-center gap-2">
+								<div class="rounded-full bg-primary/10 p-2">
+									<BookOpenIcon class="h-5 w-5 text-primary" />
+								</div>
+								<h2 class="text-2xl font-bold tracking-tight group-hover:text-primary">
+									{lesson.name}
+								</h2>
+							</div>
+							<div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100">
+								<ArrowUpRightIcon class="h-4 w-4 text-primary" />
+							</div>
+						</div>
+						<p class="text-sm text-muted-foreground">{lesson.teaser}</p>
+					</CardContent>
+					<CardFooter class="border-t bg-muted/50 p-4">
+						<div class="flex w-full items-center justify-between">
+							<div class="flex items-center gap-2">
+								<div class="flex items-center gap-1 text-sm text-muted-foreground">
+									<PlayIcon class="h-4 w-4" />
+									<span>Lecția {lesson.order + 1}</span>
+								</div>
+							</div>
+							<div class="group-hover:bg-primary group-hover:text-primary-foreground inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+								Începe lecția
+							</div>
+						</div>
+					</CardFooter>
+				</Card>
+			</a>
+		{/each}
+	</div>
+</main>

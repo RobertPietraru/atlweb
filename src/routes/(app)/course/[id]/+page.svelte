@@ -28,13 +28,13 @@
 					<p class="text-sm text-muted-foreground">{chapter.description}</p>
 				</CardContent>
 				<CardFooter class="border-t bg-muted/50 p-4">
-					<p class="text-sm text-muted-foreground">
+					<div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
 						{#if chapter.lessonCount > 1}
 							{chapter.lessonCount} Lecții
 						{:else if chapter.lessonCount === 1}
 							O Lecție
 						{/if}
-					</p>
+					</div>
 					<Button
 						href="/course/{data.course.id}/chapter/{chapter.id}"
 						variant="outline"

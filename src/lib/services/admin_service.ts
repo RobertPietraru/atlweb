@@ -218,6 +218,7 @@ export class AdminService {
         const lessons = await this.db.select({
             id: table.lesson.id,
             name: table.lesson.name,
+            teaser: table.lesson.teaser,
             order: table.lesson.order
         }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId)).orderBy(table.lesson.order).limit(4);
         return {
