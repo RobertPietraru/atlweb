@@ -9,18 +9,11 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import {
-		BookOpenIcon,
-		CodeIcon,
-		EyeIcon,
-		FileOutputIcon,
-		PlusIcon,
-		TextIcon,
-		PlayIcon
-	} from 'lucide-svelte';
+	import { BookOpenIcon, CodeIcon, PlusIcon, TextIcon, PlayIcon, TrashIcon, ArrowUpRightIcon } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
+	import { ArrowUp, ArrowDown, Delete } from 'svelte-lucide';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -209,16 +202,21 @@
 	</div>
 	{@render addBlock(0)}
 	{#each lesson.blocks as block, index}
-		{#if block.type === 'text'}
-			{@render textBlock(block)}
-		{/if}
-		{#if block.type === 'resources'}
-			{@render resourcesBlock(block)}
-		{/if}
+		<div class="flex">
+			{@render manageBlock(index)}
+			<div class="flex-1">
+				{#if block.type === 'text'}
+					{@render textBlock(block)}
+				{/if}
+				{#if block.type === 'resources'}
+					{@render resourcesBlock(block)}
+				{/if}
 
-		{#if block.type === 'code'}
-			{@render codeBlock(block)}
-		{/if}
+				{#if block.type === 'code'}
+					{@render codeBlock(block)}
+				{/if}
+			</div>
+		</div>
 		{@render addBlock(index + 1)}
 	{/each}
 </main>
@@ -281,6 +279,64 @@
 
 			<Separator
 				class="absolute top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent text-primary-foreground transition-all duration-300 ease-in-out group-hover:h-1 group-hover:via-primary/50"
+			/>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet manageBlock(index: number)}
+	<div class="relative -ml-4 -mr-2" id="adder">
+		<div class="group flex flex-col">
+			<div class="flex flex-col gap-2 justify-between">
+				<Button
+					variant="destructive"
+					size="icon"
+					class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30"
+					onclick={() => {
+						lesson.blocks.splice(index, 1);
+					}}
+				>
+					<TrashIcon
+						class="h-4 w-4 -rotate-90 transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:rotate-0 group-hover:scale-125"
+					/>
+				</Button>
+				{#if index !== 0}
+					<Button
+						size="icon"
+					class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30"
+					disabled={index === 0}
+					onclick={() => {
+						const temp = lesson.blocks[index];
+						lesson.blocks[index] = lesson.blocks[index - 1];
+						lesson.blocks[index - 1] = temp;
+					}}
+				>
+					<ArrowUp
+							class="h-4 w-4  transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:scale-125"
+						/>
+					</Button>
+				{/if}
+
+				{#if index !== lesson.blocks.length - 1}
+					<Button
+						size="icon"
+						class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30"
+						disabled={index === lesson.blocks.length - 1}
+					onclick={() => {
+						const temp = lesson.blocks[index];
+						lesson.blocks[index] = lesson.blocks[index + 1];
+						lesson.blocks[index + 1] = temp;
+					}}
+				>
+					<ArrowDown
+							class="h-4 w-4  transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:scale-125"
+						/>
+					</Button>
+				{/if}
+			</div>
+
+			<Separator
+				class="absolute left-1/2 h-full w-[2px] -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/20 to-transparent text-primary-foreground transition-all duration-300 ease-in-out group-hover:w-1 group-hover:via-primary/50"
 			/>
 		</div>
 	</div>
