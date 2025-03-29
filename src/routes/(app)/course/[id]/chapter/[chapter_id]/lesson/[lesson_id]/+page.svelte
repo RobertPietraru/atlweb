@@ -51,12 +51,12 @@
 			<span>Înapoi la capitol</span>
 		</Button>
 	</div>
-	<div class="prose prose-slate mb-4 max-w-none">{@html marked(lesson.description)}</div>
+	<div class="markdown-content prose prose-slate mb-4 max-w-none">{@html marked(lesson.description)}</div>
 
 	<div class="space-y-8">
 		{#each lesson.blocks as block, index}
 			<div
-				class="rounded-lg border-2 bg-white p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+				class="rounded-lg border-2 bg-muted/50 p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
 			>
 				{#if block.type === 'text'}
 					{@render textBlock(block)}
@@ -73,7 +73,7 @@
 </main>
 
 {#snippet textBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'text' }>)}
-	<div class="prose prose-slate max-w-none">
+	<div class="markdown-content prose prose-slate max-w-none">
 		{@html marked(block.text)}
 	</div>
 {/snippet}
@@ -110,7 +110,7 @@
 		</div>
 	{/if}
 
-	<div class="prose prose-slate max-w-none">
+	<div class="markdown-content prose prose-slate max-w-none">
 		{@html marked(block.content)}
 	</div>
 {/snippet}
@@ -127,7 +127,10 @@
 				variant="outline"
 				class="transition-all hover:bg-primary hover:text-primary-foreground"
 				onclick={async () => {
-					if (JSON.stringify($state.snapshot(lesson)) !== JSON.stringify($state.snapshot(lastRanLessonState))) {
+					if (
+						JSON.stringify($state.snapshot(lesson)) !==
+						JSON.stringify($state.snapshot(lastRanLessonState))
+					) {
 						lastRanLessonState = structuredClone($state.snapshot(lesson));
 					} else {
 						lastRanLessonState = null;
@@ -141,7 +144,7 @@
 			</Button>
 		</div>
 
-		<div class="rounded-md ">
+		<div class="rounded-md">
 			<Tabs.Content value="html">
 				<Textarea bind:value={block.html} class="min-h-[200px] font-mono" />
 			</Tabs.Content>
@@ -160,7 +163,10 @@
 						title="Code Preview"
 						class="h-full w-full"
 						srcdoc={getCodePreview(
-							lastRanLessonState!.blocks[index] as Extract<(typeof lesson.blocks)[0], { type: 'code' }>
+							lastRanLessonState!.blocks[index] as Extract<
+								(typeof lesson.blocks)[0],
+								{ type: 'code' }
+							>
 						)}
 						sandbox="allow-scripts"
 					></iframe>
@@ -177,17 +183,25 @@
 	:global(.markdown-content h2) {
 		@apply text-xl font-bold;
 	}
+
 	:global(.markdown-content h3) {
 		@apply text-lg font-bold;
 	}
+
 	:global(.markdown-content p) {
 		@apply mb-4;
 	}
+
 	:global(.markdown-content ul) {
 		@apply mb-4 list-inside list-disc;
 	}
+
 	:global(.markdown-content li) {
 		@apply mb-2;
+	}
+
+	:global(.markdown-content hr) {
+		@apply my-4;
 	}
 	:global(.tab-trigger) {
 		@apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
