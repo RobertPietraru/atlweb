@@ -3,7 +3,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { PlayIcon, ArrowLeftIcon, BookOpenIcon, ArrowRightIcon } from 'lucide-svelte';
+	import { PlayIcon, ArrowLeftIcon, BookOpenIcon, ArrowRightIcon, MenuIcon } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 
@@ -14,6 +14,7 @@
 	});
 	let lesson = $state(data.lesson);
 	let lastRanLessonState: typeof lesson | null = $state(null);
+	let showSidebar = $state(false);
 
 	let activeTab = $state<'html' | 'css' | 'js'>('html');
 
@@ -25,9 +26,12 @@
 		let html_content = '';
 		html_content += `<ht` + `ml>`;
 		html_content += `<he` + `ad>`;
+		html_content += `<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
 		html_content +=
 			`<sty` +
 			`le>
+			* { box-sizing: border-box; }
+			body { margin: 0; padding: 16px; max-width: 100vw; overflow-x: hidden; }
 			${css}
 		</sty` +
 			`le>`;
@@ -41,42 +45,19 @@
 	}
 </script>
 
-<div class="flex min-h-screen w-full">
-	<main class="flex-1 p-8">
-		<div class="mb-2 flex gap-4">
-			<div class="flex items-center gap-3">
-				<div class="rounded-full bg-primary/10 p-2">
-					<BookOpenIcon class="h-5 w-5 text-primary" />
-				</div>
-				<h1 class="text-3xl font-bold tracking-tight">{lesson.name || 'Lectie'}</h1>
-			</div>
-			<div class="flex-1"></div>
-		</div>
-		<div class="markdown-content prose prose-slate mb-4 max-w-none">
-			{@html marked(lesson.description)}
-		</div>
+<div class="flex min-h-screen w-full flex-col lg:flex-row-reverse">
 
-		<div class="space-y-8">
-			{#each lesson.blocks as block, index}
-				<div
-					class="rounded-lg border-2 bg-muted/50 p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
-				>
-					{#if block.type === 'text'}
-						{@render textBlock(block)}
-					{/if}
-					{#if block.type === 'resources'}
-						{@render resourcesBlock(block)}
-					{/if}
-					{#if block.type === 'code'}
-						{@render codeBlock(block, index)}
-					{/if}
-				</div>
-			{/each}
-		</div>
-	</main>
+	<div class="w-full flex items-center justify-between border-b bg-card p-4 lg:hidden ">
+		<h1 class="text-xl font-bold flex-1">{lesson.name || 'Lectie'}</h1>
+		<Button variant="ghost" size="icon" onclick={() => showSidebar = !showSidebar}>
+			<MenuIcon class="h-5 w-5" />
+		</Button>
+	</div>
 
-	<aside class="w-96 border-l bg-card p-6">
-		<div class="flex flex-col gap-6">
+
+	<aside class="w-full border-b bg-card lg:w-96 lg:border-l lg:border-b-0" class:hidden={!showSidebar} class:lg:block={true}>
+
+		<div class="flex flex-col gap-6 p-6">
 			<Button href="../" variant="outline" class="w-full">
 				<ArrowLeftIcon class="mr-2 h-4 w-4" />
 				Înapoi la capitol
@@ -91,6 +72,7 @@
 						<a 
 							href="./{lesson.id}"
 							class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
+							onclick={() => showSidebar = false}
 						>
 							<span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20">
 								{i + 1}
@@ -113,6 +95,39 @@
 			</div>
 		</div>
 	</aside>
+
+	<main class="flex-1 p-4 md:p-8 w-full">
+		<div class="mb-2 flex gap-4">
+			<div class="flex items-center gap-3">
+				<div class="rounded-full bg-primary/10 p-2">
+					<BookOpenIcon class="h-5 w-5 text-primary" />
+				</div>
+				<h1 class="text-3xl font-bold tracking-tight hidden lg:block">{lesson.name || 'Lectie'}</h1>
+			</div>
+			<div class="flex-1"></div>
+		</div>
+		<div class="markdown-content mb-4">
+			{@html marked(lesson.description)}
+		</div>
+
+		<div class="space-y-8">
+			{#each lesson.blocks as block, index}
+				<div
+					class="rounded-lg border-2 bg-muted/50 p-4 md:p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+				>
+					{#if block.type === 'text'}
+						{@render textBlock(block)}
+					{/if}
+					{#if block.type === 'resources'}
+						{@render resourcesBlock(block)}
+					{/if}
+					{#if block.type === 'code'}
+						{@render codeBlock(block, index)}
+					{/if}
+				</div>
+			{/each}
+		</div>
+	</main>
 </div>
 
 {#snippet textBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'text' }>)}
@@ -160,7 +175,7 @@
 
 {#snippet codeBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>, index: number)}
 	<Tabs.Root bind:value={activeTab} class="space-y-4">
-		<div class="flex items-center justify-between">
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 			<Tabs.List class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1">
 				<Tabs.Trigger value="html" class="tab-trigger">HTML</Tabs.Trigger>
 				<Tabs.Trigger value="css" class="tab-trigger">CSS</Tabs.Trigger>
@@ -168,7 +183,7 @@
 			</Tabs.List>
 			<Button
 				variant="outline"
-				class="transition-all hover:bg-primary hover:text-primary-foreground"
+				class="transition-all hover:bg-primary hover:text-primary-foreground w-full sm:w-auto"
 				onclick={async () => {
 					if (
 						JSON.stringify($state.snapshot(lesson)) !==
@@ -250,7 +265,11 @@
 	:global(.markdown-content a) {
 		@apply text-blue-500;
 	}
+	:global(.markdown-content iframe) {
+		@apply w-full md:max-w-2xl;
+	}
 	:global(.tab-trigger) {
 		@apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
 	}
+
 </style>
