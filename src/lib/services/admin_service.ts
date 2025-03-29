@@ -304,6 +304,12 @@ export class AdminService {
     }
 
     async deleteChapter(id: string) {
+        const lessons = await this.db.select({
+            id: table.lesson.id
+        }).from(table.lesson).where(eq(table.lesson.chapterId, id));
+        for (const lesson of lessons) {
+            await this.deleteLesson(lesson.id);
+        }
         await this.db.delete(table.chapter).where(eq(table.chapter.id, id));
     }
 
@@ -317,7 +323,12 @@ export class AdminService {
         });
     }
     async deleteLesson(id: table.Id) {
-        await this.db.delete(table.lesson).where(eq(table.lesson.id, id));
+        await this.db.transaction(async (tx) => {
+            await tx.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, id));
+            await tx.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, id));
+            await tx.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, id));
+            await tx.delete(table.lesson).where(eq(table.lesson.id, id));
+        });
     }
     async getPreviousAndNextLesson(lesson_id: table.Id) {
         const lesson = await this.db.select({
