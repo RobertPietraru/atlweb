@@ -312,15 +312,18 @@ export class AdminService {
                 type: 'text'
             }));
 
-        /// get all videos
-        const videos = (await this.db.select(
+        /// get all resources
+        const resources = (await this.db.select(
             {
-                id: table.lessonVideoBlock.id,
-                urls: table.lessonVideoBlock.urls,
-                order: table.lessonVideoBlock.order,
-            }).from(table.lessonVideoBlock).where(eq(table.lessonVideoBlock.lessonId, lesson_id))).map(block => ({
+                id: table.lessonResourcesBlock.id,
+                title: table.lessonResourcesBlock.title,
+                content: table.lessonResourcesBlock.content,
+                urls: table.lessonResourcesBlock.urls,
+                urlLabels: table.lessonResourcesBlock.urlLabels,
+                order: table.lessonResourcesBlock.order,
+            }).from(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, lesson_id))).map(block => ({
                 ...block,
-                type: 'video'
+                type: 'resources'
             }));
 
         /// get all code blocks
@@ -347,7 +350,7 @@ export class AdminService {
                 type: 'code_result'
             }));
 
-        const blocks = [...textBlocks, ...videos, ...codeBlocks, ...codeResultBlocks] as table.LessonBlock[];
+        const blocks = [...textBlocks, ...resources, ...codeBlocks, ...codeResultBlocks] as table.LessonBlock[];
         blocks.sort((a, b) => a.order - b.order);
         return {
             ...lesson[0],
@@ -367,11 +370,11 @@ export class AdminService {
                 id: table.lessonTextBlock.id,
             }).from(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, lesson_id)));
 
-        /// get all videos
-        const videos = (await this.db.select(
+        /// get all resources
+        const resources = (await this.db.select(
             {
-                id: table.lessonVideoBlock.id,
-            }).from(table.lessonVideoBlock).where(eq(table.lessonVideoBlock.lessonId, lesson_id)));
+                id: table.lessonResourcesBlock.id,
+            }).from(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, lesson_id)));
 
 
         /// get all code blocks
@@ -387,7 +390,7 @@ export class AdminService {
                 id: table.lessonCodeResultBlock.id,
             }).from(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.lessonId, lesson_id)));
 
-        return [...textBlocks, ...videos, ...codeBlocks, ...codeResultBlocks].map(block => block.id);
+        return [...textBlocks, ...resources, ...codeBlocks, ...codeResultBlocks].map(block => block.id);
     }
 
     async updateBlock(blockId: table.Id, block: table.LessonBlock) {
@@ -396,11 +399,14 @@ export class AdminService {
                 text: block.text,
                 order: block.order,
             }).where(eq(table.lessonTextBlock.id, blockId));
-        } else if (block.type === 'video') {
-            await this.db.update(table.lessonVideoBlock).set({
+        } else if (block.type === 'resources') {
+            await this.db.update(table.lessonResourcesBlock).set({
+                title: block.title,
+                content: block.content,
                 urls: block.urls,
+                urlLabels: block.urlLabels,
                 order: block.order,
-            }).where(eq(table.lessonVideoBlock.id, blockId));
+            }).where(eq(table.lessonResourcesBlock.id, blockId));
         } else if (block.type === 'code') {
             await this.db.update(table.lessonCodeBlock).set({
                 html: block.html,
@@ -418,7 +424,7 @@ export class AdminService {
 
     async deleteBlock(blockId: table.Id) {
         await this.db.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.id, blockId));
-        await this.db.delete(table.lessonVideoBlock).where(eq(table.lessonVideoBlock.id, blockId));
+        await this.db.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.id, blockId));
         await this.db.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.id, blockId));
         await this.db.delete(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.id, blockId));
     }
@@ -430,10 +436,13 @@ export class AdminService {
                 text: block.text,
                 order: block.order,
             });
-        } else if (block.type === 'video') {
-            await this.db.insert(table.lessonVideoBlock).values({
+        } else if (block.type === 'resources') {
+            await this.db.insert(table.lessonResourcesBlock).values({
                 lessonId: lesson_id,
+                title: block.title,
+                content: block.content,
                 urls: block.urls,
+                urlLabels: block.urlLabels,
                 order: block.order,
             });
         } else if (block.type === 'code') {

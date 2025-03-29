@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, uuid, integer, primaryKey } from 'drizzle-orm/pg-core';
 
-export const blockType = ['text', 'video', 'code', 'code_result'] as const;
+export const blockType = ['text', 'resources', 'code', 'code_result'] as const;
 export type BlockType = typeof blockType[number];
 
 export const permissionsList = [
@@ -69,12 +69,15 @@ export const lessonTextBlock = pgTable('lesson_text_block', {
 	order: integer('order').notNull(),
 });
 
-export const lessonVideoBlock = pgTable('lesson_video_block', {
+export const lessonResourcesBlock = pgTable('lesson_resources_block', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	lessonId: uuid('lesson_id')
 		.notNull()
 		.references(() => lesson.id),
+	title: text('title').notNull(),
+	content: text('content').notNull(),
 	urls: text('urls').array().notNull(),
+	urlLabels: text('url_labels').array().notNull(),
 	order: integer('order').notNull(),
 });
 
@@ -160,7 +163,7 @@ export type Exercise = typeof exercise.$inferSelect;
 export type Submission = typeof submission.$inferSelect;
 export type Id = string;
 
-export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonVideoBlock.$inferSelect, 'lessonId'> & { type: 'video' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' } | Omit<typeof lessonCodeResultBlock.$inferSelect, 'lessonId'> & { type: 'code_result' };
+export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' } | Omit<typeof lessonCodeResultBlock.$inferSelect, 'lessonId'> & { type: 'code_result' };
 
 export type Permissions = typeof permissionsList[number];
 

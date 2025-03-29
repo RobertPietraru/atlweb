@@ -61,7 +61,8 @@ export const actions = {
             error(404, 'Lesson not found');
         }
 
+        const modifiedLesson = await adminService.getLessonWithBlocks(params.lesson_id);
 
-        return { success: true };
+        return { success: true, lesson: modifiedLesson };
     }
 };

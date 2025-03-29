@@ -8,7 +8,7 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { CodeIcon, PlusIcon, TextIcon, VideoIcon } from 'lucide-svelte';
+	import { BookOpenIcon, CodeIcon, PlusIcon, TextIcon, VideoIcon } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { View } from 'svelte-lucide';
 
@@ -19,7 +19,6 @@
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
 	);
 	let visiblePopupIndex = $state<number | null>(null);
-	$inspect(visiblePopupIndex);
 
 	let saving = $state(false);
 
@@ -39,6 +38,8 @@
 				toast.success('Lecția a fost salvată cu succes', {
 					position: 'bottom-left'
 				});
+				console.log(result.data);
+				lesson = result.data?.lesson as typeof lesson;
 				oldLesson = structuredClone($state.snapshot(lesson));
 			} else {
 				toast.error('A apărut o eroare la salvarea lecției', {
@@ -55,7 +56,7 @@
 		}
 	}
 
-	function insertBlock(type: 'text' | 'video' | 'code' | 'code_result', index: number) {
+	function insertBlock(type: 'text' | 'resources' | 'code' | 'code_result', index: number) {
 		/// remove all visible popups
 		visiblePopupIndex = null;
 		let block: (typeof lesson.blocks)[0];
@@ -68,12 +69,15 @@
 				type: 'text'
 			};
 			lesson.blocks.splice(index, 0, block);
-		} else if (type === 'video') {
+		} else if (type === 'resources') {
 			block = {
 				id: '',
+				title: '',
+				content: '',
 				urls: [],
+				urlLabels: [],
 				order: index,
-				type: 'video'
+				type: 'resources'
 			};
 			lesson.blocks.splice(index, 0, block);
 		} else if (type === 'code') {
@@ -95,6 +99,12 @@
 			};
 			lesson.blocks.splice(index, 0, block);
 		}
+
+		// Update order of all blocks after insertion
+		lesson.blocks = lesson.blocks.map((b, i) => ({
+			...b,
+			order: i
+		}));
 	}
 </script>
 
@@ -179,12 +189,15 @@
 			</div>
 		</Card>
 	</div>
-	{@render addBlock(-1)}
+	{@render addBlock(0)}
 	{#each lesson.blocks as block, index}
 		{#if block.type === 'text'}
 			{@render textBlock(block)}
 		{/if}
-		{@render addBlock(index)}
+		{#if block.type === 'resources'}
+			{@render resourcesBlock(block)}
+		{/if}
+		{@render addBlock(index + 1)}
 	{/each}
 </main>
 {#snippet addBlock(index: number)}
@@ -192,8 +205,9 @@
 		<div class="group flex justify-center">
 			<Button
 				size="icon"
-				class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:bg-primary group-hover:shadow-lg group-hover:shadow-primary/30 {visiblePopupIndex === index
-					? 'h-12 w-12 translate-y-1 opacity-100 bg-primary shadow-lg shadow-primary/30' 
+				class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:bg-primary group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30 {visiblePopupIndex ===
+				index
+					? 'h-12 w-12 translate-y-1 bg-primary opacity-100 shadow-lg shadow-primary/30'
 					: ''}"
 				onclick={() => {
 					if (visiblePopupIndex === index) {
@@ -204,7 +218,8 @@
 				}}
 			>
 				<PlusIcon
-					class="h-4 w-4 transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:rotate-90 group-hover:scale-125 {visiblePopupIndex === index
+					class="h-4 w-4 transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:rotate-90 group-hover:scale-125 {visiblePopupIndex ===
+					index
 						? 'h-5 w-5 rotate-90 scale-125'
 						: ''}"
 				/>
@@ -227,9 +242,9 @@
 						variant="ghost"
 						size="icon"
 						class="rounded-full hover:bg-primary/20"
-						onclick={() => insertBlock('video', index)}
+						onclick={() => insertBlock('resources', index)}
 					>
-						<VideoIcon class="h-5 w-5" />
+						<BookOpenIcon class="h-5 w-5" />
 					</Button>
 					<Button
 						variant="ghost"
@@ -270,6 +285,95 @@
 			</div>
 			<div class="markdown-content h-full min-h-[200px] overflow-y-auto p-4">
 				{@html marked(block.text)}
+			</div>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet resourcesBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'resources' }>)}
+	<div class="flex flex-col gap-4">
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex h-full flex-col gap-4">
+				<Input 
+					placeholder="Enter title..."
+					bind:value={block.title}
+				/>
+
+				<div class="flex flex-col gap-2">
+					{#each block.urls as _, i}
+						<div class="flex gap-2">
+							<Input
+								placeholder="URL..."
+								bind:value={block.urls[i]}
+							/>
+							<Input 
+								placeholder="Label..."
+								bind:value={block.urlLabels[i]}
+							/>
+							<Button 
+								variant="ghost" 
+								size="icon"
+								class="shrink-0"
+								onclick={() => {
+									block.urls.splice(i, 1);
+									block.urlLabels.splice(i, 1);
+									block.urls = block.urls;
+									block.urlLabels = block.urlLabels;
+								}}
+							>
+								×
+							</Button>
+						</div>
+					{/each}
+					<Button
+						variant="outline"
+						onclick={() => {
+							block.urls = [...block.urls, ''];
+							block.urlLabels = [...block.urlLabels, ''];
+						}}
+					>
+						Add URL
+					</Button>
+				</div>
+
+				<Textarea
+					class="min-h-[200px] flex-1"
+					placeholder="Write your content here..."
+					bind:value={block.content}
+				/>
+			</div>
+
+			<div class="flex h-full flex-col gap-4 p-4">
+				{#if block.title}
+					<h3 class="text-xl font-bold">{block.title}</h3>
+					<Separator />
+				{/if}
+				
+				{#if block.urls.length > 0}
+					<div class="grid grid-cols-2 gap-4">
+						{#each block.urls as url, i}
+							<a 
+								href={url}
+								class="group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm transition-all duration-300 ease-in-out hover:border-primary/20 hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-md shadow-gray-200"
+								target="_blank"
+								rel="noopener noreferrer"
+								class:pointer-events-none={!url}
+								class:opacity-50={!url}
+							>
+								<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg text-primary transition-colors group-hover:scale-105 group-hover:bg-primary/20">
+									📚
+								</div>
+								<span class="line-clamp-1 flex-1 font-medium text-gray-700 transition-colors group-hover:text-gray-900">
+									{block.urlLabels[i] || url}
+								</span>
+							</a>
+						{/each}
+					</div>
+				{/if}
+
+				<div class="markdown-content flex-1">
+					{@html marked(block.content)}
+				</div>
 			</div>
 		</div>
 	</div>
