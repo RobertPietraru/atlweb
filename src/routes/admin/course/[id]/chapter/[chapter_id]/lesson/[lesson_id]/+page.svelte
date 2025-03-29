@@ -6,10 +6,10 @@
 	import { Card } from '$lib/components/ui/card';
 	import { toast } from 'svelte-sonner';
 	import { deserialize } from '$app/forms';
-	import { superForm } from 'sveltekit-superforms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { PlusIcon } from 'lucide-svelte';
+	import { CodeIcon, FileTextIcon, ImageIcon, InstagramIcon, PlusIcon, TextIcon, VideoIcon } from 'lucide-svelte';
+	import { fade, slide } from 'svelte/transition';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -17,8 +17,28 @@
 	let isSaved = $derived(
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
 	);
+	let addPopupVisible = $state(false);
 
 	let saving = $state(false);
+
+	function handleClickOutside(event: MouseEvent) {
+		const adder = document.getElementById('adder');
+		if (adder && !adder.contains(event.target as Node)) {
+			addPopupVisible = false;
+		}
+	}
+
+	$effect(() => {
+		if (addPopupVisible) {
+			document.addEventListener('click', handleClickOutside);
+		} else {
+			document.removeEventListener('click', handleClickOutside);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 
 	async function saveLesson() {
 		saving = true;
@@ -136,17 +156,40 @@
 	</div>
 
 	<div class="relative -my-3" id="adder">
-		<div class="flex justify-center group">
-			<Button 
-				size="icon" 
-				class="z-10 h-10 rounded-full hover:bg-primary transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-1"
+		<div class="group flex justify-center">
+			<Button
+				size="icon"
+				class="z-10 h-12 w-12 rounded-full transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:shadow-lg hover:shadow-primary/30"
+				onclick={() => (addPopupVisible = !addPopupVisible)}
 			>
-				<PlusIcon 
-					class="h-4 w-4 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125" 
+				<PlusIcon
+					class="h-5 w-5 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125"
 				/>
 			</Button>
-			<Separator 
-				class="h-[2px] absolute top-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent text-primary-foreground group-hover:via-primary/50 group-hover:h-1 transition-all duration-300 ease-in-out"
+
+			{#if addPopupVisible}
+				<div
+					class="absolute bottom-full mb-2 flex items-center gap-2 rounded-lg bg-background p-2 shadow-lg z-50"
+					transition:slide={{ duration: 200 }}
+				>
+					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+						<TextIcon class="h-5 w-5" />
+					</Button>
+					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+						<VideoIcon class="h-5 w-5" />
+					</Button>
+					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+						<CodeIcon class="h-5 w-5" />
+					</Button>
+
+					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+						<InstagramIcon class="h-5 w-5" />
+					</Button>
+				</div>
+			{/if}
+
+			<Separator
+				class="absolute top-1/2 h-[2px] -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent text-primary-foreground transition-all duration-300 ease-in-out group-hover:h-1 group-hover:via-primary/50"
 			/>
 		</div>
 	</div>
