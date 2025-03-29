@@ -200,21 +200,10 @@
 			<div class="space-y-6">
 				<div>
 					<h2 class="text-2xl font-bold">{lesson.name || 'Titlul lecției'}</h2>
+					<h3 class="markdown-content mt-2">{lesson.teaser}</h3>
 				</div>
 
-				{#if lesson.teaser}
-					<div class="prose max-w-none">
-						<h3 class="text-lg font-semibold">Teaser</h3>
-						<div class="markdown-content mt-2">{@html marked(lesson.teaser)}</div>
-					</div>
-				{/if}
-
-				{#if lesson.description}
-					<div class="prose max-w-none">
-						<h3 class="text-lg font-semibold">Descriere</h3>
-						<div class="markdown-content mt-2">{@html marked(lesson.description)}</div>
-					</div>
-				{/if}
+				<div class="markdown-content mt-2">{@html marked(lesson.description)}</div>
 			</div>
 		</Card>
 	</div>
@@ -458,10 +447,7 @@
 
 				{#if block.showOutput}
 					<div class="flex h-full flex-col gap-4 p-4">
-						<iframe
-							title="Code Preview"
-							class="h-full w-full"
-							srcdoc={getCodePreview(block)}
+						<iframe title="Code Preview" class="h-full w-full" srcdoc={getCodePreview(block)}
 						></iframe>
 					</div>
 				{/if}
