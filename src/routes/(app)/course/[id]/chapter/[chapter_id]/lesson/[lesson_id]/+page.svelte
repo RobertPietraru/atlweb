@@ -3,11 +3,15 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { PlayIcon, ArrowLeftIcon, BookOpenIcon } from 'lucide-svelte';
+	import { PlayIcon, ArrowLeftIcon, BookOpenIcon, ArrowRightIcon } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
+	$effect(() => {
+		lesson = data.lesson;
+		lastRanLessonState = null;
+	});
 	let lesson = $state(data.lesson);
 	let lastRanLessonState: typeof lesson | null = $state(null);
 
@@ -37,40 +41,79 @@
 	}
 </script>
 
-<main class="min-h-screen w-full p-8">
-	<div class="mb-2 flex items-center justify-between">
-		<div class="flex items-center gap-3">
-			<div class="rounded-full bg-primary/10 p-2">
-				<BookOpenIcon class="h-5 w-5 text-primary" />
+<div class="flex min-h-screen w-full">
+	<main class="flex-1 p-8">
+		<div class="mb-2 flex gap-4">
+			<div class="flex items-center gap-3">
+				<div class="rounded-full bg-primary/10 p-2">
+					<BookOpenIcon class="h-5 w-5 text-primary" />
+				</div>
+				<h1 class="text-3xl font-bold tracking-tight">{lesson.name || 'Lectie'}</h1>
 			</div>
-			<h1 class="text-3xl font-bold tracking-tight">{lesson.name || 'Lectie'}</h1>
+			<div class="flex-1"></div>
+		</div>
+		<div class="markdown-content prose prose-slate mb-4 max-w-none">
+			{@html marked(lesson.description)}
 		</div>
 
-		<Button href="../" class="group transition-all hover:bg-primary/10">
-			<ArrowLeftIcon class="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-			<span>Înapoi la capitol</span>
-		</Button>
-	</div>
-	<div class="markdown-content prose prose-slate mb-4 max-w-none">{@html marked(lesson.description)}</div>
+		<div class="space-y-8">
+			{#each lesson.blocks as block, index}
+				<div
+					class="rounded-lg border-2 bg-muted/50 p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+				>
+					{#if block.type === 'text'}
+						{@render textBlock(block)}
+					{/if}
+					{#if block.type === 'resources'}
+						{@render resourcesBlock(block)}
+					{/if}
+					{#if block.type === 'code'}
+						{@render codeBlock(block, index)}
+					{/if}
+				</div>
+			{/each}
+		</div>
+	</main>
 
-	<div class="space-y-8">
-		{#each lesson.blocks as block, index}
-			<div
-				class="rounded-lg border-2 bg-muted/50 p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
-			>
-				{#if block.type === 'text'}
-					{@render textBlock(block)}
-				{/if}
-				{#if block.type === 'resources'}
-					{@render resourcesBlock(block)}
-				{/if}
-				{#if block.type === 'code'}
-					{@render codeBlock(block, index)}
-				{/if}
+	<aside class="w-96 border-l bg-card p-6">
+		<div class="flex flex-col gap-6">
+			<Button href="../" variant="outline" class="w-full">
+				<ArrowLeftIcon class="mr-2 h-4 w-4" />
+				Înapoi la capitol
+			</Button>
+
+			<div class="rounded-xl border bg-muted/50 p-6 shadow-sm">
+				<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
+				<p class="mb-6 text-sm text-muted-foreground">Parcurge toate lecțiile pentru a finaliza acest capitol</p>
+				
+				<div class="space-y-3">
+					{#each data.lessonNamesInChapter as lesson, i}
+						<a 
+							href="./{lesson.id}"
+							class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
+						>
+							<span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20">
+								{i + 1}
+							</span>
+							<span class="flex-1 font-medium">{lesson.name}</span>
+							{#if lesson.id === data.lesson.id}
+								<div class="h-2 w-2 rounded-full bg-primary"></div>
+							{/if}
+						</a>
+					{/each}
+				</div>
 			</div>
-		{/each}
-	</div>
-</main>
+
+			<div class="rounded-xl border bg-muted/50 p-6 shadow-sm">
+				<h3 class="mb-2 text-xl font-semibold">Progres</h3>
+				<p class="text-sm text-muted-foreground">Ai completat {data.lessonNamesInChapter.findIndex(l => l.id === data.lesson.id) + 1} din {data.lessonNamesInChapter.length} lecții</p>
+				<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+					<div class="h-full bg-primary" style="width: {((data.lessonNamesInChapter.findIndex(l => l.id === data.lesson.id) + 1) / data.lessonNamesInChapter.length) * 100}%"></div>
+				</div>
+			</div>
+		</div>
+	</aside>
+</div>
 
 {#snippet textBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'text' }>)}
 	<div class="markdown-content prose prose-slate max-w-none">

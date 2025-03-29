@@ -1,5 +1,5 @@
 import { hash, verify } from '@node-rs/argon2';
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, and } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -319,7 +319,40 @@ export class AdminService {
     async deleteLesson(id: table.Id) {
         await this.db.delete(table.lesson).where(eq(table.lesson.id, id));
     }
-
+    async getPreviousAndNextLesson(lesson_id: table.Id) {
+        const lesson = await this.db.select({
+            id: table.lesson.id,
+            order: table.lesson.order,
+            chapterId: table.lesson.chapterId
+        }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+        if (lesson.length === 0) {
+            return null;
+        }
+        const lessonCount = await this.db.select({
+            lessonCount: sql<number>`count(${table.lesson.id})`
+        }).from(table.lesson).where(eq(table.lesson.chapterId, lesson[0].chapterId));
+        if (lessonCount.length === 0) {
+            return null;
+        }
+        let previousLesson = null;
+        let nextLesson = null;
+        if (lesson[0].order > 0) {
+            previousLesson = await this.db.select({
+                id: table.lesson.id,
+                name: table.lesson.name,
+            }).from(table.lesson).where(and(eq(table.lesson.chapterId, lesson[0].chapterId), eq(table.lesson.order, lesson[0].order - 1))).limit(1);
+        }
+        if (lesson[0].order < lessonCount[0].lessonCount - 1) {
+            nextLesson = await this.db.select({
+                id: table.lesson.id,
+                name: table.lesson.name,
+            }).from(table.lesson).where(and(eq(table.lesson.chapterId, lesson[0].chapterId), eq(table.lesson.order, lesson[0].order + 1))).limit(1);
+        }
+        return {
+            previous: previousLesson ? previousLesson[0] : null,
+            next: nextLesson ? nextLesson[0] : null
+        };
+    }
     async getLessonWithBlocks(lesson_id: table.Id) {
         const lesson = await this.db.select({
             id: table.lesson.id,
@@ -374,6 +407,13 @@ export class AdminService {
             ...lesson[0],
             blocks
         };
+    }
+
+    async getLessonNamesInChapter(chapter_id: table.Id) {
+        return await this.db.select({
+            name: table.lesson.name,
+            id: table.lesson.id,
+        }).from(table.lesson).where(eq(table.lesson.chapterId, chapter_id)).orderBy(table.lesson.order);
     }
     async updateLesson(lesson_id: table.Id, params: { name: string, teaser: string, description: string }) {
         await this.db.update(table.lesson).set({
