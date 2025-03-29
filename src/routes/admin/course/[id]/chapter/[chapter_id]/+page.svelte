@@ -1,11 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
-	import * as Dialog from '$lib/components/ui/dialog';
+	import { Card, CardContent } from '$lib/components/ui/card';
 	import { toast } from 'svelte-sonner';
 	import { deserialize } from '$app/forms';
 

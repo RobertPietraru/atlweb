@@ -40,7 +40,7 @@
 </script>
 
 <Sidebar.Provider>
-	<Sidebar.Root bind:ref={sidebarRef} class="p-1">
+	<Sidebar.Root bind:ref={sidebarRef}>
 		<Sidebar.Header>
 			<a class="text-3xl font-bold transition-colors hover:text-muted" href="/"> ATLWEB </a>
 		</Sidebar.Header>
