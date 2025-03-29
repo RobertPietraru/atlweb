@@ -339,18 +339,7 @@ export class AdminService {
                 type: 'code'
             }));
 
-        /// get all code result blocks
-        const codeResultBlocks = (await this.db.select(
-            {
-                id: table.lessonCodeResultBlock.id,
-                order: table.lessonCodeResultBlock.order,
-                codeblockId: table.lessonCodeResultBlock.codeblockId,
-            }).from(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.lessonId, lesson_id))).map(block => ({
-                ...block,
-                type: 'code_result'
-            }));
-
-        const blocks = [...textBlocks, ...resources, ...codeBlocks, ...codeResultBlocks] as table.LessonBlock[];
+        const blocks = [...textBlocks, ...resources, ...codeBlocks] as table.LessonBlock[];
         blocks.sort((a, b) => a.order - b.order);
         return {
             ...lesson[0],
@@ -384,13 +373,7 @@ export class AdminService {
             }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id)));
 
 
-        /// get all code result blocks
-        const codeResultBlocks = (await this.db.select(
-            {
-                id: table.lessonCodeResultBlock.id,
-            }).from(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.lessonId, lesson_id)));
-
-        return [...textBlocks, ...resources, ...codeBlocks, ...codeResultBlocks].map(block => block.id);
+        return [...textBlocks, ...resources, ...codeBlocks].map(block => block.id);
     }
 
     async updateBlock(blockId: table.Id, block: table.LessonBlock) {
@@ -414,11 +397,6 @@ export class AdminService {
                 javascript: block.javascript,
                 order: block.order,
             }).where(eq(table.lessonCodeBlock.id, blockId));
-        } else if (block.type === 'code_result') {
-            await this.db.update(table.lessonCodeResultBlock).set({
-                codeblockId: block.codeblockId,
-                order: block.order,
-            }).where(eq(table.lessonCodeResultBlock.id, blockId));
         }
     }
 
@@ -426,7 +404,6 @@ export class AdminService {
         await this.db.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.id, blockId));
         await this.db.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.id, blockId));
         await this.db.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.id, blockId));
-        await this.db.delete(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.id, blockId));
     }
 
     async createBlock(lesson_id: table.Id, block: table.LessonBlock) {
@@ -451,12 +428,6 @@ export class AdminService {
                 html: block.html,
                 css: block.css,
                 javascript: block.javascript,
-                order: block.order,
-            });
-        } else if (block.type === 'code_result') {
-            await this.db.insert(table.lessonCodeResultBlock).values({
-                lessonId: lesson_id,
-                codeblockId: block.codeblockId,
                 order: block.order,
             });
         }

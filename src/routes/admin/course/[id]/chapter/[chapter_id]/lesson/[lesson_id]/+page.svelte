@@ -56,7 +56,7 @@
 		}
 	}
 
-	function insertBlock(type: 'text' | 'resources' | 'code' | 'code_result', index: number) {
+	function insertBlock(type: 'text' | 'resources' | 'code', index: number) {
 		/// remove all visible popups
 		visiblePopupIndex = null;
 		let block: (typeof lesson.blocks)[0];
@@ -87,15 +87,8 @@
 				css: '',
 				javascript: '',
 				order: index,
-				type: 'code'
-			};
-			lesson.blocks.splice(index, 0, block);
-		} else if (type === 'code_result') {
-			block = {
-				id: '',
-				order: index,
-				codeblockId: '',
-				type: 'code_result'
+				type: 'code',
+				showOutput: false
 			};
 			lesson.blocks.splice(index, 0, block);
 		}
@@ -254,15 +247,6 @@
 					>
 						<CodeIcon class="h-5 w-5" />
 					</Button>
-
-					<Button
-						variant="ghost"
-						size="icon"
-						class="rounded-full hover:bg-primary/20"
-						onclick={() => insertBlock('code_result', index)}
-					>
-						<View class="h-5 w-5" />
-					</Button>
 				</div>
 			{/if}
 
@@ -294,24 +278,15 @@
 	<div class="flex flex-col gap-4">
 		<div class="grid grid-cols-2 gap-4">
 			<div class="flex h-full flex-col gap-4">
-				<Input 
-					placeholder="Enter title..."
-					bind:value={block.title}
-				/>
+				<Input placeholder="Enter title..." bind:value={block.title} />
 
 				<div class="flex flex-col gap-2">
 					{#each block.urls as _, i}
 						<div class="flex gap-2">
-							<Input
-								placeholder="URL..."
-								bind:value={block.urls[i]}
-							/>
-							<Input 
-								placeholder="Label..."
-								bind:value={block.urlLabels[i]}
-							/>
-							<Button 
-								variant="ghost" 
+							<Input placeholder="URL..." bind:value={block.urls[i]} />
+							<Input placeholder="Label..." bind:value={block.urlLabels[i]} />
+							<Button
+								variant="ghost"
 								size="icon"
 								class="shrink-0"
 								onclick={() => {
@@ -348,22 +323,26 @@
 					<h3 class="text-xl font-bold">{block.title}</h3>
 					<Separator />
 				{/if}
-				
+
 				{#if block.urls.length > 0}
 					<div class="grid grid-cols-2 gap-4">
 						{#each block.urls as url, i}
-							<a 
+							<a
 								href={url}
-								class="group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm transition-all duration-300 ease-in-out hover:border-primary/20 hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-md shadow-gray-200"
+								class="group flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm shadow-gray-200 transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:border-primary/20 hover:bg-gray-50 hover:shadow-lg active:translate-y-0 active:shadow-md"
 								target="_blank"
 								rel="noopener noreferrer"
 								class:pointer-events-none={!url}
 								class:opacity-50={!url}
 							>
-								<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg text-primary transition-colors group-hover:scale-105 group-hover:bg-primary/20">
+								<div
+									class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-lg text-primary transition-colors group-hover:scale-105 group-hover:bg-primary/20"
+								>
 									📚
 								</div>
-								<span class="line-clamp-1 flex-1 font-medium text-gray-700 transition-colors group-hover:text-gray-900">
+								<span
+									class="line-clamp-1 flex-1 font-medium text-gray-700 transition-colors group-hover:text-gray-900"
+								>
 									{block.urlLabels[i] || url}
 								</span>
 							</a>
