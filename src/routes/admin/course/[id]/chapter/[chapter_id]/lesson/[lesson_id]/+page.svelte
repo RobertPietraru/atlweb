@@ -8,8 +8,9 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { CodeIcon, FileTextIcon, ImageIcon, InstagramIcon, PlusIcon, TextIcon, VideoIcon } from 'lucide-svelte';
+	import { CodeIcon, PlusIcon, TextIcon, VideoIcon } from 'lucide-svelte';
 	import { fade, slide } from 'svelte/transition';
+	import { View } from 'svelte-lucide';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -17,28 +18,9 @@
 	let isSaved = $derived(
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
 	);
-	let addPopupVisible = $state(false);
+	let visiblePopupsIndexes = $state<number[]>([]);
 
 	let saving = $state(false);
-
-	function handleClickOutside(event: MouseEvent) {
-		const adder = document.getElementById('adder');
-		if (adder && !adder.contains(event.target as Node)) {
-			addPopupVisible = false;
-		}
-	}
-
-	$effect(() => {
-		if (addPopupVisible) {
-			document.addEventListener('click', handleClickOutside);
-		} else {
-			document.removeEventListener('click', handleClickOutside);
-		}
-
-		return () => {
-			document.removeEventListener('click', handleClickOutside);
-		};
-	});
 
 	async function saveLesson() {
 		saving = true;
@@ -69,6 +51,47 @@
 			});
 		} finally {
 			saving = false;
+		}
+	}
+
+	function insertBlock(type: 'text' | 'video' | 'code' | 'code_result', index: number) {
+		visiblePopupsIndexes.push(index);
+		let block: (typeof lesson.blocks)[0];
+
+		if (type === 'text') {
+			block = {
+				id: '',
+				text: '',
+				order: index,
+				type: 'text'
+			};
+			lesson.blocks.splice(index, 0, block);
+		} else if (type === 'video') {
+			block = {
+				id: '',
+				urls: [],
+				order: index,
+				type: 'video'
+			};
+			lesson.blocks.splice(index, 0, block);
+		} else if (type === 'code') {
+			block = {
+				id: '',
+				html: '',
+				css: '',
+				javascript: '',
+				order: index,
+				type: 'code'
+			};
+			lesson.blocks.splice(index, 0, block);
+		} else if (type === 'code_result') {
+			block = {
+				id: '',
+				order: index,
+				codeblockId: '',
+				type: 'code_result'
+			};
+			lesson.blocks.splice(index, 0, block);
 		}
 	}
 </script>
@@ -154,36 +177,75 @@
 			</div>
 		</Card>
 	</div>
-
-	<div class="relative -my-3" id="adder">
+	{@render addBlock(0)}
+	{#each lesson.blocks as block, index}
+		{#if block.type === 'text'}
+			{@render textBlock(block)}
+		{/if}
+		{@render addBlock(index)}
+	{/each}
+</main>
+{#snippet addBlock(index: number)}
+	<div class="relative -mb-1 -mt-4" id="adder">
 		<div class="group flex justify-center">
 			<Button
 				size="icon"
-				class="z-10 h-12 w-12 rounded-full transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:shadow-lg hover:shadow-primary/30"
-				onclick={() => (addPopupVisible = !addPopupVisible)}
+				class="z-10 h-12 w-12 rounded-full transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:shadow-lg hover:shadow-primary/30 {visiblePopupsIndexes.includes(
+					index
+				)
+					? 'translate-y-1 bg-primary shadow-lg shadow-primary/30'
+					: ''}"
+				onclick={() =>
+					visiblePopupsIndexes.includes(index)
+						? visiblePopupsIndexes.splice(visiblePopupsIndexes.indexOf(index), 1)
+						: visiblePopupsIndexes.push(index)}
 			>
 				<PlusIcon
-					class="h-5 w-5 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125"
+					class="h-5 w-5 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125 {visiblePopupsIndexes.includes(
+						index
+					)
+						? 'rotate-90 scale-125'
+						: ''}"
 				/>
 			</Button>
 
-			{#if addPopupVisible}
+			{#if visiblePopupsIndexes.includes(index)}
 				<div
-					class="absolute bottom-full mb-2 flex items-center gap-2 rounded-lg bg-background p-2 shadow-lg z-50"
+					class="absolute bottom-full z-50 mb-2 flex items-center gap-2 rounded-lg bg-background p-2 shadow-lg"
 					transition:slide={{ duration: 200 }}
 				>
-					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+					<Button
+						variant="ghost"
+						size="icon"
+						class="rounded-full hover:bg-primary/20"
+						onclick={() => insertBlock('text', index)}
+					>
 						<TextIcon class="h-5 w-5" />
 					</Button>
-					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+					<Button
+						variant="ghost"
+						size="icon"
+						class="rounded-full hover:bg-primary/20"
+						onclick={() => insertBlock('video', index)}
+					>
 						<VideoIcon class="h-5 w-5" />
 					</Button>
-					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
+					<Button
+						variant="ghost"
+						size="icon"
+						class="rounded-full hover:bg-primary/20"
+						onclick={() => insertBlock('code', index)}
+					>
 						<CodeIcon class="h-5 w-5" />
 					</Button>
 
-					<Button variant="ghost" size="icon" class="rounded-full hover:bg-primary/20">
-						<InstagramIcon class="h-5 w-5" />
+					<Button
+						variant="ghost"
+						size="icon"
+						class="rounded-full hover:bg-primary/20"
+						onclick={() => insertBlock('code_result', index)}
+					>
+						<View class="h-5 w-5" />
 					</Button>
 				</div>
 			{/if}
@@ -193,7 +255,24 @@
 			/>
 		</div>
 	</div>
-</main>
+{/snippet}
+
+{#snippet textBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'text' }>)}
+	<div class="flex flex-col gap-2">
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex flex-col gap-2">
+				<Textarea
+					class="h-full min-h-[200px]"
+					placeholder="Write your content here..."
+					bind:value={block.text}
+				/>
+			</div>
+			<div class="markdown-content h-full min-h-[200px] overflow-y-auto p-4">
+				{@html marked(block.text)}
+			</div>
+		</div>
+	</div>
+{/snippet}
 
 <style>
 	:global(.markdown-content h1) {
