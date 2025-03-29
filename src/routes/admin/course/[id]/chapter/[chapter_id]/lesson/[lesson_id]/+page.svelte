@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import { Toggle } from '$lib/components/ui/toggle';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
@@ -8,9 +9,9 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { BookOpenIcon, CodeIcon, PlusIcon, TextIcon, VideoIcon } from 'lucide-svelte';
-	import { fade, slide } from 'svelte/transition';
-	import { View } from 'svelte-lucide';
+	import { BookOpenIcon, CodeIcon, EyeIcon, PlusIcon, TextIcon } from 'lucide-svelte';
+	import * as Tabs from '$lib/components/ui/tabs';
+	import { slide } from 'svelte/transition';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -19,6 +20,7 @@
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
 	);
 	let visiblePopupIndex = $state<number | null>(null);
+	let activeTab = $state<'html' | 'css' | 'js'>('html');
 
 	let saving = $state(false);
 
@@ -190,6 +192,10 @@
 		{#if block.type === 'resources'}
 			{@render resourcesBlock(block)}
 		{/if}
+
+		{#if block.type === 'code'}
+			{@render codeBlock(block)}
+		{/if}
 		{@render addBlock(index + 1)}
 	{/each}
 </main>
@@ -354,6 +360,41 @@
 					{@html marked(block.content)}
 				</div>
 			</div>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet codeBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>)}
+	<div class="flex flex-col gap-4">
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex h-full flex-col gap-4">
+				<Tabs.Root bind:value={activeTab}>
+					<div class="flex items-center justify-between">
+						<Tabs.List>
+							<Tabs.Trigger value="html">HTML</Tabs.Trigger>
+							<Tabs.Trigger value="css">CSS</Tabs.Trigger>
+							<Tabs.Trigger value="js">JavaScript</Tabs.Trigger>
+						</Tabs.List>
+						<Button
+							class="{block.showOutput ? 'bg-accent text-accent-foreground' : ''}"
+							onclick={() => (block.showOutput = !block.showOutput)}
+						>
+							Cu fereastra de output
+						</Button>
+					</div>
+					<Tabs.Content value="html">
+						<Textarea bind:value={block.html} />
+					</Tabs.Content>
+					<Tabs.Content value="css">
+						<Textarea bind:value={block.css} />
+					</Tabs.Content>
+					<Tabs.Content value="js">
+						<Textarea bind:value={block.javascript} />
+					</Tabs.Content>
+				</Tabs.Root>
+			</div>
+
+			<div class="flex h-full flex-col gap-4 p-4"></div>
 		</div>
 	</div>
 {/snippet}
