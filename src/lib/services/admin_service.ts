@@ -3,8 +3,7 @@ import { eq, sql } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-
-export type SessionValidationResult = { session: null, user: null } | { session: table.Session, user: table.User };
+import { lesson } from '$lib/server/db/schema';
 
 export class AdminService {
     private db: PostgresJsDatabase;
@@ -185,6 +184,27 @@ export class AdminService {
         return courses;
     }
 
+    async getChapterWithLessons(chapterId: table.Id) {
+        const chapter = await this.db.select({
+            id: table.chapter.id,
+            name: table.chapter.name,
+            order: table.chapter.order,
+            description: table.chapter.description,
+        }).from(table.chapter).where(eq(table.chapter.id, chapterId)).limit(1);
+        if (chapter.length === 0) {
+            return null;
+        }
+        const lessons = await this.db.select({
+            id: table.lesson.id,
+            name: table.lesson.name,
+            order: table.lesson.order
+        }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId)).orderBy(table.lesson.order);
+        return {
+            ...chapter[0],
+            lessons
+        };
+    }
+
     async getCourseWithChapters(courseId: table.Id) {
         const course = await this.db.select({
             id: table.course.id,
@@ -226,6 +246,24 @@ export class AdminService {
         return chapter.id;
     }
 
+    async createLesson(chapterId: table.Id) {
+        const lessonCount = await this.db.select({
+            lessonCount: sql<number>`count(${table.lesson.id})`
+        }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId));
+        if (lessonCount.length === 0) {
+            return null;
+        }
+        const index = lessonCount[0].lessonCount;
+        const [lesson] = await this.db.insert(table.lesson).values({
+            name: '',
+            chapterId,
+            description: '',
+            teaser: '',
+            order: index,
+        }).returning({ id: table.lesson.id });
+        return lesson.id;
+    }
+
     async reorderAllChapters(chapters: string[]) {
         await this.db.transaction(async (tx) => {
             for (let i = 0; i < chapters.length; i++) {
@@ -239,10 +277,184 @@ export class AdminService {
     async deleteChapter(id: string) {
         await this.db.delete(table.chapter).where(eq(table.chapter.id, id));
     }
+
+    async reorderAllLessons(lessons: string[]) {
+        await this.db.transaction(async (tx) => {
+            for (let i = 0; i < lessons.length; i++) {
+                await tx.update(table.lesson)
+                    .set({ order: i + 1 })
+                    .where(eq(table.lesson.id, lessons[i]));
+            }
+        });
+    }
+    async deleteLesson(id: table.Id) {
+        await this.db.delete(table.lesson).where(eq(table.lesson.id, id));
+    }
+
+    async getLessonWithBlocks(lesson_id: table.Id) {
+        const lesson = await this.db.select({
+            id: table.lesson.id,
+            name: table.lesson.name,
+            teaser: table.lesson.teaser,
+            description: table.lesson.description,
+        }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+        if (lesson.length === 0) {
+            return null;
+        }
+        /// get all text blocks
+        const textBlocks = (await this.db.select(
+            {
+                id: table.lessonTextBlock.id,
+                text: table.lessonTextBlock.text,
+                order: table.lessonTextBlock.order,
+            }).from(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, lesson_id))).map(block => ({
+                ...block,
+                type: 'text'
+            }));
+
+        /// get all videos
+        const videos = (await this.db.select(
+            {
+                id: table.lessonVideoBlock.id,
+                urls: table.lessonVideoBlock.urls,
+                order: table.lessonVideoBlock.order,
+            }).from(table.lessonVideoBlock).where(eq(table.lessonVideoBlock.lessonId, lesson_id))).map(block => ({
+                ...block,
+                type: 'video'
+            }));
+
+        /// get all code blocks
+        const codeBlocks = (await this.db.select(
+            {
+                id: table.lessonCodeBlock.id,
+                html: table.lessonCodeBlock.html,
+                css: table.lessonCodeBlock.css,
+                javascript: table.lessonCodeBlock.javascript,
+                order: table.lessonCodeBlock.order,
+            }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id))).map(block => ({
+                ...block,
+                type: 'code'
+            }));
+
+        /// get all code result blocks
+        const codeResultBlocks = (await this.db.select(
+            {
+                id: table.lessonCodeResultBlock.id,
+                order: table.lessonCodeResultBlock.order,
+                codeblockId: table.lessonCodeResultBlock.codeblockId,
+            }).from(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.lessonId, lesson_id))).map(block => ({
+                ...block,
+                type: 'code_result'
+            }));
+
+        const blocks = [...textBlocks, ...videos, ...codeBlocks, ...codeResultBlocks] as table.LessonBlock[];
+        blocks.sort((a, b) => a.order - b.order);
+        return {
+            ...lesson[0],
+            blocks
+        };
+    }
+    async updateLesson(lesson_id: table.Id, params: { name: string, teaser: string, description: string }) {
+        await this.db.update(table.lesson).set({
+            name: params.name,
+            teaser: params.teaser,
+            description: params.description,
+        }).where(eq(table.lesson.id, lesson_id));
+    }
+    async getBlockIdsOfLesson(lesson_id: table.Id) {
+        const textBlocks = (await this.db.select(
+            {
+                id: table.lessonTextBlock.id,
+            }).from(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, lesson_id)));
+
+        /// get all videos
+        const videos = (await this.db.select(
+            {
+                id: table.lessonVideoBlock.id,
+            }).from(table.lessonVideoBlock).where(eq(table.lessonVideoBlock.lessonId, lesson_id)));
+
+
+        /// get all code blocks
+        const codeBlocks = (await this.db.select(
+            {
+                id: table.lessonCodeBlock.id,
+            }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id)));
+
+
+        /// get all code result blocks
+        const codeResultBlocks = (await this.db.select(
+            {
+                id: table.lessonCodeResultBlock.id,
+            }).from(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.lessonId, lesson_id)));
+
+        return [...textBlocks, ...videos, ...codeBlocks, ...codeResultBlocks].map(block => block.id);
+    }
+
+    async updateBlock(blockId: table.Id, block: table.LessonBlock) {
+        if (block.type === 'text') {
+            await this.db.update(table.lessonTextBlock).set({
+                text: block.text,
+                order: block.order,
+            }).where(eq(table.lessonTextBlock.id, blockId));
+        } else if (block.type === 'video') {
+            await this.db.update(table.lessonVideoBlock).set({
+                urls: block.urls,
+                order: block.order,
+            }).where(eq(table.lessonVideoBlock.id, blockId));
+        } else if (block.type === 'code') {
+            await this.db.update(table.lessonCodeBlock).set({
+                html: block.html,
+                css: block.css,
+                javascript: block.javascript,
+                order: block.order,
+            }).where(eq(table.lessonCodeBlock.id, blockId));
+        } else if (block.type === 'code_result') {
+            await this.db.update(table.lessonCodeResultBlock).set({
+                codeblockId: block.codeblockId,
+                order: block.order,
+            }).where(eq(table.lessonCodeResultBlock.id, blockId));
+        }
+    }
+
+    async deleteBlock(blockId: table.Id) {
+        await this.db.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.id, blockId));
+        await this.db.delete(table.lessonVideoBlock).where(eq(table.lessonVideoBlock.id, blockId));
+        await this.db.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.id, blockId));
+        await this.db.delete(table.lessonCodeResultBlock).where(eq(table.lessonCodeResultBlock.id, blockId));
+    }
+
+    async createBlock(lesson_id: table.Id, block: table.LessonBlock) {
+        if (block.type === 'text') {
+            await this.db.insert(table.lessonTextBlock).values({
+                lessonId: lesson_id,
+                text: block.text,
+                order: block.order,
+            });
+        } else if (block.type === 'video') {
+            await this.db.insert(table.lessonVideoBlock).values({
+                lessonId: lesson_id,
+                urls: block.urls,
+                order: block.order,
+            });
+        } else if (block.type === 'code') {
+            await this.db.insert(table.lessonCodeBlock).values({
+                lessonId: lesson_id,
+                html: block.html,
+                css: block.css,
+                javascript: block.javascript,
+                order: block.order,
+            });
+        } else if (block.type === 'code_result') {
+            await this.db.insert(table.lessonCodeResultBlock).values({
+                lessonId: lesson_id,
+                codeblockId: block.codeblockId,
+                order: block.order,
+            });
+        }
+    }
 }
 
 
 
 
-
-
+export type LessonWithBlocks = NonNullable<Awaited<ReturnType<AdminService['getLessonWithBlocks']>>>;

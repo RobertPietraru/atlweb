@@ -181,7 +181,7 @@
 								<div class="flex gap-2">
 									<Button
 										variant="outline"
-										href="/admin/course/{data.course.id}/chapters/{chapter.id}"
+										href="/admin/course/{data.course.id}/chapter/{chapter.id}"
 									>
 										Editează
 									</Button>
