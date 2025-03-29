@@ -2,20 +2,26 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
-
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	const isMobile = new IsMobile();
 	let { data } = $props();
 </script>
 
-<main class="min-h-[100vh] w-full px-8 py-4">
-	<div class="mb-8 space-y-4">
+<main class="min-h-[100vh] w-full py-4">
+	<div class="mb-8 space-y-4 px-4 md:px-8">
 		<div class="flex items-center justify-between">
-			<h1 class="text-3xl font-bold">{data.chapter.name}</h1>
-			<Button href="/course/{data.courseId}" variant="outline" size="sm">Înapoi la capitole</Button>
+			<h1 class="text-2xl md:text-3xl font-bold">{data.chapter.name}</h1>
+			{#if !isMobile.current}
+				<Button href="/course/{data.courseId}" variant="outline" size="sm">Înapoi la capitole</Button>
+			{/if}
 		</div>
 		<p class="text-lg text-muted-foreground">{data.chapter.description}</p>
+		{#if isMobile.current}
+			<Button href="/course/{data.courseId}" variant="outline" class="w-full">Înapoi la capitole</Button>
+		{/if}
 	</div>
 
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:px-8">
 		{#each data.chapter.lessons as lesson}
 			<a href="/course/{data.courseId}/chapter/{data.chapter.id}/lesson/{lesson.id}" class="h-full">
 				<Card

@@ -6,6 +6,8 @@
 	import { PlayIcon, ArrowLeftIcon, BookOpenIcon, ArrowRightIcon, MenuIcon } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	const isMobile = new IsMobile();
 
 	let { data } = $props();
 	$effect(() => {
@@ -46,17 +48,23 @@
 </script>
 
 <div class="flex min-h-screen w-full flex-col lg:flex-row-reverse">
+	{#if isMobile.current}
+		<div class="flex w-full items-center justify-between border-b bg-card p-4 lg:hidden gap-3">
+			<div class="rounded-full bg-primary/10 p-2">
+				<BookOpenIcon class="h-5 w-5 text-primary" />
+			</div>
+			<h1 class="flex-1 text-xl font-bold">{lesson.name || 'Lectie'}</h1>
+			<Button variant="ghost" size="icon" onclick={() => (showSidebar = !showSidebar)}>
+				<MenuIcon class="h-5 w-5" />
+			</Button>
+		</div>
+	{/if}
 
-	<div class="w-full flex items-center justify-between border-b bg-card p-4 lg:hidden ">
-		<h1 class="text-xl font-bold flex-1">{lesson.name || 'Lectie'}</h1>
-		<Button variant="ghost" size="icon" onclick={() => showSidebar = !showSidebar}>
-			<MenuIcon class="h-5 w-5" />
-		</Button>
-	</div>
-
-
-	<aside class="w-full border-b bg-card lg:w-96 lg:border-l lg:border-b-0" class:hidden={!showSidebar} class:lg:block={true}>
-
+	<aside
+		class="w-full border-b bg-card lg:w-96 lg:border-b-0 lg:border-l"
+		class:hidden={!showSidebar}
+		class:lg:block={true}
+	>
 		<div class="flex flex-col gap-6 p-6">
 			<Button href="../" variant="outline" class="w-full">
 				<ArrowLeftIcon class="mr-2 h-4 w-4" />
@@ -65,16 +73,20 @@
 
 			<div class="rounded-xl border bg-muted/50 p-6 shadow-sm">
 				<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
-				<p class="mb-6 text-sm text-muted-foreground">Parcurge toate lecțiile pentru a finaliza acest capitol</p>
-				
+				<p class="mb-6 text-sm text-muted-foreground">
+					Parcurge toate lecțiile pentru a finaliza acest capitol
+				</p>
+
 				<div class="space-y-3">
 					{#each data.lessonNamesInChapter as lesson, i}
-						<a 
+						<a
 							href="./{lesson.id}"
 							class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
-							onclick={() => showSidebar = false}
+							onclick={() => (showSidebar = false)}
 						>
-							<span class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20">
+							<span
+								class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20"
+							>
 								{i + 1}
 							</span>
 							<span class="flex-1 font-medium">{lesson.name}</span>
@@ -88,32 +100,44 @@
 
 			<div class="rounded-xl border bg-muted/50 p-6 shadow-sm">
 				<h3 class="mb-2 text-xl font-semibold">Progres</h3>
-				<p class="text-sm text-muted-foreground">Ai completat {data.lessonNamesInChapter.findIndex(l => l.id === data.lesson.id) + 1} din {data.lessonNamesInChapter.length} lecții</p>
+				<p class="text-sm text-muted-foreground">
+					Ai completat {data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1} din
+					{data.lessonNamesInChapter.length} lecții
+				</p>
 				<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
-					<div class="h-full bg-primary" style="width: {((data.lessonNamesInChapter.findIndex(l => l.id === data.lesson.id) + 1) / data.lessonNamesInChapter.length) * 100}%"></div>
+					<div
+						class="h-full bg-primary"
+						style="width: {((data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) +
+							1) /
+							data.lessonNamesInChapter.length) *
+							100}%"
+					></div>
 				</div>
 			</div>
 		</div>
 	</aside>
 
-	<main class="flex-1 p-4 md:p-8 w-full">
-		<div class="mb-2 flex gap-4">
-			<div class="flex items-center gap-3">
-				<div class="rounded-full bg-primary/10 p-2">
-					<BookOpenIcon class="h-5 w-5 text-primary" />
+	<main class="w-full flex-1 md:p-8">
+		{#if !isMobile.current}
+			<div class="mb-2 flex gap-4">
+				<div class="flex items-center gap-3">
+					<div class="rounded-full bg-primary/10 p-2">
+						<BookOpenIcon class="h-5 w-5 text-primary" />
+					</div>
+					<h1 class="hidden text-3xl font-bold tracking-tight lg:block">
+						{lesson.name || 'Lectie'}
+					</h1>
 				</div>
-				<h1 class="text-3xl font-bold tracking-tight hidden lg:block">{lesson.name || 'Lectie'}</h1>
 			</div>
-			<div class="flex-1"></div>
-		</div>
-		<div class="markdown-content mb-4">
+		{/if}
+		<div class="markdown-content mb-4 px-4 md:px-0">
 			{@html marked(lesson.description)}
 		</div>
 
 		<div class="space-y-8">
 			{#each lesson.blocks as block, index}
 				<div
-					class="rounded-lg border-2 bg-muted/50 p-4 md:p-6 shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
+					class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
 				>
 					{#if block.type === 'text'}
 						{@render textBlock(block)}
@@ -175,7 +199,7 @@
 
 {#snippet codeBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>, index: number)}
 	<Tabs.Root bind:value={activeTab} class="space-y-4">
-		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+		<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 			<Tabs.List class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1">
 				<Tabs.Trigger value="html" class="tab-trigger">HTML</Tabs.Trigger>
 				<Tabs.Trigger value="css" class="tab-trigger">CSS</Tabs.Trigger>
@@ -183,7 +207,7 @@
 			</Tabs.List>
 			<Button
 				variant="outline"
-				class="transition-all hover:bg-primary hover:text-primary-foreground w-full sm:w-auto"
+				class="w-full transition-all hover:bg-primary hover:text-primary-foreground sm:w-auto"
 				onclick={async () => {
 					if (
 						JSON.stringify($state.snapshot(lesson)) !==
@@ -271,5 +295,4 @@
 	:global(.tab-trigger) {
 		@apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
 	}
-
 </style>

@@ -4,12 +4,14 @@
 	import { ArrowUpRightIcon, BookOpenIcon } from 'lucide-svelte';
 	import { Book } from 'svelte-lucide';
 
+    import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	const isMobile = new IsMobile();
 	let { data } = $props();
 </script>
 
 <main class="min-h-[100vh] w-full px-8 py-4">
 	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-3xl font-bold">Courses</h1>
+		<h1 class="text-2xl md:text-3xl font-bold">Courses</h1>
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
