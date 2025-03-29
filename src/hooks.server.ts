@@ -35,7 +35,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 };
 
 
-const unprotectedPrefix = ['/login', '/register'];
+const unprotectedPrefix = ['/login', '/register', '/course'];
 export const authentication: Handle = async ({ event, resolve }) => {
 	// Protect any routes that don't start with the unprotectedPrefix or are not the root path
 	if (!unprotectedPrefix.some((path) => event.url.pathname.startsWith(path)) && event.url.pathname !== '/') {
