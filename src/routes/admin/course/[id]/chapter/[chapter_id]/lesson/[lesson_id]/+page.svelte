@@ -188,12 +188,12 @@
 	{/each}
 </main>
 {#snippet addBlock(index: number)}
-	<div class="relative -mb-1 -mt-4" id="adder">
+	<div class="relative -mb-4 -mt-4" id="adder">
 		<div class="group flex justify-center">
 			<Button
 				size="icon"
-				class="z-10 h-12 w-12 rounded-full transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:shadow-lg hover:shadow-primary/30 {visiblePopupIndex === index
-					? 'translate-y-1 bg-primary shadow-lg shadow-primary/30'
+				class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:bg-primary group-hover:shadow-lg group-hover:shadow-primary/30 {visiblePopupIndex === index
+					? 'h-12 w-12 translate-y-1 opacity-100 bg-primary shadow-lg shadow-primary/30' 
 					: ''}"
 				onclick={() => {
 					if (visiblePopupIndex === index) {
@@ -204,8 +204,8 @@
 				}}
 			>
 				<PlusIcon
-					class="h-5 w-5 transition-all duration-300 group-hover:rotate-90 group-hover:scale-125 {visiblePopupIndex === index
-						? 'rotate-90 scale-125'
+					class="h-4 w-4 transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:rotate-90 group-hover:scale-125 {visiblePopupIndex === index
+						? 'h-5 w-5 rotate-90 scale-125'
 						: ''}"
 				/>
 			</Button>
