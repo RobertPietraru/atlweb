@@ -205,6 +205,27 @@ export class AdminService {
         };
     }
 
+    async getChapterPreview(chapterId: table.Id) {
+        const chapter = await this.db.select({
+            id: table.chapter.id,
+            name: table.chapter.name,
+            order: table.chapter.order,
+            description: table.chapter.description,
+        }).from(table.chapter).where(eq(table.chapter.id, chapterId)).limit(1);
+        if (chapter.length === 0) {
+            return null;
+        }
+        const lessons = await this.db.select({
+            id: table.lesson.id,
+            name: table.lesson.name,
+            order: table.lesson.order
+        }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId)).orderBy(table.lesson.order).limit(4);
+        return {
+            ...chapter[0],
+            lessons
+        };
+    }
+
     async getCourseWithChapters(courseId: table.Id) {
         const course = await this.db.select({
             id: table.course.id,
@@ -218,8 +239,15 @@ export class AdminService {
         const chapters = await this.db.select({
             id: table.chapter.id,
             name: table.chapter.name,
-            order: table.chapter.order
-        }).from(table.chapter).where(eq(table.chapter.course, courseId)).orderBy(table.chapter.order);
+            order: table.chapter.order,
+            description: table.chapter.description,
+            lessonCount: sql<number>`count(${table.lesson.id})`
+        })
+        .from(table.chapter)
+        .leftJoin(table.lesson, eq(table.chapter.id, table.lesson.chapterId))
+        .where(eq(table.chapter.course, courseId))
+        .groupBy(table.chapter.id)
+        .orderBy(table.chapter.order);
 
         return {
             ...course[0],
