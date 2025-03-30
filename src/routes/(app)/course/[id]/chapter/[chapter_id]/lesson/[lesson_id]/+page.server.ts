@@ -1,9 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { adminService } from '$lib/injection';
-import type { LessonWithBlocks } from '$lib/services/admin_service.js';
 
 export const load = async ({ locals, params }) => {
-    const lesson = await adminService.getLessonWithBlocks(params.lesson_id);
+    const lesson = await adminService.getLessonWithBlocks(params.lesson_id, locals.user?.id ?? null);
     const lessonNamesInChapter = await adminService.getLessonNamesInChapter(params.chapter_id);
 
     if (!lesson) {

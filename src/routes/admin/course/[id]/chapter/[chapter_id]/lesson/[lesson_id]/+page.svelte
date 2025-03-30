@@ -109,6 +109,7 @@
 		} else if (type === 'exercise') {
 			block = {
 				id: '',
+				isSolved: false,
 				type: 'exercise',
 				name: '',
 				description: '',
