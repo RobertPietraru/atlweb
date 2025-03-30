@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text, timestamp, uuid, integer, primaryKey, boolean } from 'drizzle-orm/pg-core';
 
-export const blockType = ['text', 'resources', 'code'] as const;
+export const blockType = ['text', 'resources', 'code', 'exercise'] as const;
 export type BlockType = typeof blockType[number];
 
 export const permissionsList = [
@@ -97,13 +97,16 @@ export const lessonCodeBlock = pgTable('lesson_code_block', {
 export const exercise = pgTable('exercise', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
+	creationDate: timestamp('creation_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	description: text('description').notNull(),
+	instructions: text('instructions').notNull(),
+	initialHtml: text('initial_html').notNull(),
+	initialCss: text('initial_css').notNull(),
+	initialJavascript: text('initial_javascript').notNull(),
 	lessonId: uuid('lesson_id')
 		.notNull()
 		.references(() => lesson.id),
 	order: integer('order').notNull(),
-	creatorId: uuid('creator_id')
-		.notNull()
-		.references(() => user.id),
 });
 
 export const submission = pgTable('submission', {
@@ -114,7 +117,10 @@ export const submission = pgTable('submission', {
 	userId: uuid('user_id')
 		.notNull()
 		.references(() => user.id),
-
+	submissionDate: timestamp('submission_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	checked: boolean('checked').notNull().default(false),
+	needHelp: boolean('need_help').notNull().default(false),
+	anonymous: boolean('anonymous').notNull().default(false),
 	javascriptCode: text('javascript_code').notNull(),
 	htmlCode: text('html_code').notNull(),
 	cssCode: text('css_code').notNull(),
@@ -154,7 +160,7 @@ export type Exercise = typeof exercise.$inferSelect;
 export type Submission = typeof submission.$inferSelect;
 export type Id = string;
 
-export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' };
+export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' } | Omit<typeof exercise.$inferSelect, 'lessonId'> & { type: 'exercise' };
 
 export type Permissions = typeof permissionsList[number];
 

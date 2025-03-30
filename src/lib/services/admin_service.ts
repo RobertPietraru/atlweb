@@ -1,11 +1,11 @@
-import { hash, verify } from '@node-rs/argon2';
-import { eq, sql, and } from 'drizzle-orm';
+import { hash } from '@node-rs/argon2';
+import { eq, sql, and, desc } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { lesson } from '$lib/server/db/schema';
 
 export class AdminService {
+
     private db: PostgresJsDatabase;
     constructor(db: PostgresJsDatabase) {
         this.db = db;
@@ -245,11 +245,11 @@ export class AdminService {
             description: table.chapter.description,
             lessonCount: sql<number>`count(${table.lesson.id})`
         })
-        .from(table.chapter)
-        .leftJoin(table.lesson, eq(table.chapter.id, table.lesson.chapterId))
-        .where(eq(table.chapter.course, courseId))
-        .groupBy(table.chapter.id)
-        .orderBy(table.chapter.order);
+            .from(table.chapter)
+            .leftJoin(table.lesson, eq(table.chapter.id, table.lesson.chapterId))
+            .where(eq(table.chapter.course, courseId))
+            .groupBy(table.chapter.id)
+            .orderBy(table.chapter.order);
 
         return {
             ...course[0],
@@ -328,6 +328,11 @@ export class AdminService {
             await tx.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, id));
             await tx.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, id));
             await tx.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, id));
+            const exercises = await tx.select({ id: table.exercise.id }).from(table.exercise).where(eq(table.exercise.lessonId, id));
+            for (const exercise of exercises) {
+                await tx.delete(table.submission).where(eq(table.submission.exerciseId, exercise.id));
+            }
+            await tx.delete(table.exercise).where(eq(table.exercise.lessonId, id));
             await tx.delete(table.lesson).where(eq(table.lesson.id, id));
         });
     }
@@ -413,7 +418,21 @@ export class AdminService {
                 type: 'code'
             }));
 
-        const blocks = [...textBlocks, ...resources, ...codeBlocks] as table.LessonBlock[];
+        const exercises = (await this.db.select({
+            id: table.exercise.id,
+            name: table.exercise.name,
+            order: table.exercise.order,
+            description: table.exercise.description,
+            instructions: table.exercise.instructions,
+            initialHtml: table.exercise.initialHtml,
+            initialCss: table.exercise.initialCss,
+            initialJavascript: table.exercise.initialJavascript,
+        }).from(table.exercise).where(eq(table.exercise.lessonId, lesson_id))).map(block => ({
+            ...block,
+            type: 'exercise'
+        }));
+
+        const blocks = [...textBlocks, ...resources, ...codeBlocks, ...exercises] as table.LessonBlock[];
         blocks.sort((a, b) => a.order - b.order);
         return {
             ...lesson[0],
@@ -453,8 +472,12 @@ export class AdminService {
                 id: table.lessonCodeBlock.id,
             }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id)));
 
+        const exercises = await this.db.select({
+            id: table.exercise.id,
+        }).from(table.exercise).where(eq(table.exercise.lessonId, lesson_id));
 
-        return [...textBlocks, ...resources, ...codeBlocks].map(block => block.id);
+
+        return [...textBlocks, ...resources, ...codeBlocks, ...exercises].map(block => block.id);
     }
 
     async updateBlock(blockId: table.Id, block: table.LessonBlock) {
@@ -478,13 +501,37 @@ export class AdminService {
                 javascript: block.javascript,
                 order: block.order,
             }).where(eq(table.lessonCodeBlock.id, blockId));
+        } else if (block.type === 'exercise') {
+            await this.db.update(table.exercise).set({
+                name: block.name,
+                description: block.description,
+                instructions: block.instructions,
+                initialHtml: block.initialHtml,
+                initialCss: block.initialCss,
+                initialJavascript: block.initialJavascript,
+                order: block.order,
+            }).where(eq(table.exercise.id, blockId));
         }
     }
 
     async deleteBlock(blockId: table.Id) {
-        await this.db.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.id, blockId));
-        await this.db.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.id, blockId));
-        await this.db.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.id, blockId));
+        let deleted = [];
+        deleted = await this.db.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.id, blockId));
+        if (deleted.length !== 0) {
+            return;
+        }
+        deleted = await this.db.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.id, blockId));
+        if (deleted.length !== 0) {
+            return;
+        }
+        deleted = await this.db.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.id, blockId));
+        if (deleted.length !== 0) {
+            return;
+        }
+        /// delete all submissions for this exercise
+        await this.db.delete(table.submission).where(eq(table.submission.exerciseId, blockId));
+        /// delete the exercise
+        await this.db.delete(table.exercise).where(eq(table.exercise.id, blockId));
     }
 
     async createBlock(lesson_id: table.Id, block: table.LessonBlock) {
@@ -511,7 +558,65 @@ export class AdminService {
                 javascript: block.javascript,
                 order: block.order,
             });
+        } else if (block.type === 'exercise') {
+            await this.db.insert(table.exercise).values({
+                lessonId: lesson_id,
+                description: block.description,
+                order: block.order,
+                name: block.name,
+                instructions: block.instructions,
+                initialHtml: block.initialHtml,
+                initialCss: block.initialCss,
+                initialJavascript: block.initialJavascript,
+            });
         }
+    }
+
+    async getExercise(exercise_id: table.Id) {
+        const exercise = await this.db.select().from(table.exercise).where(eq(table.exercise.id, exercise_id)).limit(1);
+        if (exercise.length === 0) {
+            return null;
+        }
+        return exercise[0];
+    }
+
+    async getLessonNameAndId(lesson_id: table.Id) {
+        const lesson = await this.db.select({
+            name: table.lesson.name,
+            id: table.lesson.id,
+        }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+        if (lesson.length === 0) {
+            return null;
+        }
+        return lesson[0];
+    }
+
+    async getSubmissions(exercise_id: table.Id) {
+        return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id)).orderBy(desc(table.submission.submissionDate)).limit(5);
+    }
+
+    async createSubmission(exerciseId: table.Id, userId: table.Id, params: {
+        html: string,
+        css: string,
+        javascript: string,
+        needHelp: boolean,
+        anonymous: boolean,
+    }) {
+        const [submission] = await this.db.insert(table.submission).values({
+            exerciseId,
+            userId,
+            checked: false,
+            htmlCode: params.html,
+            cssCode: params.css,
+            javascriptCode: params.javascript,
+            needHelp: params.needHelp,
+            anonymous: params.anonymous,
+        }).returning();
+        return submission;
+    }
+
+    async deleteSubmission(submissionId: table.Id) {
+        await this.db.delete(table.submission).where(eq(table.submission.id, submissionId));
     }
 }
 
