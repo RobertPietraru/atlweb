@@ -31,6 +31,8 @@ export const permissionsList = [
 	'user.edit',
 	'user.delete',
 	'user.view',
+
+	'submission.solve',
 ] as const;
 export const course = pgTable('course', {
 	id: uuid('id').primaryKey().defaultRandom(),
