@@ -160,7 +160,7 @@ export type Exercise = typeof exercise.$inferSelect;
 export type Submission = typeof submission.$inferSelect;
 export type Id = string;
 
-export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' } | Omit<typeof exercise.$inferSelect, 'lessonId'> & { type: 'exercise' };
+export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' } | Omit<typeof exercise.$inferSelect, 'lessonId'> & { type: 'exercise', isSolved: boolean };
 
 export type Permissions = typeof permissionsList[number];
 

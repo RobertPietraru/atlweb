@@ -70,7 +70,7 @@
 
 	<!-- w-full border-b bg-card lg:fixed lg:right-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l -->
 	<aside
-		class="w-full border-b bg-card lg:sticky lg:top-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l lg:z-10"
+		class="w-full border-b bg-card lg:sticky lg:top-0 lg:z-10 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l"
 		class:hidden={!showSidebar}
 		class:lg:block={true}
 	>
@@ -275,10 +275,15 @@
 {/snippet}
 
 {#snippet exerciseBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>)}
-	<a href="./{data.lesson.id}/exercise/{block.id}" class="block transition-all duration-200 hover:scale-[1.02]">
-		<Card class="space-y-4 transition-colors duration-200 hover:bg-muted/50">
+	<a
+		href="./{data.lesson.id}/exercise/{block.id}"
+		class="block transition-all duration-200 hover:scale-[1.02]"
+	>
+		<Card class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {block.isSolved ? 'bg-primary/10' : ''}">
 			<div class="flex items-center gap-2 px-4 pt-4">
-				<BookOpen class="h-5 w-5 text-primary transition-transform duration-200 group-hover:scale-110" />
+				<BookOpen
+					class="h-5 w-5 text-primary transition-transform duration-200 group-hover:scale-110"
+				/>
 				<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
 			</div>
 			<Separator />
@@ -287,13 +292,20 @@
 			</div>
 			<div class="flex items-center justify-end gap-2 px-4 pb-4">
 				<div class="flex items-center gap-1.5">
+					{#if block.isSolved}
+					<FileCheck class="h-4 w-4 text-primary" />
+						<span class="text-sm font-medium text-primary animate-pulse"> Soluție trimisă </span>
+					{:else}
 					<FileCheck class="h-4 w-4 text-muted-foreground" />
-					<span class="text-sm font-medium text-muted-foreground">
-						{0} soluții trimise de tine
-					</span>
+						<span class="text-sm font-medium text-muted-foreground"> Soluție netrimisă </span>
+					{/if}
 				</div>
 				<div class="flex-1"></div>
-				<Button variant="outline" size="sm" class="gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground">
+				<Button
+					variant="outline"
+					size="sm"
+					class="gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
+				>
 					<PlayCircle class="h-4 w-4" />
 					<span>Încearcă exercițiul</span>
 				</Button>

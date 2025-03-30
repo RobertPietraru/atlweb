@@ -28,10 +28,11 @@
 	});
 	let submitPopupOpen = $state(false);
 	let submitPopupRef = $state<HTMLButtonElement | null>(null);
+	let showResultView = $state(false);
 
 	let submissions = $state(data.submissions);
 	let deleting = $state<string[]>([]);
-    $inspect(deleting);
+	$inspect(deleting);
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
 	let submittedCode: { html: string; css: string; javascript: string } | null = $state(null);
@@ -165,7 +166,7 @@
 		}
 	}
 
-    async function deleteSubmission(submissionId: string) {
+	async function deleteSubmission(submissionId: string) {
 		try {
 			const formData = new FormData();
 			deleting.push(submissionId);
@@ -178,7 +179,10 @@
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
 				toast.success('Raspunsul a fost sters cu succes');
-				submissions.splice(submissions.findIndex((submission) => submission.id === submissionId), 1);
+				submissions.splice(
+					submissions.findIndex((submission) => submission.id === submissionId),
+					1
+				);
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
@@ -191,9 +195,11 @@
 		} catch (error) {
 			toast.error('A apărut o eroare la stergerea raspunsului');
 		} finally {
-			deleting.splice(deleting.findIndex((id) => id === submissionId), 1);
+			deleting.splice(
+				deleting.findIndex((id) => id === submissionId),
+				1
+			);
 		}
-
 	}
 
 	onDestroy(() => {
@@ -275,13 +281,19 @@
 										{/if}
 									</td>
 									<td class="py-2">
-											<Button variant="destructive" size="icon" class="size-6" onclick={() => deleteSubmission(submission.id)} disabled={deleting.includes(submission.id)}>
-                                                {#if deleting.includes(submission.id)}
-                                                    <Loader2 class="size-4 animate-spin" />
-                                                {:else}
-                                                    <TrashIcon class="size-4" />
-                                                {/if}
-											</Button>
+										<Button
+											variant="destructive"
+											size="icon"
+											class="size-6"
+											onclick={() => deleteSubmission(submission.id)}
+											disabled={deleting.includes(submission.id)}
+										>
+											{#if deleting.includes(submission.id)}
+												<Loader2 class="size-4 animate-spin" />
+											{:else}
+												<TrashIcon class="size-4" />
+											{/if}
+										</Button>
 									</td>
 								</tr>
 							{/each}
@@ -292,7 +304,7 @@
 		</Resizable.PaneGroup>
 	</Resizable.Pane>
 	<Resizable.Handle withHandle class="bg-muted" />
-	<Resizable.Pane defaultSize={60} class="p-0">
+	<Resizable.Pane class="p-0">
 		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeTab}>
 			<div class="flex items-center gap-4 px-2 py-2">
 				<Tabs.List class="">
@@ -309,6 +321,7 @@
 				<Button
 					class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
 					onclick={async () => {
+						showResultView = true;
 						if (
 							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
 						) {
@@ -336,18 +349,21 @@
 		</Tabs.Root>
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
-	<Resizable.Pane defaultSize={30}>
-		<div class="flex h-full items-center justify-center">
-			{#if lastRunCode !== null}
-				<iframe
-					title="Code Preview"
-					class="h-full w-full"
-					srcdoc={getCodePreview(lastRunCode)}
-					sandbox="allow-scripts"
-				></iframe>
-			{/if}
-		</div>
-	</Resizable.Pane>
+
+	{#if showResultView}
+		<Resizable.Pane defaultSize={30}>
+			<div class="flex h-full items-center justify-center">
+				{#if lastRunCode !== null}
+					<iframe
+						title="Code Preview"
+						class="h-full w-full"
+						srcdoc={getCodePreview(lastRunCode)}
+						sandbox="allow-scripts"
+					></iframe>
+				{/if}
+			</div>
+		</Resizable.Pane>
+	{/if}
 </Resizable.PaneGroup>
 {#snippet submitButton()}
 	<Popover.Root bind:open={submitPopupOpen}>

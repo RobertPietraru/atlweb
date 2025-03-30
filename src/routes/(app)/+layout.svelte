@@ -4,12 +4,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
-
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import { toggleMode } from 'mode-watcher';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 
 	let { children, data } = $props();
+	const isMobile = new IsMobile();
 
 	const navMain = [
 		{
@@ -113,6 +115,28 @@
 		<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 			<Sidebar.Trigger class="-ml-1" />
 			<Separator orientation="vertical" class="mr-2 h-4" />
+			<Breadcrumb.Root>
+				<Breadcrumb.List>
+					{#each data.breadcrumbs as crumb, i}
+						<Breadcrumb.Item>
+							<Breadcrumb.Link href={crumb.url}>
+								{#if isMobile.current}
+									{#if crumb.name.length > 20}
+										{crumb.name.slice(0, 10)}...{crumb.name.slice(-10)}
+									{:else}
+										{crumb.name}
+									{/if}
+								{:else}
+									{crumb.name}
+								{/if}
+							</Breadcrumb.Link>
+						</Breadcrumb.Item>
+						{#if i < data.breadcrumbs.length - 1}
+							<Breadcrumb.Separator />
+						{/if}
+					{/each}
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
 			<div class="flex-1"></div>
 			<Button onclick={toggleMode} variant="ghost" size="icon">
 				<Sun

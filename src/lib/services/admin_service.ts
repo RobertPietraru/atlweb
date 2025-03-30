@@ -370,7 +370,7 @@ export class AdminService {
             next: nextLesson ? nextLesson[0] : null
         };
     }
-    async getLessonWithBlocks(lesson_id: table.Id) {
+    async getLessonWithBlocks(lesson_id: table.Id, userId: table.Id | null) {
         const lesson = await this.db.select({
             id: table.lesson.id,
             name: table.lesson.name,
@@ -427,12 +427,26 @@ export class AdminService {
             initialHtml: table.exercise.initialHtml,
             initialCss: table.exercise.initialCss,
             initialJavascript: table.exercise.initialJavascript,
+
         }).from(table.exercise).where(eq(table.exercise.lessonId, lesson_id))).map(block => ({
             ...block,
             type: 'exercise'
         }));
+        const exercisesWithStatus = await Promise.all(exercises.map(async block => {
+            if (userId == null) return block;
+            const submissionCount = await this.db.select({
+                count: sql<number>`count(*)`
+            })
+                .from(table.submission)
+                .where(and(eq(table.submission.exerciseId, block.id), eq(table.submission.userId, userId)));
+            return {
+                ...block,
+                isSolved: submissionCount[0].count > 0
+            };
+        }));
 
-        const blocks = [...textBlocks, ...resources, ...codeBlocks, ...exercises] as table.LessonBlock[];
+
+        const blocks = [...textBlocks, ...resources, ...codeBlocks, ...exercisesWithStatus] as table.LessonBlock[];
         blocks.sort((a, b) => a.order - b.order);
         return {
             ...lesson[0],
@@ -617,6 +631,64 @@ export class AdminService {
 
     async deleteSubmission(submissionId: table.Id) {
         await this.db.delete(table.submission).where(eq(table.submission.id, submissionId));
+    }
+    async getBreadcrumbs(courseId: table.Id | null, chapterId: table.Id | null, lessonId: table.Id | null, exerciseId: table.Id | null) {
+        const breadcrumbs: { name: string, url: string }[] = [];
+        if (courseId) {
+            const name = await this.db.select({
+                name: table.course.name,
+            }).from(table.course).where(eq(table.course.id, courseId)).limit(1);
+            if (name.length === 0) {
+                return null;
+            }
+            breadcrumbs.push({
+                name: name[0].name,
+                url: `/course/${courseId}`,
+            });
+        } else {
+            return breadcrumbs;
+        }
+        if (chapterId) {
+            const name = await this.db.select({
+                name: table.chapter.name,
+            }).from(table.chapter).where(eq(table.chapter.id, chapterId)).limit(1);
+            if (name.length === 0) {
+                return null;
+            }
+            breadcrumbs.push({
+                name: name[0].name,
+                url: `/course/${courseId}/chapter/${chapterId}`,
+            });
+        } else {
+            return breadcrumbs;
+        }
+        if (lessonId) {
+            const name = await this.db.select({
+                name: table.lesson.name,
+            }).from(table.lesson).where(eq(table.lesson.id, lessonId)).limit(1);
+            if (name.length === 0) {
+                return null;
+            }
+            breadcrumbs.push({
+                name: name[0].name,
+                url: `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}`,
+            });
+        } else {
+            return breadcrumbs;
+        }
+        if (exerciseId) {
+            const name = await this.db.select({
+                name: table.exercise.name,
+            }).from(table.exercise).where(eq(table.exercise.id, exerciseId)).limit(1);
+            if (name.length === 0) {
+                return null;
+            }
+            breadcrumbs.push({
+                name: name[0].name,
+                url: `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/exercise/${exerciseId}`,
+            });
+        }
+        return breadcrumbs;
     }
 }
 
