@@ -8,13 +8,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import {
 		CheckIcon,
-		ChevronDown,
 		EyeIcon,
-		HelpCircleIcon,
-		Loader2,
 		PlayIcon,
-		TrashIcon,
-		UserIcon
 	} from 'lucide-svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
@@ -26,19 +21,11 @@
 		css: data.exercise.initialCss,
 		javascript: data.exercise.initialJavascript
 	});
-	let submitPopupOpen = $state(false);
-	let submitPopupRef = $state<HTMLButtonElement | null>(null);
 	let showResultView = $state(false);
-
+	let selectedSubmissionIndex = $state<number | null>(null);
 	let submissions = $state(data.submissions);
-	let deleting = $state<string[]>([]);
-	$inspect(deleting);
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
-	let submittedCode: { html: string; css: string; javascript: string } | null = $state(null);
-	let currentCodeAndSubmittedCodeAreTheSame = $derived(
-		JSON.stringify($state.snapshot(code)) === JSON.stringify($state.snapshot(submittedCode))
-	);
 
 	let htmlEditor: Monaco.editor.IStandaloneCodeEditor;
 	let cssEditor: Monaco.editor.IStandaloneCodeEditor;
@@ -94,14 +81,27 @@
 		});
 	});
 
-	function setCode(params: { css: string; html: string; javascript: string }) {
-		code.css = params.css;
-		code.html = params.html;
-		code.javascript = params.javascript;
-		htmlEditor?.setValue(params.html);
-		cssEditor?.setValue(params.css);
-		jsEditor?.setValue(params.javascript);
-		toast.success('Codul a fost adus la cel de atunci');
+	function setCode(submissionIndex: number) {
+		selectedSubmissionIndex = submissionIndex;
+		const submission = submissions[submissionIndex];
+		code.css = submission.cssCode;
+		code.html = submission.htmlCode;
+		code.javascript = submission.javascriptCode;
+		htmlEditor?.setValue(submission.htmlCode);
+		cssEditor?.setValue(submission.cssCode);
+		jsEditor?.setValue(submission.javascriptCode);
+		toast.success('Am selectat codul lui ' + (submission.username ?? 'Anonim'));
+	}
+
+	function clearCode() {
+		selectedSubmissionIndex = null;
+		lastRunCode = null;
+		code.html = data.exercise.initialHtml;
+		code.css = data.exercise.initialCss;
+		code.javascript = data.exercise.initialJavascript;
+		htmlEditor?.setValue(data.exercise.initialHtml);
+		cssEditor?.setValue(data.exercise.initialCss);
+		jsEditor?.setValue(data.exercise.initialJavascript);
 	}
 	function getCodePreview(params: { css: string; html: string; javascript: string }) {
 		const css = params.css ?? '';
@@ -127,78 +127,41 @@
 		return html_content;
 	}
 
-	async function submitCode(params: { needHelp: boolean; anonymous: boolean }) {
+	async function closeDownIssueWithFix() {
+		if (selectedSubmissionIndex === null) {
+			toast.error('Nu ai selectat un raspuns');
+			return;
+		}
 		try {
 			submitting = true;
-			submitPopupOpen = false;
 			const formData = new FormData();
+			formData.append('submissionId', submissions[selectedSubmissionIndex].id);
 			formData.append('html', code.html);
 			formData.append('css', code.css);
 			formData.append('javascript', code.javascript);
-			formData.append('needHelp', params.needHelp.toString());
-			formData.append('anonymous', params.anonymous.toString());
-			const response = await fetch('?/submit', {
+			const response = await fetch('?/solve', {
 				method: 'POST',
 				body: formData
 			});
 
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
-				submittedCode = structuredClone($state.snapshot(code));
-				toast.success('Codul a fost trimis cu succes');
-
-				console.log(result.data);
-				submissions = [result.data?.submission as (typeof submissions)[0], ...submissions];
+				toast.success('Codul a fost rezolvat cu succes');
+				submissions = submissions.filter((_, index) => index !== selectedSubmissionIndex);
+				clearCode();
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la trimiterea codului',
+						'A apărut o eroare la rezolvarea raspunsului',
 					{
 						position: 'bottom-left'
 					}
 				);
 			}
 		} catch (error) {
-			console.error(error);
-			toast.error('A apărut o eroare la trimiterea codului');
+			toast.error('A apărut o eroare la rezolvarea raspunsului');
 		} finally {
 			submitting = false;
-		}
-	}
-
-	async function deleteSubmission(submissionId: string) {
-		try {
-			const formData = new FormData();
-			deleting.push(submissionId);
-			formData.append('submissionId', submissionId);
-			const response = await fetch('?/delete', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				toast.success('Raspunsul a fost sters cu succes');
-				submissions.splice(
-					submissions.findIndex((submission) => submission.id === submissionId),
-					1
-				);
-			} else if (result.type === 'failure') {
-				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la stergerea raspunsului',
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			toast.error('A apărut o eroare la stergerea raspunsului');
-		} finally {
-			deleting.splice(
-				deleting.findIndex((id) => id === submissionId),
-				1
-			);
 		}
 	}
 
@@ -235,13 +198,11 @@
 							<tr class="border-b">
 								<th class="py-2 text-left"></th>
 								<th class="py-2 text-left">Data</th>
-								<th class="py-2 text-left">Status</th>
-								<th class="py-2 text-left">Anonim</th>
-								<th class="py-2 text-left"></th>
+								<th class="py-2 text-left">Nume</th>
 							</tr>
 						</thead>
 						<tbody>
-							{#each submissions as submission}
+							{#each submissions as submission, index}
 								<tr class="border-b hover:bg-muted/50">
 									<td class="py-2">
 										<Button
@@ -249,11 +210,7 @@
 											size="icon"
 											class="size-6"
 											onclick={() => {
-												setCode({
-													css: submission.cssCode,
-													html: submission.htmlCode,
-													javascript: submission.javascriptCode
-												});
+												setCode(index);
 											}}
 										>
 											<EyeIcon class="size-4" />
@@ -263,37 +220,11 @@
 										{new Date(submission.submissionDate).toLocaleString().split(',')[1]}
 									</td>
 									<td class="py-2">
-										{#if submission.needHelp}
-											{#if submission.checked}
-												<span class="text-green-500">Verificat</span>
-											{:else}
-												<span class="text-yellow-500">Ajutor solicitat</span>
-											{/if}
+										{#if submission.username}
+											{submission.username}
 										{:else}
-											<span class="text-green-500">Trimis</span>
+											<span class="text-gray-500">Anonim</span>
 										{/if}
-									</td>
-									<td class="py-2">
-										{#if submission.anonymous}
-											<span class="text-gray-500">Da</span>
-										{:else}
-											<span class="text-gray-500">Nu</span>
-										{/if}
-									</td>
-									<td class="py-2">
-										<Button
-											variant="ghost"
-											size="icon"
-											class="rounded-full bg-destructive text-destructive-foreground"
-											onclick={() => deleteSubmission(submission.id)}
-											disabled={deleting.includes(submission.id)}
-										>
-											{#if deleting.includes(submission.id)}
-												<Loader2 class="size-4 animate-spin" />
-											{:else}
-												<TrashIcon class="size-4" />
-											{/if}
-										</Button>
 									</td>
 								</tr>
 							{/each}
@@ -312,20 +243,27 @@
 					<Tabs.Trigger value="css" class="">CSS</Tabs.Trigger>
 					<Tabs.Trigger value="javascript" class="">JavaScript</Tabs.Trigger>
 				</Tabs.List>
+				{#if selectedSubmissionIndex !== null}
+					<div class="flex-1"></div>
+					<h1
+						class="rounded-lg bg-fuchsia-500/20 px-4 text-3xl font-bold text-fuchsia-600 shadow-lg shadow-fuchsia-200/50"
+					>
+						Codul lui {submissions[selectedSubmissionIndex].username ?? 'Anonim'}
+					</h1>
+				{/if}
 				<div class="flex-1"></div>
 
-
-				{#if data.isHelper}
 				<Button
+					variant="outline"
 					class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
-					href="./{data.exercise.id}/submissions"
+					disabled={selectedSubmissionIndex === null || submitting}
+					onclick={async () => {
+						await closeDownIssueWithFix();
+					}}
 				>
-					<span>Lista solutii</span>
+					<CheckIcon class="h-4 w-4" />
+					<span>Rezolvă</span>
 				</Button>
-				{/if}
-				<div class="h-10">
-					{@render submitButton()}
-				</div>
 
 				<Button
 					class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
@@ -374,58 +312,6 @@
 		</Resizable.Pane>
 	{/if}
 </Resizable.PaneGroup>
-{#snippet submitButton()}
-	<Popover.Root bind:open={submitPopupOpen}>
-		<Popover.Trigger
-			bind:ref={submitPopupRef}
-			disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-		>
-			{#snippet child({ props })}
-				<Button {...props} aria-expanded={submitPopupOpen} class="h-10">
-					{#if submitting}
-						Se trimite...
-					{:else}
-						Trimite
-					{/if}
-					<ChevronDown class="opacity-50" />
-				</Button>
-			{/snippet}
-		</Popover.Trigger>
-		<Popover.Content class=" w-[250px] space-y-0 rounded-md p-0">
-			<Button
-				variant="ghost"
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				class="w-full justify-start rounded-t-md"
-				onclick={() => submitCode({ needHelp: false, anonymous: false })}
-			>
-				<CheckIcon class="size-4" />
-				Trimite
-			</Button>
-
-			<Separator class="my-2" />
-
-			<Button
-				variant="ghost"
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				class="w-full justify-start rounded-b-none"
-				onclick={() => submitCode({ needHelp: true, anonymous: false })}
-			>
-				<HelpCircleIcon class="size-4" />
-				Cere ajutor
-			</Button>
-
-			<Button
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				variant="ghost"
-				class="w-full justify-start rounded-b-md"
-				onclick={() => submitCode({ needHelp: true, anonymous: true })}
-			>
-				<UserIcon class="size-4" />
-				Cere ajutor anonim
-			</Button>
-		</Popover.Content>
-	</Popover.Root>
-{/snippet}
 
 <style>
 	:global(.markdown-content h1) {

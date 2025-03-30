@@ -1,5 +1,5 @@
 import { hash } from '@node-rs/argon2';
-import { eq, sql, and, desc } from 'drizzle-orm';
+import { eq, sql, and, desc, asc } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -606,7 +606,34 @@ export class AdminService {
     }
 
     async getSubmissions(exercise_id: table.Id) {
-        return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id)).orderBy(desc(table.submission.submissionDate)).limit(5);
+        return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id)).orderBy(desc(table.submission.submissionDate));
+    }
+
+    async getSubmissionsToCheck(exercise_id: table.Id) {
+        const list = await this.db
+            .select({
+                submission: table.submission,
+                user: table.user,
+            })
+            .from(table.submission)
+            .leftJoin(table.user, eq(table.submission.userId, table.user.id))
+            .where(
+                and(
+                    eq(table.submission.exerciseId, exercise_id),
+                    eq(table.submission.checked, false),
+                    eq(table.submission.needHelp, true)
+                )
+            )
+            .orderBy(asc(table.submission.submissionDate))
+            .limit(5);
+
+        return list.map(item => (item.submission.anonymous || !item.user ? {
+            ...item.submission,
+            username: null,
+        } : {
+            ...item.submission,
+            username: item.user?.username,
+        }));
     }
 
     async createSubmission(exerciseId: table.Id, userId: table.Id, params: {
@@ -689,6 +716,19 @@ export class AdminService {
             });
         }
         return breadcrumbs;
+    }
+
+    async completeSubmission(submissionId: table.Id, params: {
+        html: string,
+        css: string,
+        javascript: string,
+    }) {
+        await this.db.update(table.submission).set({
+            htmlCode: params.html,
+            cssCode: params.css,
+            javascriptCode: params.javascript,
+            checked: true,
+        }).where(eq(table.submission.id, submissionId));
     }
 }
 

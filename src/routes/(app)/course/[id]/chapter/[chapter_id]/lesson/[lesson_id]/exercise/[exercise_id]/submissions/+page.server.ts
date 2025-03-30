@@ -7,17 +7,19 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         redirect(302, '/login?redirect=/course/' + params.id + '/chapter/' + params.chapter_id + '/lesson/' + params.lesson_id + '/exercise/' + params.exercise_id);
     }
 
+    if (!locals.permissions.includes('submission.solve')) {
+        error(403, 'Nu ai permisiunea sa rezolvi exercitiile');
+    }
+
     const exercise = await adminService.getExercise(params.exercise_id);
-    const submissions = await adminService.getSubmissions(params.exercise_id);
+    const submissions = await adminService.getSubmissionsToCheck(params.exercise_id);
     const lesson = await adminService.getLessonNameAndId(params.lesson_id);
     
-    const isHelper = locals.permissions.includes('submission.solve');
     if (!exercise) {
         error(404, 'Exercise not found');
     }
 
     return {
-        isHelper,
         exercise,
         lesson,
         submissions,
@@ -54,16 +56,26 @@ export const actions= {
         }
     },
 
-    delete: async ({ request, params ,locals}) => {
+    solve: async ({ request, params ,locals}) => {
         const formData = await request.formData();
         const submissionId = formData.get('submissionId') ?? '';
+
+        const html = formData.get('html') ?? '';
+        const css = formData.get('css') ?? '';
+        const javascript = formData.get('javascript') ?? '';
+
         if (!submissionId) {
             error(400, 'Nu ai trimis codul');
         }
-        if (!locals.user) {
-            error(401, 'Nu ai permisiunea sa stergei raspunsul');
+
+        if (!locals.permissions.includes('submission.solve')) {
+            error(401, 'Nu ai permisiunea sa rezolvi raspunsul');
         }
-        await adminService.deleteSubmission(submissionId as string);
+        await adminService.completeSubmission(submissionId as string, {
+            html: html as string,
+            css: css as string,
+            javascript: javascript as string,
+        });
 
         return {
             success: true
