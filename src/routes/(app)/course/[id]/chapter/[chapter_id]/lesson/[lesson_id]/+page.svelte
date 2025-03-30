@@ -42,8 +42,6 @@
 		html_content +=
 			`<sty` +
 			`le>
-			* { box-sizing: border-box; }
-			body { margin: 0; padding: 16px; max-width: 100vw; overflow-x: hidden; }
 			${css}
 		</sty` +
 			`le>`;

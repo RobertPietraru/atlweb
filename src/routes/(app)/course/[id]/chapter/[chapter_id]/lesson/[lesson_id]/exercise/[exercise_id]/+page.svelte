@@ -5,7 +5,17 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { marked } from 'marked';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { PlayIcon } from 'lucide-svelte';
 	let { data } = $props();
+
+	let code = $state({
+		html: data.exercise.initialHtml,
+		css: data.exercise.initialCss,
+		javascript: data.exercise.initialJavascript
+	});
+
+	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
 
 	let htmlEditor: Monaco.editor.IStandaloneCodeEditor;
 	let cssEditor: Monaco.editor.IStandaloneCodeEditor;
@@ -15,71 +25,7 @@
 	let cssEditorContainer: HTMLElement | null = $state(null);
 	let jsEditorContainer: HTMLElement | null = $state(null);
 
-    let activeTab : 'html' | 'css' | 'javascript' = $state('html');
-
-	const htmlSnippets = {
-		'!': {
-			prefix: '!',
-			body: [
-				'<!DOCTYPE html>',
-				'<html lang="en">',
-				'<head>',
-				'\t<meta charset="UTF-8">',
-				'\t<meta name="viewport" content="width=device-width, initial-scale=1.0">',
-				'\t<title>Document</title>',
-				'</head>',
-				'<body>',
-				'\t$0',
-				'</body>',
-				'</html>'
-			].join('\n')
-		},
-		div: {
-			prefix: 'div',
-			body: ['<div>', '\t$0', '</div>'].join('\n')
-		},
-		p: {
-			prefix: 'p',
-			body: ['<p>', '\t$0', '</p>'].join('\n')
-		},
-
-		span: {
-			prefix: 'span',
-			body: ['<span>', '\t$0', '</span>'].join('\n')
-		},
-		img: {
-			prefix: 'img',
-			body: ['<img src="$0" alt="Image">', '\t$0', '</img>'].join('\n')
-		},
-		br: {
-			prefix: 'br',
-			body: ['<br>'].join('\n')
-		},
-		hr: {
-			prefix: 'hr',
-			body: ['<hr>'].join('\n')
-		},
-		a: {
-			prefix: 'a',
-			body: ['<a href="$0">Link</a>'].join('\n')
-		},
-		ul: {
-			prefix: 'ul',
-			body: ['<ul>', '\t$0', '</ul>'].join('\n')
-		},
-		li: {
-			prefix: 'li',
-			body: ['<li>', '\t$0', '</li>'].join('\n')
-		},
-		ol: {
-			prefix: 'ol',
-			body: ['<ol>', '\t$0', '</ol>'].join('\n')
-		},
-		table: {
-			prefix: 'table',
-			body: ['<table>', '\t$0', '</table>'].join('\n')
-		}
-	};
+	let activeTab: 'html' | 'css' | 'javascript' = $state('html');
 
 	onMount(async () => {
 		monaco = (await import('./monaco')).default;
@@ -87,11 +33,11 @@
 		htmlEditor = monaco.editor.create(htmlEditorContainer!, {
 			theme: 'vs-dark',
 			automaticLayout: true,
-            
+
 			language: 'html'
 		});
 
-		cssEditor = monaco.editor.create(cssEditorContainer!, {    
+		cssEditor = monaco.editor.create(cssEditorContainer!, {
 			theme: 'vs-dark',
 			automaticLayout: true,
 			language: 'css'
@@ -110,7 +56,41 @@
 		htmlEditor.setModel(htmlModel);
 		cssEditor.setModel(cssModel);
 		jsEditor.setModel(jsModel);
+		htmlEditor.onDidChangeModelContent(() => {
+			code.html = htmlEditor.getValue();
+		});
+
+		cssEditor.onDidChangeModelContent(() => {
+			code.css = cssEditor.getValue();
+		});
+
+		jsEditor.onDidChangeModelContent(() => {
+			code.javascript = jsEditor.getValue();
+		});
 	});
+	function getCodePreview(params: { css: string; html: string; javascript: string }) {
+		const css = params.css ?? '';
+		const html = params.html ?? '';
+		const javascript = params.javascript ?? '';
+
+		let html_content = '';
+		html_content += `<ht` + `ml>`;
+		html_content += `<he` + `ad>`;
+		html_content += `<meta name="viewport" content="width=device-width, initial-scale=1.0">`;
+		html_content +=
+			`<sty` +
+			`le>
+			${css}
+		</sty` +
+			`le>`;
+		html_content += `</he` + `ad>`;
+		html_content += `<bo` + `dy>${html}</bo` + `dy>`;
+		html_content += `<sc` + `ript>`;
+		html_content += `${javascript}</sc` + `ript>`;
+		html_content += `</ht` + `ml>`;
+
+		return html_content;
+	}
 
 	onDestroy(() => {
 		monaco?.editor.getModels().forEach((model) => model.dispose());
@@ -120,7 +100,7 @@
 	});
 </script>
 
-<Resizable.PaneGroup direction="horizontal" class="">
+<Resizable.PaneGroup direction="horizontal">
 	<Resizable.Pane
 		defaultSize={25}
 		onResize={() => {
@@ -152,11 +132,44 @@
 	<Resizable.Handle withHandle class="bg-muted" />
 	<Resizable.Pane defaultSize={60} class="p-0">
 		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeTab}>
-			<Tabs.List class="flex justify-start border-b border-muted">
-				<Tabs.Trigger value="html" class="rounded-t-lg border border-b-0 border-muted px-4 py-2 text-sm font-medium hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:border-muted">HTML</Tabs.Trigger>
-				<Tabs.Trigger value="css" class="rounded-t-lg border border-b-0 border-muted px-4 py-2 text-sm font-medium hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:border-muted">CSS</Tabs.Trigger>
-				<Tabs.Trigger value="javascript" class="rounded-t-lg border border-b-0 border-muted px-4 py-2 text-sm font-medium hover:bg-muted/50 data-[state=active]:bg-background data-[state=active]:border-muted">JavaScript</Tabs.Trigger>
-			</Tabs.List>
+			<div class="flex items-center justify-between px-2 py-2">
+				<Tabs.List class="">
+					<Tabs.Trigger
+						value="html"
+						class=""
+						>HTML</Tabs.Trigger
+					>
+					<Tabs.Trigger
+						value="css"
+						class=""
+						>CSS</Tabs.Trigger
+					>
+					<Tabs.Trigger
+						value="javascript"
+						class=""
+						>JavaScript</Tabs.Trigger
+					>
+				</Tabs.List>
+				<Button
+					variant="outline"
+					class="gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
+					onclick={async () => {
+                        if (
+							JSON.stringify($state.snapshot(lastRunCode)) !==
+							JSON.stringify($state.snapshot(code))
+						) {
+							lastRunCode = structuredClone($state.snapshot(code));
+						} else {
+							lastRunCode = null;
+							await new Promise((resolve) => setTimeout(resolve, 0));
+							lastRunCode = structuredClone($state.snapshot(code));
+						}
+					}}
+				>
+					<PlayIcon class="h-4 w-4" />
+					<span>Run</span>
+				</Button>
+			</div>
 			<Tabs.Content value="html" class="h-full w-full">
 				<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
 			</Tabs.Content>
@@ -170,8 +183,15 @@
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
 	<Resizable.Pane defaultSize={30}>
-		<div class="flex h-full items-center justify-center p-6">
-			<span class="font-semibold">Content</span>
+		<div class="flex h-full items-center justify-center">
+			{#if lastRunCode !== null}
+				<iframe
+					title="Code Preview"
+					class="h-full w-full"
+					srcdoc={getCodePreview(lastRunCode)}
+					sandbox="allow-scripts"
+				></iframe>
+			{/if}
 		</div>
 	</Resizable.Pane>
 </Resizable.PaneGroup>
