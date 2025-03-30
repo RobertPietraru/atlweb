@@ -588,7 +588,7 @@
 						<div class="flex items-center gap-1.5">
 							<FileCheck class="h-4 w-4 text-muted-foreground" />
 							<span class="text-sm font-medium text-muted-foreground">
-								{0} soluții trimise de tine
+								Nu ai rezolvat acest exercițiu
 							</span>
 						</div>
 						<div class="flex-1"></div>
@@ -598,8 +598,6 @@
 						</Button>
 					</div>
 				</Card>
-				<h2 class="text-lg font-semibold">Instructiuni</h2>
-				<Separator />
 				<div class="markdown-content">
 					{@html marked(block.instructions)}
 				</div>
@@ -637,6 +635,9 @@
 
 	:global(.markdown-content code) {
 		@apply bg-muted text-muted-foreground p-1;
+	}
+	:global(.markdown-content pre) {
+		@apply bg-muted p-1 text-muted-foreground;
 	}
 
 	:global(.markdown-content hr) {

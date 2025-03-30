@@ -71,9 +71,12 @@
 	async function saveChapterInfo() {
 		loading = true;
 		try {
+			const formData = new FormData();
+			formData.append('name', editForm.name);
+			formData.append('description', editForm.description);
 			const response = await fetch('?/update', {
 				method: 'POST',
-				body: JSON.stringify(editForm)
+				body: formData
 			});
 
 			const result = deserialize(await response.text());

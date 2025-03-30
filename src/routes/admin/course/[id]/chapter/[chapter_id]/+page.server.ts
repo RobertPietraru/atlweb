@@ -80,19 +80,18 @@ export const actions = {
     },
     update: async ({ request, locals, params }) => {
         const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
+        const formData = await request.formData();
+        const name = formData.get('name');
+        const description = formData.get('description');
 
         if (!hasPermission) {
             error(403, 'You do not have permission to edit this course');
         }
 
-        const form = await superValidate(request, zod(schema));
-        if (!form.valid) {
-            return { form };
-        }
 
         await adminService.updateChapter(params.chapter_id, {
-            name: form.data.name,
-            description: form.data.description
+            name: name as string,
+            description: description as string
         });
 
         return { success: true };

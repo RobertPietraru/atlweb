@@ -127,18 +127,16 @@
 	</aside>
 
 	<main class="w-full flex-1 md:p-8">
-		{#if !isMobile.current}
-			<div class="mb-2 flex gap-4">
-				<div class="flex items-center gap-3">
-					<div class="rounded-full bg-primary/10 p-2">
-						<BookOpenIcon class="h-5 w-5 text-primary" />
-					</div>
-					<h1 class="hidden text-3xl font-bold tracking-tight lg:block">
-						{lesson.name || 'Lectie'}
-					</h1>
+		<div class="mb-4 flex gap-4">
+			<div class="flex items-center gap-3">
+				<div class="rounded-full bg-primary/10 p-2">
+					<BookOpenIcon class="h-5 w-5 text-primary" />
 				</div>
+				<h1 class="hidden text-3xl font-bold tracking-tight lg:block">
+					{lesson.name || 'Lectie'}
+				</h1>
 			</div>
-		{/if}
+		</div>
 		<div class="markdown-content mb-4 px-4 md:px-0">
 			{@html marked(lesson.description)}
 		</div>
@@ -279,7 +277,11 @@
 		href="./{data.lesson.id}/exercise/{block.id}"
 		class="block transition-all duration-200 hover:scale-[1.02]"
 	>
-		<Card class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {block.isSolved ? 'bg-primary/10' : ''}">
+		<Card
+			class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {block.isSolved
+				? 'bg-primary/10'
+				: ''}"
+		>
 			<div class="flex items-center gap-2 px-4 pt-4">
 				<BookOpen
 					class="h-5 w-5 text-primary transition-transform duration-200 group-hover:scale-110"
@@ -293,10 +295,10 @@
 			<div class="flex items-center justify-end gap-2 px-4 pb-4">
 				<div class="flex items-center gap-1.5">
 					{#if block.isSolved}
-					<FileCheck class="h-4 w-4 text-primary" />
-						<span class="text-sm font-medium text-primary animate-pulse"> Soluție trimisă </span>
+						<FileCheck class="h-4 w-4 text-primary" />
+						<span class="animate-pulse text-sm font-medium text-primary"> Soluție trimisă </span>
 					{:else}
-					<FileCheck class="h-4 w-4 text-muted-foreground" />
+						<FileCheck class="h-4 w-4 text-muted-foreground" />
 						<span class="text-sm font-medium text-muted-foreground"> Soluție netrimisă </span>
 					{/if}
 				</div>
@@ -349,6 +351,10 @@
 		@apply w-full md:max-w-2xl;
 	}
 	:global(.markdown-content code) {
+		@apply bg-muted p-1 text-muted-foreground;
+	}
+
+	:global(.markdown-content pre) {
 		@apply bg-muted p-1 text-muted-foreground;
 	}
 	:global(.tab-trigger) {
