@@ -11,14 +11,8 @@
 	<div class="mb-8 space-y-4 px-4 md:px-8">
 		<div class="flex items-center justify-between">
 			<h1 class="text-2xl md:text-3xl font-bold">{data.chapter.name}</h1>
-			{#if !isMobile.current}
-				<Button href="/course/{data.courseId}" variant="outline" size="sm">Înapoi la capitole</Button>
-			{/if}
 		</div>
 		<p class="text-lg text-muted-foreground">{data.chapter.description}</p>
-		{#if isMobile.current}
-			<Button href="/course/{data.courseId}" variant="outline" class="w-full">Înapoi la capitole</Button>
-		{/if}
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:px-8">

@@ -9,19 +9,11 @@
 
 <main class="min-h-[100vh] w-full py-4">
 	<div class="mb-8 space-y-4 px-4 md:px-8">
-		<div class="flex items-center justify-between">
-			<h1 class="text-2xl md:text-3xl font-bold">{data.course.name}</h1>
-			{#if !isMobile.current}
-				<Button href="/" variant="outline" size="sm">Înapoi la cursuri</Button>
-			{/if}
-		</div>
+		<h1 class="text-2xl font-bold md:text-3xl">{data.course.name}</h1>
 		<p class="text-lg text-muted-foreground">{data.course.description}</p>
-		{#if isMobile.current}
-			<Button href="/" variant="outline" class="w-full">Înapoi la cursuri</Button>
-		{/if}
 	</div>
 
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:px-8">
+	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:px-8 lg:grid-cols-3">
 		{#each data.course.chapters as chapter}
 			<a href="/course/{data.course.id}/chapter/{chapter.id}" class="h-full">
 				<Card
