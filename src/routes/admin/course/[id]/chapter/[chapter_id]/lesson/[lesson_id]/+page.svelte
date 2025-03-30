@@ -9,11 +9,10 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { BookOpenIcon, CodeIcon, PlusIcon, TextIcon, PlayIcon, TrashIcon, ArrowUpRightIcon } from 'lucide-svelte';
+	import { BookOpenIcon, CodeIcon, PlusIcon, TextIcon, PlayIcon, TrashIcon, Braces } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
-	import { onMount } from 'svelte';
-	import { ArrowUp, ArrowDown, Delete } from 'svelte-lucide';
+	import { ArrowUp, ArrowDown } from 'svelte-lucide';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -60,7 +59,7 @@
 		}
 	}
 
-	function insertBlock(type: 'text' | 'resources' | 'code', index: number) {
+	function insertBlock(type: 'text' | 'resources' | 'code' | 'exercise', index: number) {
 		/// remove all visible popups
 		visiblePopupIndex = null;
 		let block: (typeof lesson.blocks)[0];
@@ -93,6 +92,20 @@
 				order: index,
 				type: 'code',
 				showOutput: false
+			};
+			lesson.blocks.splice(index, 0, block);
+		} else if (type === 'exercise') {
+			block = {
+				id: '',
+				type: 'exercise',
+				name: '',
+				description: '',
+				instructions: '',
+				initialHtml: '',
+				initialCss: '',
+				initialJavascript: '',
+				order: index,
+				creationDate: new Date()
 			};
 			lesson.blocks.splice(index, 0, block);
 		}
@@ -211,9 +224,12 @@
 				{#if block.type === 'resources'}
 					{@render resourcesBlock(block)}
 				{/if}
-
 				{#if block.type === 'code'}
 					{@render codeBlock(block)}
+				{/if}
+
+				{#if block.type === 'exercise'}
+					{@render exerciseBlock(block)}
 				{/if}
 			</div>
 		</div>
@@ -274,6 +290,14 @@
 					>
 						<CodeIcon class="h-5 w-5" />
 					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
+						class="rounded-full hover:bg-primary/20"
+						onclick={() => insertBlock('exercise', index)}
+					>
+						<Braces class="h-5 w-5" />
+					</Button>
 				</div>
 			{/if}
 
@@ -287,7 +311,7 @@
 {#snippet manageBlock(index: number)}
 	<div class="relative -ml-4 -mr-2" id="adder">
 		<div class="group flex flex-col">
-			<div class="flex flex-col gap-2 justify-between">
+			<div class="flex flex-col justify-between gap-2">
 				<Button
 					variant="destructive"
 					size="icon"
@@ -303,15 +327,15 @@
 				{#if index !== 0}
 					<Button
 						size="icon"
-					class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30"
-					disabled={index === 0}
-					onclick={() => {
-						const temp = lesson.blocks[index];
-						lesson.blocks[index] = lesson.blocks[index - 1];
-						lesson.blocks[index - 1] = temp;
-					}}
-				>
-					<ArrowUp
+						class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30"
+						disabled={index === 0}
+						onclick={() => {
+							const temp = lesson.blocks[index];
+							lesson.blocks[index] = lesson.blocks[index - 1];
+							lesson.blocks[index - 1] = temp;
+						}}
+					>
+						<ArrowUp
 							class="h-4 w-4  transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:scale-125"
 						/>
 					</Button>
@@ -322,13 +346,13 @@
 						size="icon"
 						class="z-10 h-8 w-8 rounded-full opacity-30 transition-all duration-300 group-hover:h-12 group-hover:w-12 group-hover:-translate-y-1 group-hover:opacity-100 group-hover:shadow-lg group-hover:shadow-primary/30"
 						disabled={index === lesson.blocks.length - 1}
-					onclick={() => {
-						const temp = lesson.blocks[index];
-						lesson.blocks[index] = lesson.blocks[index + 1];
-						lesson.blocks[index + 1] = temp;
-					}}
-				>
-					<ArrowDown
+						onclick={() => {
+							const temp = lesson.blocks[index];
+							lesson.blocks[index] = lesson.blocks[index + 1];
+							lesson.blocks[index + 1] = temp;
+						}}
+					>
+						<ArrowDown
 							class="h-4 w-4  transition-all duration-300 group-hover:h-5 group-hover:w-5 group-hover:scale-125"
 						/>
 					</Button>
@@ -490,11 +514,6 @@
 					variant="outline"
 					onclick={() => {
 						block.showOutput = true;
-						window.addEventListener('message', (event) => {
-							if (event.data.type === 'log') {
-								alert(event.data.data);
-							}
-						});
 					}}
 				>
 					<PlayIcon class="mr-2 h-4 w-4" />
@@ -507,6 +526,52 @@
 						></iframe>
 					</div>
 				{/if}
+			</div>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet exerciseBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>)}
+	<div class="flex flex-col gap-4">
+		<div class="grid grid-cols-2 gap-4">
+			<div class="flex h-full flex-col gap-4">
+				<Textarea bind:value={block.name} placeholder="Nume" />
+				<Textarea bind:value={block.description} placeholder="Descriere (va aparea in lectie)" />
+				<Textarea bind:value={block.instructions} placeholder="Instructiuni (vor aparea in pagina de exercitiu)" />
+				<Tabs.Root bind:value={activeTab}>
+					<div class="flex items-center justify-between">
+						<Tabs.List>
+							<Tabs.Trigger value="html">HTML</Tabs.Trigger>
+							<Tabs.Trigger value="css">CSS</Tabs.Trigger>
+							<Tabs.Trigger value="js">JavaScript</Tabs.Trigger>
+						</Tabs.List>
+					</div>
+					<Tabs.Content value="html">
+						<Textarea bind:value={block.initialHtml} placeholder="Initial HTML" />
+					</Tabs.Content>
+					<Tabs.Content value="css">
+						<Textarea bind:value={block.initialCss} placeholder="Initial CSS" />
+					</Tabs.Content>
+					<Tabs.Content value="js">
+						<Textarea bind:value={block.initialJavascript} placeholder="Initial JavaScript" />
+					</Tabs.Content>
+				</Tabs.Root>
+			</div>
+
+			<div class="flex h-full flex-col gap-4 p-4">
+				<Card class="p-4">
+					<div class="space-y-4">
+						<div>
+							<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
+							<p class="text-sm text-gray-600">{block.description}</p>
+						</div>
+
+						<div class="flex items-center gap-2">
+							<span class="text-sm font-medium">Solutii trimise:</span>
+							<span class="rounded-full bg-gray-100 px-2 py-1 text-sm">0</span>
+						</div>
+					</div>
+				</Card>
 			</div>
 		</div>
 	</div>
