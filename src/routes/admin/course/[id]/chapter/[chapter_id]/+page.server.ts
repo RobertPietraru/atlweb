@@ -29,7 +29,10 @@ export const load = async ({ locals, params }) => {
         error(404, 'Chapter not found');
     }
 
-    const form = await superValidate(zod(schema));
+    const form = await superValidate({
+        name: chapter.name,
+        description: chapter.description
+    }, zod(schema));
 
     return {
         chapter,
@@ -74,5 +77,25 @@ export const actions = {
 
         await adminService.reorderAllLessons(form.data.lessons);
         return { success: true };
-    }
+    },
+    update: async ({ request, locals, params }) => {
+        const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
+
+        if (!hasPermission) {
+            error(403, 'You do not have permission to edit this course');
+        }
+
+        const form = await superValidate(request, zod(schema));
+        if (!form.valid) {
+            return { form };
+        }
+
+        await adminService.updateChapter(params.chapter_id, {
+            name: form.data.name,
+            description: form.data.description
+        });
+
+        return { success: true };
+
+    },
 };

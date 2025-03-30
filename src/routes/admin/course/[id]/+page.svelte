@@ -8,13 +8,20 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { toast } from 'svelte-sonner';
 	import { deserialize } from '$app/forms';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	let { data } = $props();
 	let chapters = $state(data.course.chapters.map((ch) => ({ ...ch })));
 	let initialChapters = data.course.chapters;
 	let hasChanges = $derived(JSON.stringify(chapters) !== JSON.stringify(initialChapters));
+	let saving = $state(false);
+	let isEditing = $state(false);
+	let editForm = $state({
+		name: data.course.name,
+		description: data.course.description
+	});
 
-	const { form, message, errors } = superForm(data.form);
+	const { form, errors } = superForm(data.form);
 	let dialogOpen = $state(false);
 	let loading = $state(false);
 
@@ -100,6 +107,45 @@
 		}
 	}
 
+	async function saveCourseInfo() {
+		saving = true;
+		try {
+			const formData = new FormData();
+			formData.append('name', editForm.name);
+			formData.append('description', editForm.description);
+			const response = await fetch('?/update', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
+				data.course.name = editForm.name;
+				data.course.description = editForm.description;
+				isEditing = false;
+				toast.success('Informațiile cursului au fost salvate cu succes', {
+					position: 'bottom-left'
+				});
+			} else if (result.type === 'failure') {
+				console.error('Error saving course info:', result.data?.message);
+				toast.error(
+					(result.data?.message as string | undefined | null) ?? 
+					'A apărut o eroare la salvarea informațiilor cursului',
+					{
+						position: 'bottom-left'
+					}
+				);
+			}
+		} catch (error) {
+			console.error('Error saving course info:', error);
+			toast.error('A apărut o eroare la salvarea informațiilor cursului', {
+				position: 'bottom-left'
+			});
+		} finally {
+			saving = false;
+		}
+	}
+
 	function deleteChapter(index: number) {
 		chapters = chapters.filter((_, i) => i !== index);
 		hasChanges = true;
@@ -113,17 +159,39 @@
 
 	<div class="grid gap-12">
 		<section>
-			<h2 class="mb-6 text-2xl font-semibold tracking-tight">Informații de bază</h2>
+			<div class="mb-6 flex items-center justify-between">
+				<h2 class="text-2xl font-semibold tracking-tight">Informații de bază</h2>
+				{#if !isEditing}
+					<Button variant="outline" onclick={() => (isEditing = true)}>Editează</Button>
+				{/if}
+			</div>
 			<Card>
 				<CardContent class="space-y-6 pt-6">
-					<div>
-						<Label class="text-sm text-muted-foreground">Nume curs</Label>
-						<p class="mt-1 text-lg font-medium">{data.course.name}</p>
-					</div>
-					<div>
-						<Label class="text-sm text-muted-foreground">Descriere</Label>
-						<p class="mt-1 text-lg leading-relaxed">{data.course.description}</p>
-					</div>
+					{#if isEditing}
+						<div>
+							<Label for="name">Nume curs</Label>
+							<Input id="name" bind:value={editForm.name} />
+						</div>
+						<div>
+							<Label for="description">Descriere</Label>
+							<Textarea id="description" bind:value={editForm.description} />
+						</div>
+						<div class="flex gap-2">
+							<Button variant="default" onclick={saveCourseInfo} disabled={saving}>Salvează</Button>
+							<Button variant="outline" onclick={() => (isEditing = false)} disabled={saving}>
+								Anulează
+							</Button>
+						</div>
+					{:else}
+						<div>
+							<Label class="text-sm text-muted-foreground">Nume curs</Label>
+							<p class="mt-1 text-lg font-medium">{data.course.name}</p>
+						</div>
+						<div>
+							<Label class="text-sm text-muted-foreground">Descriere</Label>
+							<p class="mt-1 text-lg leading-relaxed">{data.course.description}</p>
+						</div>
+					{/if}
 				</CardContent>
 			</Card>
 		</section>

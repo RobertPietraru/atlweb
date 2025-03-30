@@ -37,6 +37,7 @@ export const permissionsList = [
 export const course = pgTable('course', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
+	/// markdown
 	description: text('description').notNull(),
 	order: integer('order').notNull(),
 });
@@ -44,6 +45,7 @@ export const course = pgTable('course', {
 export const chapter = pgTable('chapter', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
+	/// markdown
 	description: text('description').notNull(),
 	order: integer('order').notNull(),
 	course: uuid('course_id')
@@ -55,6 +57,7 @@ export const lesson = pgTable('lesson', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
 	teaser: text('teaser').notNull(),
+	/// markdown
 	description: text('description').notNull(),
 	chapterId: uuid('chapter_id')
 		.notNull()
@@ -67,22 +70,26 @@ export const lessonTextBlock = pgTable('lesson_text_block', {
 	lessonId: uuid('lesson_id')
 		.notNull()
 		.references(() => lesson.id),
+	/// markdown
 	text: text('text').notNull(),
 	order: integer('order').notNull(),
 });
 
+/// aditional resources such as tutorials, articles, etc
 export const lessonResourcesBlock = pgTable('lesson_resources_block', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	lessonId: uuid('lesson_id')
 		.notNull()
 		.references(() => lesson.id),
 	title: text('title').notNull(),
+	/// markdown
 	content: text('content').notNull(),
 	urls: text('urls').array().notNull(),
 	urlLabels: text('url_labels').array().notNull(),
 	order: integer('order').notNull(),
 });
 
+/// a little block that contains html, css and javascript code
 export const lessonCodeBlock = pgTable('lesson_code_block', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	lessonId: uuid('lesson_id')
@@ -101,7 +108,9 @@ export const exercise = pgTable('exercise', {
 	name: text('name').notNull(),
 	creationDate: timestamp('creation_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 	description: text('description').notNull(),
+	/// markdown
 	instructions: text('instructions').notNull(),
+	/// the starter code for the exercise
 	initialHtml: text('initial_html').notNull(),
 	initialCss: text('initial_css').notNull(),
 	initialJavascript: text('initial_javascript').notNull(),
@@ -120,11 +129,17 @@ export const submission = pgTable('submission', {
 		.notNull()
 		.references(() => user.id),
 	submissionDate: timestamp('submission_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	/// if it's been checked by the teacher
 	checked: boolean('checked').notNull().default(false),
+	/// if the student needs help
 	needHelp: boolean('need_help').notNull().default(false),
+	/// if the student wants to be anonymous
 	anonymous: boolean('anonymous').notNull().default(false),
+	/// the javascript code
 	javascriptCode: text('javascript_code').notNull(),
+	/// the html code
 	htmlCode: text('html_code').notNull(),
+	/// the css code
 	cssCode: text('css_code').notNull(),
 });
 

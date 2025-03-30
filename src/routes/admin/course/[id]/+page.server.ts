@@ -14,14 +14,10 @@ const reorderSchema = z.object({
 });
 
 export const load = async ({ locals, params }) => {
-    if (!locals.user) {
-        redirect(302, '/login');
-    }
-
-    const hasPermission = await adminService.hasPermission(locals.user.id, 'course.view');
+    const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.view');
 
     if (!hasPermission) {
-        redirect(302, '/');
+        error(403, 'You do not have permission to view this course');
     }
 
     const course = await adminService.getCourseWithChapters(params.id);
@@ -56,12 +52,28 @@ export const actions = {
         await adminService.createChapter(params.id, form.data);
         return { form };
     },
-    manageChapters: async ({ request, locals, params }) => {
-        if (!locals.user) {
-            redirect(302, '/login');
+    update: async ({ request, locals, params }) => {
+        const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
+
+        if (!hasPermission) {
+            error(403, 'You do not have permission to edit this course');
         }
 
-        const hasPermission = await adminService.hasPermission(locals.user.id, 'course.edit');
+        const form = await superValidate(request, zod(schema));
+        if (!form.valid) {
+            return { form };
+        }
+
+        await adminService.updateCourse(params.id, {
+            name: form.data.name,
+            description: form.data.description
+        });
+
+        return { success: true };
+
+    },
+    manageChapters: async ({ request, locals, params }) => {
+        const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
         if (!hasPermission) {
             redirect(302, '/');
         }
