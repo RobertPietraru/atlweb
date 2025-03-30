@@ -1,5 +1,5 @@
 import { hash } from '@node-rs/argon2';
-import { eq, sql, and } from 'drizzle-orm';
+import { eq, sql, and, desc } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -592,13 +592,15 @@ export class AdminService {
     }
 
     async getSubmissions(exercise_id: table.Id) {
-        return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id));
+        return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id)).orderBy(desc(table.submission.submissionDate)).limit(5);
     }
 
     async createSubmission(exerciseId: table.Id, userId: table.Id, params: {
         html: string,
         css: string,
         javascript: string,
+        needHelp: boolean,
+        anonymous: boolean,
     }) {
         const [submission] = await this.db.insert(table.submission).values({
             exerciseId,
@@ -607,8 +609,14 @@ export class AdminService {
             htmlCode: params.html,
             cssCode: params.css,
             javascriptCode: params.javascript,
+            needHelp: params.needHelp,
+            anonymous: params.anonymous,
         }).returning();
         return submission;
+    }
+
+    async deleteSubmission(submissionId: table.Id) {
+        await this.db.delete(table.submission).where(eq(table.submission.id, submissionId));
     }
 }
 

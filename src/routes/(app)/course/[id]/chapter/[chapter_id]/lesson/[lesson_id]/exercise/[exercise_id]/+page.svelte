@@ -9,10 +9,11 @@
 	import {
 		CheckIcon,
 		ChevronDown,
+		EyeIcon,
 		HelpCircleIcon,
 		Loader2,
 		PlayIcon,
-		SendIcon,
+		TrashIcon,
 		UserIcon
 	} from 'lucide-svelte';
 	import { deserialize } from '$app/forms';
@@ -27,6 +28,10 @@
 	});
 	let submitPopupOpen = $state(false);
 	let submitPopupRef = $state<HTMLButtonElement | null>(null);
+
+	let submissions = $state(data.submissions);
+	let deleting = $state<string[]>([]);
+    $inspect(deleting);
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
 	let submittedCode: { html: string; css: string; javascript: string } | null = $state(null);
@@ -87,6 +92,16 @@
 			code.javascript = jsEditor.getValue();
 		});
 	});
+
+	function setCode(params: { css: string; html: string; javascript: string }) {
+		code.css = params.css;
+		code.html = params.html;
+		code.javascript = params.javascript;
+		htmlEditor?.setValue(params.html);
+		cssEditor?.setValue(params.css);
+		jsEditor?.setValue(params.javascript);
+		toast.success('Codul a fost adus la cel de atunci');
+	}
 	function getCodePreview(params: { css: string; html: string; javascript: string }) {
 		const css = params.css ?? '';
 		const html = params.html ?? '';
@@ -129,6 +144,10 @@
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
 				submittedCode = structuredClone($state.snapshot(code));
+				toast.success('Codul a fost trimis cu succes');
+
+				console.log(result.data);
+				submissions = [result.data?.submission as (typeof submissions)[0], ...submissions];
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
@@ -144,6 +163,37 @@
 		} finally {
 			submitting = false;
 		}
+	}
+
+    async function deleteSubmission(submissionId: string) {
+		try {
+			const formData = new FormData();
+			deleting.push(submissionId);
+			formData.append('submissionId', submissionId);
+			const response = await fetch('?/delete', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
+				toast.success('Raspunsul a fost sters cu succes');
+				submissions.splice(submissions.findIndex((submission) => submission.id === submissionId), 1);
+			} else if (result.type === 'failure') {
+				toast.error(
+					(result.data?.message as string | undefined | null) ??
+						'A apărut o eroare la stergerea raspunsului',
+					{
+						position: 'bottom-left'
+					}
+				);
+			}
+		} catch (error) {
+			toast.error('A apărut o eroare la stergerea raspunsului');
+		} finally {
+			deleting.splice(deleting.findIndex((id) => id === submissionId), 1);
+		}
+
 	}
 
 	onDestroy(() => {
@@ -172,13 +222,71 @@
 			</Resizable.Pane>
 			<Resizable.Handle withHandle class="bg-muted" />
 
-			{#if data.submissions.length > 0}
-				<Resizable.Pane defaultSize={25}>
-					{#each data.submissions as submission}
-						<div>
-							<p>{submission.id}</p>
-						</div>
-					{/each}
+			{#if submissions.length > 0}
+				<Resizable.Pane defaultSize={25} class="h-full overflow-y-auto p-4">
+					<table class="w-full border-collapse">
+						<thead>
+							<tr class="border-b">
+								<th class="py-2 text-left"></th>
+								<th class="py-2 text-left">Data</th>
+								<th class="py-2 text-left">Status</th>
+								<th class="py-2 text-left">Anonim</th>
+								<th class="py-2 text-left"></th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each submissions as submission}
+								<tr class="border-b hover:bg-muted/50">
+									<td class="py-2">
+										<Button
+											variant="ghost"
+											size="icon"
+											class="size-6"
+											onclick={() => {
+												setCode({
+													css: submission.cssCode,
+													html: submission.htmlCode,
+													javascript: submission.javascriptCode
+												});
+											}}
+										>
+											<EyeIcon class="size-4" />
+										</Button>
+									</td>
+									<td class="py-2">
+										{new Date(submission.submissionDate).toLocaleString().split(',')[1]}
+									</td>
+									<td class="py-2">
+										{#if submission.needHelp}
+											{#if submission.checked}
+												<span class="text-green-500">Verificat</span>
+											{:else}
+												<span class="text-yellow-500">Ajutor solicitat</span>
+											{/if}
+										{:else}
+											<span class="text-green-500">Trimis</span>
+										{/if}
+									</td>
+									<td class="py-2">
+										{#if submission.anonymous}
+											<span class="text-gray-500">Da</span>
+										{:else}
+											<span class="text-gray-500">Nu</span>
+										{/if}
+									</td>
+									<td class="py-2">
+											<Button variant="destructive" size="icon" class="size-6" onclick={() => deleteSubmission(submission.id)} disabled={deleting.includes(submission.id)}>
+                                                {#if deleting.includes(submission.id)}
+                                                    <Loader2 class="size-4 animate-spin" />
+                                                {:else}
+                                                    <TrashIcon class="size-4" />
+                                                {/if}
+											</Button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
 				</Resizable.Pane>
 			{/if}
 		</Resizable.PaneGroup>
@@ -243,7 +351,10 @@
 </Resizable.PaneGroup>
 {#snippet submitButton()}
 	<Popover.Root bind:open={submitPopupOpen}>
-		<Popover.Trigger bind:ref={submitPopupRef} disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}>
+		<Popover.Trigger
+			bind:ref={submitPopupRef}
+			disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
+		>
 			{#snippet child({ props })}
 				<Button {...props} aria-expanded={submitPopupOpen} class="h-10">
 					{#if submitting}
