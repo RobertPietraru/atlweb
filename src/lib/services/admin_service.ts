@@ -5,6 +5,12 @@ import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 export class AdminService {
+    async updateChapter(chapter_id: table.Id, params: { name: string, description: string }) {
+        await this.db.update(table.chapter).set({
+            name: params.name,
+            description: params.description
+        }).where(eq(table.chapter.id, chapter_id));
+    }
 
     private db: PostgresJsDatabase;
     constructor(db: PostgresJsDatabase) {
@@ -729,6 +735,13 @@ export class AdminService {
             javascriptCode: params.javascript,
             checked: true,
         }).where(eq(table.submission.id, submissionId));
+    }
+
+    async updateCourse(id: table.Id, params: { name: string, description: string }) {
+        await this.db.update(table.course).set({
+            name: params.name,
+            description: params.description,
+        }).where(eq(table.course.id, id));
     }
 }
 
