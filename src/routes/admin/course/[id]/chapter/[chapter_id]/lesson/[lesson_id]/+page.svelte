@@ -9,7 +9,19 @@
 	import { deserialize } from '$app/forms';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { BookOpenIcon, CodeIcon, PlusIcon, TextIcon, PlayIcon, TrashIcon, Braces } from 'lucide-svelte';
+	import {
+		BookOpenIcon,
+		CodeIcon,
+		PlusIcon,
+		TextIcon,
+		PlayIcon,
+		TrashIcon,
+		Braces,
+		BookOpen,
+		Info,
+		PlayCircle,
+		FileCheck
+	} from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
 	import { ArrowUp, ArrowDown } from 'svelte-lucide';
@@ -537,7 +549,10 @@
 			<div class="flex h-full flex-col gap-4">
 				<Textarea bind:value={block.name} placeholder="Nume" />
 				<Textarea bind:value={block.description} placeholder="Descriere (va aparea in lectie)" />
-				<Textarea bind:value={block.instructions} placeholder="Instructiuni (vor aparea in pagina de exercitiu)" />
+				<Textarea
+					bind:value={block.instructions}
+					placeholder="Instructiuni (vor aparea in pagina de exercitiu)"
+				/>
 				<Tabs.Root bind:value={activeTab}>
 					<div class="flex items-center justify-between">
 						<Tabs.List>
@@ -559,19 +574,34 @@
 			</div>
 
 			<div class="flex h-full flex-col gap-4 p-4">
-				<Card class="p-4">
-					<div class="space-y-4">
-						<div>
-							<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
-							<p class="text-sm text-gray-600">{block.description}</p>
+				<Card class="space-y-4">
+					<div class="flex items-center gap-2 px-4 pt-4">
+						<BookOpen class="h-5 w-5 text-primary" />
+						<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
+					</div>
+					<Separator />
+					<div class="flex items-start gap-2 px-4">
+						<p class="text-sm text-muted-foreground">{block.description}</p>
+					</div>
+					<div class="flex items-center justify-end gap-2 px-4 pb-4">
+						<div class="flex items-center gap-1.5">
+							<FileCheck class="h-4 w-4 text-muted-foreground" />
+							<span class="text-sm font-medium text-muted-foreground">
+								{0} soluții trimise de tine
+							</span>
 						</div>
-
-						<div class="flex items-center gap-2">
-							<span class="text-sm font-medium">Solutii trimise:</span>
-							<span class="rounded-full bg-gray-100 px-2 py-1 text-sm">0</span>
-						</div>
+						<div class="flex-1"></div>
+						<Button variant="outline" size="sm" class="gap-2">
+							<PlayCircle class="h-4 w-4" />
+							<span>Încearcă exercițiul</span>
+						</Button>
 					</div>
 				</Card>
+				<h2 class="text-lg font-semibold">Instructiuni</h2>
+				<Separator />
+				<div class="markdown-content">
+					{@html marked(block.instructions)}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -604,7 +634,12 @@
 		@apply text-blue-500;
 	}
 
+	:global(.markdown-content code) {
+		@apply bg-muted text-muted-foreground p-1;
+	}
+
 	:global(.markdown-content hr) {
 		@apply my-4;
 	}
+
 </style>

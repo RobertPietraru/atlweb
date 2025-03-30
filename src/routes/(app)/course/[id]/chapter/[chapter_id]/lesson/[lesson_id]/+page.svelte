@@ -3,10 +3,20 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { PlayIcon, ArrowLeftIcon, BookOpenIcon, ArrowRightIcon, MenuIcon } from 'lucide-svelte';
+	import {
+		PlayIcon,
+		ArrowLeftIcon,
+		BookOpenIcon,
+		ArrowRightIcon,
+		MenuIcon,
+		BookOpen,
+		FileCheck,
+		PlayCircle
+	} from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	import { Card } from '$lib/components/ui/card/index.js';
 	const isMobile = new IsMobile();
 
 	let { data } = $props();
@@ -49,7 +59,7 @@
 
 <div class="flex min-h-screen w-full flex-col lg:flex-row-reverse">
 	{#if isMobile.current}
-		<div class="flex w-full items-center justify-between border-b bg-card p-4 lg:hidden gap-3">
+		<div class="flex w-full items-center justify-between gap-3 border-b bg-card p-4 lg:hidden">
 			<div class="rounded-full bg-primary/10 p-2">
 				<BookOpenIcon class="h-5 w-5 text-primary" />
 			</div>
@@ -136,19 +146,26 @@
 
 		<div class="space-y-8">
 			{#each lesson.blocks as block, index}
-				<div
-					class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
-				>
-					{#if block.type === 'text'}
-						{@render textBlock(block)}
-					{/if}
-					{#if block.type === 'resources'}
-						{@render resourcesBlock(block)}
-					{/if}
-					{#if block.type === 'code'}
-						{@render codeBlock(block, index)}
-					{/if}
-				</div>
+				{#if block.type === 'exercise'}
+					<!-- for some reason, without this div, the exercise block will stick to the one above, idk why -->
+					<div>
+						{@render exerciseBlock(block)}
+					</div>
+				{:else}
+					<div
+						class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
+					>
+						{#if block.type === 'text'}
+							{@render textBlock(block)}
+						{/if}
+						{#if block.type === 'resources'}
+							{@render resourcesBlock(block)}
+						{/if}
+						{#if block.type === 'code'}
+							{@render codeBlock(block, index)}
+						{/if}
+					</div>
+				{/if}
 			{/each}
 		</div>
 	</main>
@@ -258,6 +275,34 @@
 	</Tabs.Root>
 {/snippet}
 
+{#snippet exerciseBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>)}
+	<a href="./{data.lesson.id}/exercise/{block.id}" class="block transition-all duration-200 hover:scale-[1.02]">
+		<Card class="space-y-4 transition-colors duration-200 hover:bg-muted/50">
+			<div class="flex items-center gap-2 px-4 pt-4">
+				<BookOpen class="h-5 w-5 text-primary transition-transform duration-200 group-hover:scale-110" />
+				<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
+			</div>
+			<Separator />
+			<div class="flex items-start gap-2 px-4">
+				<p class="text-sm text-muted-foreground">{block.description}</p>
+			</div>
+			<div class="flex items-center justify-end gap-2 px-4 pb-4">
+				<div class="flex items-center gap-1.5">
+					<FileCheck class="h-4 w-4 text-muted-foreground" />
+					<span class="text-sm font-medium text-muted-foreground">
+						{0} soluții trimise de tine
+					</span>
+				</div>
+				<div class="flex-1"></div>
+				<Button variant="outline" size="sm" class="gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground">
+					<PlayCircle class="h-4 w-4" />
+					<span>Încearcă exercițiul</span>
+				</Button>
+			</div>
+		</Card>
+	</a>
+{/snippet}
+
 <style>
 	:global(.markdown-content h1) {
 		@apply text-2xl font-bold;
@@ -291,6 +336,9 @@
 	}
 	:global(.markdown-content iframe) {
 		@apply w-full md:max-w-2xl;
+	}
+	:global(.markdown-content code) {
+		@apply bg-muted p-1 text-muted-foreground;
 	}
 	:global(.tab-trigger) {
 		@apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
