@@ -5,6 +5,7 @@ import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 export class AdminService {
+
     private db: PostgresJsDatabase;
     constructor(db: PostgresJsDatabase) {
         this.db = db;
@@ -577,6 +578,21 @@ export class AdminService {
             return null;
         }
         return exercise[0];
+    }
+
+    async getLessonNameAndId(lesson_id: table.Id) {
+        const lesson = await this.db.select({
+            name: table.lesson.name,
+            id: table.lesson.id,
+        }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+        if (lesson.length === 0) {
+            return null;
+        }
+        return lesson[0];
+    }
+
+    async getSubmissions(exercise_id: table.Id) {
+        return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id));
     }
 }
 
