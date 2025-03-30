@@ -70,8 +70,9 @@
 		</div>
 	{/if}
 
+	<!-- w-full border-b bg-card lg:fixed lg:right-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l -->
 	<aside
-		class="w-full border-b bg-card lg:w-96 lg:border-b-0 lg:border-l"
+		class="w-full border-b bg-card lg:sticky lg:top-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l lg:z-10"
 		class:hidden={!showSidebar}
 		class:lg:block={true}
 	>
