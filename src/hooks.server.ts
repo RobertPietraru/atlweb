@@ -40,7 +40,7 @@ export const authentication: Handle = async ({ event, resolve }) => {
 	// Protect any routes that don't start with the unprotectedPrefix or are not the root path
 	if (!unprotectedPrefix.some((path) => event.url.pathname.startsWith(path)) && event.url.pathname !== '/') {
 		if (!event.locals.user) {
-			throw redirect(303, '/login');
+			redirect(303, '/login?redirect=' + event.url.pathname);
 		}
 	}
 

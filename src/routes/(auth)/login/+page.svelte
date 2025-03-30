@@ -57,7 +57,7 @@
 				</form>
 			</CardContent>
 			<CardFooter class="flex justify-center">
-				<p class="text-center">Nu ai cont? <a href="/register" class="text-blue-500 hover:underline">Înregistrează-te</a></p>
+				<p class="text-center">Nu ai cont? <a href="/register?redirect={data.redirectUrl}" class="text-blue-500 hover:underline">Înregistrează-te</a></p>
 			</CardFooter>
 		</Card>
 	</div>

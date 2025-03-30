@@ -18,7 +18,7 @@ const limiter = new RateLimiter({
 
 export const load = async (event) => {
 	if (event.locals.user) {
-		return redirect(302, '/');
+		return redirect(302, event.url.searchParams.get('redirect') || '/');
 	}
 	const form = await superValidate(zod(schema));
 	return { form };
@@ -55,6 +55,6 @@ export const actions = {
 
 		authService.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, '/');
+		return redirect(302, event.url.searchParams.get('redirect') || '/');
 	},
 };

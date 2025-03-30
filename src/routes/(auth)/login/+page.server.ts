@@ -19,13 +19,15 @@ export const load= async (event) => {
 	if (event.locals.user) {
 		return redirect(302, '/');
 	}
+	const redirectUrl = event.url.searchParams.get('redirect') || '/';
 	const form = await superValidate(zod(schema));
-	return { form };
+	return { form, redirectUrl };
 };
 
 export const actions= {
 	default: async (event) => {
 		if (await limiter.isLimited(event)) error(429, 'Prea multe incercari de logare. Te rugam sa astepti o perioada de timp.');
+		const redirectUrl = event.url.searchParams.get('redirect') || '/';
 		const form = await superValidate(event.request, zod(schema));
 		if (!form.valid) {
 			return fail(400, { form });
@@ -43,6 +45,6 @@ export const actions= {
 
 		authService.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, '/');
+		return redirect(302, redirectUrl);
 	},
 };
