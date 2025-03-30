@@ -117,7 +117,10 @@ export const submission = pgTable('submission', {
 	userId: uuid('user_id')
 		.notNull()
 		.references(() => user.id),
-
+	submissionDate: timestamp('submission_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	checked: boolean('checked').notNull().default(false),
+	needHelp: boolean('need_help').notNull().default(false),
+	anonymous: boolean('anonymous').notNull().default(false),
 	javascriptCode: text('javascript_code').notNull(),
 	htmlCode: text('html_code').notNull(),
 	cssCode: text('css_code').notNull(),

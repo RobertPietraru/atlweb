@@ -6,7 +6,18 @@
 	import { marked } from 'marked';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { PlayIcon } from 'lucide-svelte';
+	import {
+		CheckIcon,
+		ChevronDown,
+		HelpCircleIcon,
+		Loader2,
+		PlayIcon,
+		SendIcon,
+		UserIcon
+	} from 'lucide-svelte';
+	import { deserialize } from '$app/forms';
+	import { toast } from 'svelte-sonner';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	let { data } = $props();
 
 	let code = $state({
@@ -14,8 +25,14 @@
 		css: data.exercise.initialCss,
 		javascript: data.exercise.initialJavascript
 	});
+	let submitPopupOpen = $state(false);
+	let submitPopupRef = $state<HTMLButtonElement | null>(null);
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
+	let submittedCode: { html: string; css: string; javascript: string } | null = $state(null);
+	let currentCodeAndSubmittedCodeAreTheSame = $derived(
+		JSON.stringify($state.snapshot(code)) === JSON.stringify($state.snapshot(submittedCode))
+	);
 
 	let htmlEditor: Monaco.editor.IStandaloneCodeEditor;
 	let cssEditor: Monaco.editor.IStandaloneCodeEditor;
@@ -26,6 +43,8 @@
 	let jsEditorContainer: HTMLElement | null = $state(null);
 
 	let activeTab: 'html' | 'css' | 'javascript' = $state('html');
+
+	let submitting = $state(false);
 
 	onMount(async () => {
 		monaco = (await import('./monaco')).default;
@@ -92,6 +111,41 @@
 		return html_content;
 	}
 
+	async function submitCode(params: { needHelp: boolean; anonymous: boolean }) {
+		try {
+			submitting = true;
+			submitPopupOpen = false;
+			const formData = new FormData();
+			formData.append('html', code.html);
+			formData.append('css', code.css);
+			formData.append('javascript', code.javascript);
+			formData.append('needHelp', params.needHelp.toString());
+			formData.append('anonymous', params.anonymous.toString());
+			const response = await fetch('?/submit', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
+				submittedCode = structuredClone($state.snapshot(code));
+			} else if (result.type === 'failure') {
+				toast.error(
+					(result.data?.message as string | undefined | null) ??
+						'A apărut o eroare la trimiterea codului',
+					{
+						position: 'bottom-left'
+					}
+				);
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error('A apărut o eroare la trimiterea codului');
+		} finally {
+			submitting = false;
+		}
+	}
+
 	onDestroy(() => {
 		monaco?.editor.getModels().forEach((model) => model.dispose());
 		htmlEditor?.dispose();
@@ -132,31 +186,23 @@
 	<Resizable.Handle withHandle class="bg-muted" />
 	<Resizable.Pane defaultSize={60} class="p-0">
 		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeTab}>
-			<div class="flex items-center justify-between px-2 py-2">
+			<div class="flex items-center gap-4 px-2 py-2">
 				<Tabs.List class="">
-					<Tabs.Trigger
-						value="html"
-						class=""
-						>HTML</Tabs.Trigger
-					>
-					<Tabs.Trigger
-						value="css"
-						class=""
-						>CSS</Tabs.Trigger
-					>
-					<Tabs.Trigger
-						value="javascript"
-						class=""
-						>JavaScript</Tabs.Trigger
-					>
+					<Tabs.Trigger value="html" class="">HTML</Tabs.Trigger>
+					<Tabs.Trigger value="css" class="">CSS</Tabs.Trigger>
+					<Tabs.Trigger value="javascript" class="">JavaScript</Tabs.Trigger>
 				</Tabs.List>
+				<div class="flex-1"></div>
+
+				<div class="h-10">
+					{@render submitButton()}
+				</div>
+
 				<Button
-					variant="outline"
-					class="gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
+					class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
 					onclick={async () => {
-                        if (
-							JSON.stringify($state.snapshot(lastRunCode)) !==
-							JSON.stringify($state.snapshot(code))
+						if (
+							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
 						) {
 							lastRunCode = structuredClone($state.snapshot(code));
 						} else {
@@ -167,7 +213,7 @@
 					}}
 				>
 					<PlayIcon class="h-4 w-4" />
-					<span>Run</span>
+					<span>Rulează</span>
 				</Button>
 			</div>
 			<Tabs.Content value="html" class="h-full w-full">
@@ -195,6 +241,55 @@
 		</div>
 	</Resizable.Pane>
 </Resizable.PaneGroup>
+{#snippet submitButton()}
+	<Popover.Root bind:open={submitPopupOpen}>
+		<Popover.Trigger bind:ref={submitPopupRef} disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}>
+			{#snippet child({ props })}
+				<Button {...props} aria-expanded={submitPopupOpen} class="h-10">
+					{#if submitting}
+						Se trimite...
+					{:else}
+						Trimite
+					{/if}
+					<ChevronDown class="opacity-50" />
+				</Button>
+			{/snippet}
+		</Popover.Trigger>
+		<Popover.Content class=" w-[250px] space-y-0 rounded-md p-0">
+			<Button
+				variant="ghost"
+				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
+				class="w-full justify-start rounded-t-md"
+				onclick={() => submitCode({ needHelp: false, anonymous: false })}
+			>
+				<CheckIcon class="size-4" />
+				Trimite
+			</Button>
+
+			<Separator class="my-2" />
+
+			<Button
+				variant="ghost"
+				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
+				class="w-full justify-start rounded-b-none"
+				onclick={() => submitCode({ needHelp: true, anonymous: false })}
+			>
+				<HelpCircleIcon class="size-4" />
+				Cere ajutor
+			</Button>
+
+			<Button
+				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
+				variant="ghost"
+				class="w-full justify-start rounded-b-md"
+				onclick={() => submitCode({ needHelp: true, anonymous: true })}
+			>
+				<UserIcon class="size-4" />
+				Cere ajutor anonim
+			</Button>
+		</Popover.Content>
+	</Popover.Root>
+{/snippet}
 
 <style>
 	:global(.markdown-content h1) {

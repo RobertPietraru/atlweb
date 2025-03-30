@@ -594,6 +594,22 @@ export class AdminService {
     async getSubmissions(exercise_id: table.Id) {
         return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id));
     }
+
+    async createSubmission(exerciseId: table.Id, userId: table.Id, params: {
+        html: string,
+        css: string,
+        javascript: string,
+    }) {
+        const [submission] = await this.db.insert(table.submission).values({
+            exerciseId,
+            userId,
+            checked: false,
+            htmlCode: params.html,
+            cssCode: params.css,
+            javascriptCode: params.javascript,
+        }).returning();
+        return submission;
+    }
 }
 
 
