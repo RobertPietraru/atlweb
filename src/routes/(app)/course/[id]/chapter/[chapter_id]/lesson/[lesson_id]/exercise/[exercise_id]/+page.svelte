@@ -6,6 +6,7 @@
 	import { marked } from 'marked';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { page } from '$app/state';
 	import {
 		CheckIcon,
 		ChevronDown,
@@ -427,25 +428,25 @@
 	</Popover.Root>
 {/snippet}
 <svelte:head>
-	<title>{exercise.name} | atl.vercel.app</title>
-	<meta name="description" content={exercise.description} />
+	<title>{data.exercise.name} | atl.vercel.app</title>
+	<meta name="description" content={data.exercise.description} />
 	<meta property="og_site_name" content="atl.vercel.app" />
-	<meta property="og:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta property="og:url" content="https://atl.vercel.app{page.url.pathname.toString()}" />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content={exercise.name} />
-	<meta property="og:description" content={exercise.description} />
+	<meta property="og:title" content={data.exercise.name} />
+	<meta property="og:description" content={data.exercise.description} />
 
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta property="twitter:domain" content="atl.vercel.app" />
-	<meta property="twitter:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
-	<meta name="twitter:title" content={exercise.name} />
-	<meta name="twitter:description" content={exercise.description} />
+	<meta property="twitter:url" content="https://atl.vercel.app{page.url.pathname.toString()}" />
+	<meta name="twitter:title" content={data.exercise.name} />
+	<meta name="twitter:description" content={data.exercise.description} />
 	{@html `<script type="application/ld+json">{
    "@context": "https://schema.org",
    "@type": "Website",
-   "name": "${exercise.name} | atl.vercel.app",
-   "url": "https://atl.vercel.app${$page.url.pathname}",
-   "description": "${exercise.description}"
+   "name": "${data.exercise.name} | atl.vercel.app",
+   "url": "https://atl.vercel.app${page.url.pathname}",
+   "description": "${data.exercise.description}"
    }</script>`}
 </svelte:head>
 <style>
