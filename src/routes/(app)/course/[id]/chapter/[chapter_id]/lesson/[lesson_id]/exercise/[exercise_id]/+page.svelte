@@ -426,7 +426,28 @@
 		</Popover.Content>
 	</Popover.Root>
 {/snippet}
+<svelte:head>
+	<title>{exercise.name} | atl.vercel.app</title>
+	<meta name="description" content={exercise.description} />
+	<meta property="og_site_name" content="atl.vercel.app" />
+	<meta property="og:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={exercise.name} />
+	<meta property="og:description" content={exercise.description} />
 
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta property="twitter:domain" content="atl.vercel.app" />
+	<meta property="twitter:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta name="twitter:title" content={exercise.name} />
+	<meta name="twitter:description" content={exercise.description} />
+	{@html `<script type="application/ld+json">{
+   "@context": "https://schema.org",
+   "@type": "Website",
+   "name": "${exercise.name} | atl.vercel.app",
+   "url": "https://atl.vercel.app${$page.url.pathname}",
+   "description": "${exercise.description}"
+   }</script>`}
+</svelte:head>
 <style>
 	:global(.markdown-content h1) {
 		@apply text-2xl font-bold;
