@@ -73,7 +73,7 @@
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item>
 						<UserRound class="h-4 w-4" />
-						<a href={`/profile/${data.user!.id}`}>Profil</a>
+						<a href={`/profile`}>Profil</a>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item onclick={toggleMode}>
 						<Sun
