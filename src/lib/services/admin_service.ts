@@ -615,6 +615,54 @@ export class AdminService {
         return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id)).orderBy(desc(table.submission.submissionDate));
     }
 
+    async getYourUnsolvedSubmissions(user_id: table.Id, page: number, limit: number) {
+        const count = await this.db.select({ count: sql<number>`count(*)` }).from(table.submission).where(eq(table.submission.userId, user_id));
+
+        if (count.length === 0 || count[0].count === 0) {
+            return {
+                submissions: [],
+                total: 0,
+            };
+        }
+        const submissions = await this.db
+            .select({
+                submission: table.submission,
+                exercise: {
+                        id: table.exercise.id,
+                        lessonId: table.exercise.lessonId,
+                        name: table.exercise.name,
+                    },
+                    lesson: {
+                        id: table.lesson.id,
+                        chapterId: table.lesson.chapterId
+                    },
+                    chapter: {
+                        id: table.chapter.id,
+                    }
+                })
+                .from(table.submission)
+                .leftJoin(table.exercise, eq(table.submission.exerciseId, table.exercise.id))
+                .leftJoin(table.lesson, eq(table.exercise.lessonId, table.lesson.id))
+                .leftJoin(table.chapter, eq(table.lesson.chapterId, table.chapter.id))
+                .where(and(eq(table.submission.userId, user_id), eq(table.submission.checked, false)))
+                .orderBy(desc(table.submission.submissionDate))
+                .limit(limit)
+                .offset((page - 1) * limit)
+        return {
+            submissions: submissions.map(submission => ({
+                ...submission.submission,
+                chapterId: submission.lesson?.chapterId,
+                exerciseId: submission.exercise?.id,
+                lessonId: submission.lesson?.id,
+                courseId: submission.chapter?.id,
+                exerciseName: submission.exercise?.name,
+            })),
+            total: count[0].count,
+            page: page,
+            limit: limit,
+        };
+    }
+
     async getSubmissionsToCheck(exercise_id: table.Id) {
         const list = await this.db
             .select({
