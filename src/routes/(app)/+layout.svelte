@@ -2,13 +2,11 @@
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import {
-		LogOut,
-		LogIn,
-		UserRound,
-		Settings
-	} from 'lucide-svelte';
+	import { LogOut, LogIn, UserRound, Settings } from 'lucide-svelte';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import { SunIcon, MoonIcon, LaptopIcon, Sun, Moon } from 'lucide-svelte';
+	import { toggleMode } from 'mode-watcher';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	let { children, data } = $props();
 	const isMobile = new IsMobile();
@@ -59,20 +57,33 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
 				<Avatar.Root>
-					<Avatar.Fallback>{data.user!.username.split(' ').map((name) => name[0]).join('')}</Avatar.Fallback>
+					<Avatar.Fallback
+						>{data
+							.user!.username.split(' ')
+							.map((name) => name[0])
+							.join('')}</Avatar.Fallback
+					>
 				</Avatar.Root>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				<DropdownMenu.Group>
-					<DropdownMenu.GroupHeading>{data.user!.username}</DropdownMenu.GroupHeading>
+					<DropdownMenu.GroupHeading>
+						{data.user!.username}
+					</DropdownMenu.GroupHeading>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item>
 						<UserRound class="h-4 w-4" />
 						<a href={`/profile/${data.user!.id}`}>Profil</a>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item>
-						<Settings class="h-4 w-4" />
-						<a href={`/settings`}>Setări</a>
+					<DropdownMenu.Item onclick={toggleMode}>
+						<Sun
+							class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+						/>
+						<Moon
+							class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+						/>
+						<span class="dark:hidden">Tema luminoasa</span>
+						<span class="hidden dark:block">Tema întunecoasa</span>
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item onclick={logout}>
@@ -125,7 +136,7 @@
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">Contact</h3>
 			<nav class="flex flex-col gap-2">
-				<a href="mailto:contact@atlweb.ro" class="hover:text-primary">contact@atlweb.ro</a>
+				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
 					<a href="https://facebook.com" class="hover:text-primary">Facebook</a>
 					<a href="https://twitter.com" class="hover:text-primary">Twitter</a>
