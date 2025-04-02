@@ -277,17 +277,17 @@
 			<Tabs.List class="m-0 p-0">
 				<Tabs.Trigger
 					value="html"
-					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-primary-foreground"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
 					>HTML</Tabs.Trigger
 				>
 				<Tabs.Trigger
 					value="css"
-					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-primary-foreground"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
 					>CSS</Tabs.Trigger
 				>
 				<Tabs.Trigger
 					value="javascript"
-					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-primary-foreground"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
 					>JavaScript</Tabs.Trigger
 				>
 			</Tabs.List>
@@ -336,7 +336,7 @@
 	</Tabs.Root>
 {/snippet}
 {#snippet submissionsTable()}
-	<ScrollArea class="h-[calc(100vh-10rem)]">
+	<ScrollArea class="h-full w-full">
 		<table class="w-full border-collapse">
 			<thead>
 				<tr class="border-b">
