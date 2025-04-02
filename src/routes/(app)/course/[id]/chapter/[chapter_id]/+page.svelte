@@ -12,6 +12,7 @@
 	<div class="mb-8 space-y-4 px-4 md:px-8">
 		<Breadcrumb.Root class="flex items-center">
 			<Breadcrumb.List>
+			<Breadcrumb.Separator />
 				{#each data.breadcrumbs as crumb, i}
 					<Breadcrumb.Item>
 						<Breadcrumb.Link href={crumb.url}>

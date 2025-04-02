@@ -2,15 +2,33 @@
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	const isMobile = new IsMobile();
 	let { data } = $props();
 </script>
 
 <main class="min-h-[100vh] w-full py-4">
 	<div class="mb-8 space-y-4 px-4 md:px-8">
+		<Breadcrumb.Root class="flex items-center">
+			<Breadcrumb.List>
+				<Breadcrumb.Separator />
+				{#each data.breadcrumbs as crumb, i}
+					<Breadcrumb.Item>
+						<Breadcrumb.Link href={crumb.url}>
+							{crumb.name}
+						</Breadcrumb.Link>
+					</Breadcrumb.Item>
+					{#if i < data.breadcrumbs.length - 1}
+						<Breadcrumb.Separator />
+					{/if}
+				{/each}
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
 		<div class="flex items-center gap-2">
-			<a class="flex items-center gap-2 text-2xl font-bold md:text-3xl hover:text-primary transition-colors" href="../courses">
-				<ArrowUpRightIcon class="h-4 w-4 rotate-180" />
+			<a
+				class="flex items-center gap-2 text-2xl font-bold transition-colors hover:text-primary md:text-3xl"
+				href="../courses"
+			>
 				{data.course.name}
 			</a>
 		</div>

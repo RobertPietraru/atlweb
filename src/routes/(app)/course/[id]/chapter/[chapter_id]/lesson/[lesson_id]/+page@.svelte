@@ -155,6 +155,7 @@
 		<div class="px-4 pt-4 md:px-8">
 			<Breadcrumb.Root class="flex items-center pb-4">
 				<Breadcrumb.List>
+			<Breadcrumb.Separator />
 					{#each data.breadcrumbs as crumb, i}
 						<Breadcrumb.Item>
 							<Breadcrumb.Link href={crumb.url}>
