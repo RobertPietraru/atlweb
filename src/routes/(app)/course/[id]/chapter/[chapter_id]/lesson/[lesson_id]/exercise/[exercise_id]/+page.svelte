@@ -14,6 +14,7 @@
 		HelpCircleIcon,
 		Loader2,
 		PlayIcon,
+		Send,
 		TrashIcon,
 		UserIcon
 	} from 'lucide-svelte';
@@ -49,7 +50,7 @@
 	let cssEditorContainer: HTMLElement | null = $state(null);
 	let jsEditorContainer: HTMLElement | null = $state(null);
 
-	let activeTab: 'html' | 'css' | 'javascript' = $state('html');
+	let activeCodeTab: 'html' | 'css' | 'javascript' = $state('html');
 
 	let submitting = $state(false);
 
@@ -306,7 +307,7 @@
 	</Resizable.Pane>
 	<Resizable.Handle withHandle class="bg-muted" />
 	<Resizable.Pane class="p-0">
-		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeTab}>
+		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
 			<div class="flex items-center gap-4 px-2 py-2">
 				<Tabs.List class="">
 					<Tabs.Trigger value="html" class="">HTML</Tabs.Trigger>
@@ -315,14 +316,13 @@
 				</Tabs.List>
 				<div class="flex-1"></div>
 
-
 				{#if data.isHelper}
-				<Button
-					class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
-					href="./{data.exercise.id}/submissions"
-				>
-					<span>Lista solutii</span>
-				</Button>
+					<Button
+						class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
+						href="./{data.exercise.id}/submissions"
+					>
+						<span>Lista solutii</span>
+					</Button>
 				{/if}
 				<div class="h-10">
 					{@render submitButton()}
@@ -343,8 +343,7 @@
 						}
 					}}
 				>
-					<PlayIcon class="h-4 w-4" />
-					<span>Rulează</span>
+					<PlayIcon class="size-4" />
 				</Button>
 			</div>
 			<Tabs.Content value="html" class="h-full w-full">
@@ -384,11 +383,10 @@
 			{#snippet child({ props })}
 				<Button {...props} aria-expanded={submitPopupOpen} class="h-10">
 					{#if submitting}
-						Se trimite...
+						<Loader2 class="size-4 animate-spin" />
 					{:else}
-						Trimite
+						<Send class="size-4" />
 					{/if}
-					<ChevronDown class="opacity-50" />
 				</Button>
 			{/snippet}
 		</Popover.Trigger>
@@ -449,6 +447,7 @@
    "description": "${data.exercise.description}"
    }</script>`}
 </svelte:head>
+
 <style>
 	:global(.markdown-content h1) {
 		@apply text-2xl font-bold;
