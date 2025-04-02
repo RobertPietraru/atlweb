@@ -80,27 +80,68 @@
 	}
 </script>
 
-{#if isMobile.current}
-	{@render my_header()}
-{/if}
-<div class="flex min-h-screen w-full flex-col lg:flex-row-reverse">
+{@render my_header()}
+<div class="flex min-h-screen w-full {isMobile.current ? 'flex-col-reverse' : 'flex-row'}">
 	<!-- w-full border-b bg-card lg:fixed lg:right-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l -->
-	{#if showSidebar}
-		<aside
-			transition:slide={{ duration: 200, axis: isMobile.current ? 'y' : 'x' }}
-			class="w-full border-b bg-card transition-all duration-300 lg:sticky lg:top-0 lg:z-10 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l"
-		>
-			<div class="flex flex-col">
-				{#if !isMobile.current}
-					<div class="flex flex-row">
-						<Button href="../" variant="ghost" class="m-0 h-[64px] w-full flex-1 py-0">
-							<ArrowLeftIcon class="mr-2 h-4 w-4" />
-							Înapoi la capitol
-						</Button>
-					</div>
-				{/if}
-				<Separator />
 
+	<main class="flex-1">
+		<div class="px-4 pt-4 md:px-8">
+			<Breadcrumb.Root class="flex items-center pb-4">
+				<Breadcrumb.List>
+					<Breadcrumb.Separator />
+					{#each data.breadcrumbs as crumb, i}
+						<Breadcrumb.Item>
+							<Breadcrumb.Link href={crumb.url}>
+								{crumb.name}
+							</Breadcrumb.Link>
+						</Breadcrumb.Item>
+						{#if i < data.breadcrumbs.length - 1}
+							<Breadcrumb.Separator />
+						{/if}
+					{/each}
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
+			<div class="mb-4 flex gap-4">
+				<div class="flex items-center gap-3">
+					<div class="rounded-full bg-primary/10 p-2">
+						<BookOpenIcon class="h-5 w-5 text-primary" />
+					</div>
+					<h1 class="text-2xl font-bold">{lesson.name || 'Lectie'}</h1>
+				</div>
+			</div>
+			<div class="markdown-content mb-4">
+				{@html marked(lesson.description)}
+			</div>
+
+			<div class="space-y-8">
+				{#each lesson.blocks as block, index}
+					{#if block.type === 'exercise'}
+						<!-- for some reason, without this div, the exercise block will stick to the one above, idk why -->
+						<div>
+							{@render exerciseBlock(block)}
+						</div>
+					{:else}
+						<div
+							class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
+						>
+							{#if block.type === 'text'}
+								{@render textBlock(block)}
+							{/if}
+							{#if block.type === 'resources'}
+								{@render resourcesBlock(block)}
+							{/if}
+							{#if block.type === 'code'}
+								{@render codeBlock(block, index)}
+							{/if}
+						</div>
+					{/if}
+				{/each}
+			</div>
+		</div>
+	</main>
+	{#if showSidebar}
+		<aside class="border-b bg-card md:max-w-96">
+			<div class="flex flex-col">
 				<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
 					<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
 					<p class="mb-6 text-sm text-muted-foreground">
@@ -147,65 +188,6 @@
 			</div>
 		</aside>
 	{/if}
-
-	<main class="w-full flex-1">
-		{#if !isMobile.current}
-			{@render my_header()}
-		{/if}
-		<div class="px-4 pt-4 md:px-8">
-			<Breadcrumb.Root class="flex items-center pb-4">
-				<Breadcrumb.List>
-			<Breadcrumb.Separator />
-					{#each data.breadcrumbs as crumb, i}
-						<Breadcrumb.Item>
-							<Breadcrumb.Link href={crumb.url}>
-								{crumb.name}
-							</Breadcrumb.Link>
-						</Breadcrumb.Item>
-						{#if i < data.breadcrumbs.length - 1}
-							<Breadcrumb.Separator />
-						{/if}
-					{/each}
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
-			<div class="mb-4 flex gap-4">
-				<div class="flex items-center gap-3">
-					<div class="rounded-full bg-primary/10 p-2">
-						<BookOpenIcon class="h-5 w-5 text-primary" />
-					</div>
-					{lesson.name || 'Lectie'}
-				</div>
-			</div>
-			<div class="markdown-content mb-4">
-				{@html marked(lesson.description)}
-			</div>
-
-			<div class="space-y-8">
-				{#each lesson.blocks as block, index}
-					{#if block.type === 'exercise'}
-						<!-- for some reason, without this div, the exercise block will stick to the one above, idk why -->
-						<div>
-							{@render exerciseBlock(block)}
-						</div>
-					{:else}
-						<div
-							class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
-						>
-							{#if block.type === 'text'}
-								{@render textBlock(block)}
-							{/if}
-							{#if block.type === 'resources'}
-								{@render resourcesBlock(block)}
-							{/if}
-							{#if block.type === 'code'}
-								{@render codeBlock(block, index)}
-							{/if}
-						</div>
-					{/if}
-				{/each}
-			</div>
-		</div>
-	</main>
 </div>
 
 {#snippet my_header()}
