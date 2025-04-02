@@ -21,6 +21,7 @@
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	let { data } = $props();
 
 	let code = $state({
@@ -51,6 +52,7 @@
 	let jsEditorContainer: HTMLElement | null = $state(null);
 
 	let activeCodeTab: 'html' | 'css' | 'javascript' = $state('html');
+	let activeSidebarTab: 'result' | 'submissions' | 'description' = $state('description');
 
 	let submitting = $state(false);
 
@@ -220,160 +222,200 @@
 		}}
 	>
 		<Resizable.PaneGroup direction="vertical" class="">
-			<Resizable.Pane defaultSize={50} class="p-4">
-				<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
-				<p>{data.exercise.description}</p>
-				<Separator class="my-4" />
-				<div class="markdown-content">
-					{@html marked(data.exercise.instructions)}
-				</div>
-			</Resizable.Pane>
-			<Resizable.Handle withHandle class="bg-muted" />
+			<Resizable.Pane defaultSize={50}>
+				<Tabs.Root class="h-full" bind:value={activeSidebarTab}>
+					<Tabs.List class="w-full border-b">
+						<Tabs.Trigger
+							value="description"
+							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+							>Descriere</Tabs.Trigger
+						>
+						<Tabs.Trigger
+							value="result"
+							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+							>Rezultat</Tabs.Trigger
+						>
+						<Tabs.Trigger
+							value="submissions"
+							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+							>Solutii</Tabs.Trigger
+						>
+					</Tabs.List>
+					<Tabs.Content value="submissions" class="h-full w-full p-4">
+						{@render submissionsTable()}
+					</Tabs.Content>
 
-			{#if submissions.length > 0}
-				<Resizable.Pane defaultSize={25} class="h-full overflow-y-auto p-4">
-					<table class="w-full border-collapse">
-						<thead>
-							<tr class="border-b">
-								<th class="py-2 text-left"></th>
-								<th class="py-2 text-left">Data</th>
-								<th class="py-2 text-left">Status</th>
-								<th class="py-2 text-left">Anonim</th>
-								<th class="py-2 text-left"></th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each submissions as submission}
-								<tr class="border-b hover:bg-muted/50">
-									<td class="py-2">
-										<Button
-											variant="ghost"
-											size="icon"
-											class="size-6"
-											onclick={() => {
-												setCode({
-													css: submission.cssCode,
-													html: submission.htmlCode,
-													javascript: submission.javascriptCode
-												});
-											}}
-										>
-											<EyeIcon class="size-4" />
-										</Button>
-									</td>
-									<td class="py-2">
-										{new Date(submission.submissionDate).toLocaleString().split(',')[1]}
-									</td>
-									<td class="py-2">
-										{#if submission.needHelp}
-											{#if submission.checked}
-												<span class="text-green-500">Verificat</span>
-											{:else}
-												<span class="text-yellow-500">Ajutor solicitat</span>
-											{/if}
-										{:else}
-											<span class="text-green-500">Trimis</span>
-										{/if}
-									</td>
-									<td class="py-2">
-										{#if submission.anonymous}
-											<span class="text-gray-500">Da</span>
-										{:else}
-											<span class="text-gray-500">Nu</span>
-										{/if}
-									</td>
-									<td class="py-2">
-										<Button
-											variant="ghost"
-											size="icon"
-											class="rounded-full bg-destructive text-destructive-foreground"
-											onclick={() => deleteSubmission(submission.id)}
-											disabled={deleting.includes(submission.id)}
-										>
-											{#if deleting.includes(submission.id)}
-												<Loader2 class="size-4 animate-spin" />
-											{:else}
-												<TrashIcon class="size-4" />
-											{/if}
-										</Button>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</Resizable.Pane>
-			{/if}
+					<Tabs.Content value="description" class="h-full w-full p-4">
+						{@render exerciseDescription()}
+					</Tabs.Content>
+
+					<Tabs.Content value="result" class="h-full w-full p-4">
+						<div class="flex h-full items-center justify-center">
+							{#if lastRunCode !== null}
+								<iframe
+									title="Code Preview"
+									class="h-full w-full"
+									srcdoc={getCodePreview(lastRunCode)}
+									sandbox="allow-scripts"
+								></iframe>
+							{/if}
+						</div>
+					</Tabs.Content>
+				</Tabs.Root>
+			</Resizable.Pane>
 		</Resizable.PaneGroup>
 	</Resizable.Pane>
 	<Resizable.Handle withHandle class="bg-muted" />
 	<Resizable.Pane class="p-0">
-		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
-			<div class="flex items-center gap-4 px-2 py-2">
-				<Tabs.List class="">
-					<Tabs.Trigger value="html" class="">HTML</Tabs.Trigger>
-					<Tabs.Trigger value="css" class="">CSS</Tabs.Trigger>
-					<Tabs.Trigger value="javascript" class="">JavaScript</Tabs.Trigger>
-				</Tabs.List>
-				<div class="flex-1"></div>
-
-				{#if data.isHelper}
-					<Button
-						class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
-						href="./{data.exercise.id}/submissions"
-					>
-						<span>Lista solutii</span>
-					</Button>
-				{/if}
-				<div class="h-10">
-					{@render submitButton()}
-				</div>
-
-				<Button
-					class="h-10 gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
-					onclick={async () => {
-						showResultView = true;
-						if (
-							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
-						) {
-							lastRunCode = structuredClone($state.snapshot(code));
-						} else {
-							lastRunCode = null;
-							await new Promise((resolve) => setTimeout(resolve, 0));
-							lastRunCode = structuredClone($state.snapshot(code));
-						}
-					}}
-				>
-					<PlayIcon class="size-4" />
-				</Button>
-			</div>
-			<Tabs.Content value="html" class="h-full w-full">
-				<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
-			</Tabs.Content>
-			<Tabs.Content value="css" class="h-full w-full">
-				<div bind:this={cssEditorContainer} class="h-full w-full" id="css-editor"></div>
-			</Tabs.Content>
-			<Tabs.Content value="javascript" class="h-full w-full">
-				<div bind:this={jsEditorContainer} class="h-full w-full" id="javascript-editor"></div>
-			</Tabs.Content>
-		</Tabs.Root>
+		{@render editor()}
 	</Resizable.Pane>
 	<Resizable.Handle withHandle />
-
-	{#if showResultView}
-		<Resizable.Pane defaultSize={30}>
-			<div class="flex h-full items-center justify-center">
-				{#if lastRunCode !== null}
-					<iframe
-						title="Code Preview"
-						class="h-full w-full"
-						srcdoc={getCodePreview(lastRunCode)}
-						sandbox="allow-scripts"
-					></iframe>
-				{/if}
-			</div>
-		</Resizable.Pane>
-	{/if}
 </Resizable.PaneGroup>
+{#snippet editor()}
+	<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
+		<div class="flex items-center gap-4">
+			<Tabs.List class="m-0 p-0">
+				<Tabs.Trigger
+					value="html"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-primary-foreground"
+					>HTML</Tabs.Trigger
+				>
+				<Tabs.Trigger
+					value="css"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-primary-foreground"
+					>CSS</Tabs.Trigger
+				>
+				<Tabs.Trigger
+					value="javascript"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-primary-foreground"
+					>JavaScript</Tabs.Trigger
+				>
+			</Tabs.List>
+			<div class="flex-1"></div>
+
+			{#if data.isHelper}
+				<Button
+					class="flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm hover:bg-secondary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+					href="./{data.exercise.id}/submissions"
+				>
+					<UserIcon class="size-4" />
+					<span>Solutii</span>
+				</Button>
+			{/if}
+			{@render submitButton()}
+
+			<Button
+				class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				onclick={async () => {
+					showResultView = true;
+					activeSidebarTab = 'result';
+					if (
+						JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
+					) {
+						lastRunCode = structuredClone($state.snapshot(code));
+					} else {
+						lastRunCode = null;
+						await new Promise((resolve) => setTimeout(resolve, 0));
+						lastRunCode = structuredClone($state.snapshot(code));
+					}
+				}}
+			>
+				<PlayIcon class="size-4" />
+				<span>Ruleaza</span>
+			</Button>
+		</div>
+		<Tabs.Content value="html" class="mt-0 h-full w-full ">
+			<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
+		</Tabs.Content>
+		<Tabs.Content value="css" class="mt-0 h-full w-full ">
+			<div bind:this={cssEditorContainer} class="h-full w-full" id="css-editor"></div>
+		</Tabs.Content>
+		<Tabs.Content value="javascript" class="mt-0 h-full w-full ">
+			<div bind:this={jsEditorContainer} class="h-full w-full" id="javascript-editor"></div>
+		</Tabs.Content>
+	</Tabs.Root>
+{/snippet}
+{#snippet submissionsTable()}
+	<ScrollArea class="h-[calc(100vh-10rem)]">
+		<table class="w-full border-collapse">
+			<thead>
+				<tr class="border-b">
+					<th class="py-2 text-left"></th>
+					<th class="py-2 text-left">Data</th>
+					<th class="py-2 text-left">Status</th>
+					<th class="py-2 text-left">Anonim</th>
+					<th class="py-2 text-left"></th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each submissions as submission}
+					<tr class="border-b hover:bg-muted/50">
+						<td class="py-2">
+							<Button
+								variant="ghost"
+								size="icon"
+								class="size-6"
+								onclick={() => {
+									setCode({
+										css: submission.cssCode,
+										html: submission.htmlCode,
+										javascript: submission.javascriptCode
+									});
+								}}
+							>
+								<EyeIcon class="size-4" />
+							</Button>
+						</td>
+						<td class="py-2">
+							{new Date(submission.submissionDate).toLocaleString().split(',')[1]}
+						</td>
+						<td class="py-2">
+							{#if submission.needHelp}
+								{#if submission.checked}
+									<span class="text-green-500">Verificat</span>
+								{:else}
+									<span class="text-yellow-500">Ajutor solicitat</span>
+								{/if}
+							{:else}
+								<span class="text-green-500">Trimis</span>
+							{/if}
+						</td>
+						<td class="py-2">
+							{#if submission.anonymous}
+								<span class="text-gray-500">Da</span>
+							{:else}
+								<span class="text-gray-500">Nu</span>
+							{/if}
+						</td>
+						<td class="py-2">
+							<Button
+								variant="ghost"
+								size="icon"
+								class="rounded-full bg-destructive text-destructive-foreground"
+								onclick={() => deleteSubmission(submission.id)}
+								disabled={deleting.includes(submission.id)}
+							>
+								{#if deleting.includes(submission.id)}
+									<Loader2 class="size-4 animate-spin" />
+								{:else}
+									<TrashIcon class="size-4" />
+								{/if}
+							</Button>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</ScrollArea>
+{/snippet}
+{#snippet exerciseDescription()}
+	<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
+	<p>{data.exercise.description}</p>
+	<Separator class="my-4" />
+	<div class="markdown-content">
+		{@html marked(data.exercise.instructions)}
+	</div>
+{/snippet}
 {#snippet submitButton()}
 	<Popover.Root bind:open={submitPopupOpen}>
 		<Popover.Trigger
