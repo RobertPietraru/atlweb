@@ -30,28 +30,6 @@
 
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
-	<Breadcrumb.Root class="flex items-center">
-		<Breadcrumb.List>
-			{#each data.breadcrumbs as crumb, i}
-				<Breadcrumb.Item>
-					<Breadcrumb.Link href={crumb.url}>
-						{#if isMobile.current}
-							{#if crumb.name.length > 20}
-								{crumb.name.slice(0, 10)}...{crumb.name.slice(-10)}
-							{:else}
-								{crumb.name}
-							{/if}
-						{:else}
-							{crumb.name}
-						{/if}
-					</Breadcrumb.Link>
-				</Breadcrumb.Item>
-				{#if i < data.breadcrumbs.length - 1}
-					<Breadcrumb.Separator />
-				{/if}
-			{/each}
-		</Breadcrumb.List>
-	</Breadcrumb.Root>
 	<div class="flex-1"></div>
 	{#if data.user}
 		<DropdownMenu.Root>
@@ -105,7 +83,7 @@
 	{@render children()}
 </div>
 
-<footer class="flex flex-col gap-8 border-t px-8 py-12 text-sm text-muted-foreground">
+<footer class="flex flex-col gap-8 border-t px-8 py-12 text-sm text-muted-foreground z-40 bg-background">
 	<div class="container grid grid-cols-1 gap-8 md:grid-cols-4">
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">ATLWEB</h3>
@@ -119,7 +97,6 @@
 			<nav class="flex flex-col gap-2">
 				<a href="/" class="hover:text-primary">Acasă</a>
 				<a href="/courses" class="hover:text-primary">Cursuri</a>
-				<a href="/exercises" class="hover:text-primary">Exerciții</a>
 				<a href="/profile" class="hover:text-primary">Profil</a>
 			</nav>
 		</div>

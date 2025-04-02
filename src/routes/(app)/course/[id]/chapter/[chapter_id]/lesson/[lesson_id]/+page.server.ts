@@ -4,6 +4,10 @@ import { adminService } from '$lib/injection';
 export const load = async ({ locals, params }) => {
     const lesson = await adminService.getLessonWithBlocks(params.lesson_id, locals.user?.id ?? null);
     const lessonNamesInChapter = await adminService.getLessonNamesInChapter(params.chapter_id);
+    const courseId = params.id;
+    const chapterId = params.chapter_id;
+    const lessonId = params.lesson_id;
+    const breadcrumbs = await adminService.getBreadcrumbs(courseId ?? null, chapterId ?? null, lessonId ?? null, null);
 
     if (!lesson) {
         error(404, 'Lesson not found');
@@ -11,6 +15,9 @@ export const load = async ({ locals, params }) => {
 
     return {
         lesson,
+
+        user: locals.user,
+        breadcrumbs: breadcrumbs ?? [],
         courseId: params.id,
         chapterId: params.chapter_id,
         lessonNamesInChapter

@@ -4,6 +4,14 @@
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { page } from '$app/stores';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { LogOut, LogIn, UserRound, Settings } from 'lucide-svelte';
+	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import { Sun, Moon } from 'lucide-svelte';
+	import { toggleMode } from 'mode-watcher';
+	import { slide } from 'svelte/transition';
+
 	import {
 		PlayIcon,
 		ArrowLeftIcon,
@@ -20,6 +28,21 @@
 	import { Card } from '$lib/components/ui/card/index.js';
 	const isMobile = new IsMobile();
 
+	async function logout() {
+		const res = await fetch('/api/auth/logout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+
+		/// reload page
+		if (res.ok) {
+			location.reload();
+		} else {
+			console.error('Failed to logout');
+		}
+	}
 	let { data } = $props();
 	$effect(() => {
 		lesson = data.lesson;
@@ -27,7 +50,8 @@
 	});
 	let lesson = $state(data.lesson);
 	let lastRanLessonState: typeof lesson | null = $state(null);
-	let showSidebar = $state(false);
+	let showSidebar = $state(!isMobile.current);
+	$inspect(showSidebar);
 
 	let activeTab = $state<'html' | 'css' | 'js'>('html');
 
@@ -56,119 +80,188 @@
 	}
 </script>
 
+{#if isMobile.current}
+	{@render my_header()}
+{/if}
 <div class="flex min-h-screen w-full flex-col lg:flex-row-reverse">
-	{#if isMobile.current}
-		<div class="flex w-full items-center justify-between gap-3 border-b bg-card p-4 lg:hidden">
-			<div class="rounded-full bg-primary/10 p-2">
-				<BookOpenIcon class="h-5 w-5 text-primary" />
-			</div>
-			<h1 class="flex-1 text-xl font-bold">{lesson.name || 'Lectie'}</h1>
-			<Button variant="ghost" size="icon" onclick={() => (showSidebar = !showSidebar)}>
-				<MenuIcon class="h-5 w-5" />
-			</Button>
-		</div>
-	{/if}
-
 	<!-- w-full border-b bg-card lg:fixed lg:right-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l -->
-	<aside
-		class="w-full border-b bg-card lg:sticky lg:top-0 lg:z-10 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l"
-		class:hidden={!showSidebar}
-		class:lg:block={true}
-	>
-		<div class="flex flex-col gap-6 p-6">
-			<Button href="../" variant="outline" class="w-full">
-				<ArrowLeftIcon class="mr-2 h-4 w-4" />
-				Înapoi la capitol
-			</Button>
-
-			<div class="rounded-xl border bg-muted/50 p-6 shadow-sm">
-				<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
-				<p class="mb-6 text-sm text-muted-foreground">
-					Parcurge toate lecțiile pentru a finaliza acest capitol
-				</p>
-
-				<div class="space-y-3">
-					{#each data.lessonNamesInChapter as lesson, i}
-						<a
-							href="./{lesson.id}"
-							class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
-							onclick={() => (showSidebar = false)}
-						>
-							<span
-								class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20"
-							>
-								{i + 1}
-							</span>
-							<span class="flex-1 font-medium">{lesson.name}</span>
-							{#if lesson.id === data.lesson.id}
-								<div class="h-2 w-2 rounded-full bg-primary"></div>
-							{/if}
-						</a>
-					{/each}
-				</div>
-			</div>
-
-			<div class="rounded-xl border bg-muted/50 p-6 shadow-sm">
-				<h3 class="mb-2 text-xl font-semibold">Progres</h3>
-				<p class="text-sm text-muted-foreground">
-					Ai completat {data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1} din
-					{data.lessonNamesInChapter.length} lecții
-				</p>
-				<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
-					<div
-						class="h-full bg-primary"
-						style="width: {((data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) +
-							1) /
-							data.lessonNamesInChapter.length) *
-							100}%"
-					></div>
-				</div>
-			</div>
-		</div>
-	</aside>
-
-	<main class="w-full flex-1 md:p-8">
-		<div class="mb-4 flex gap-4">
-			<div class="flex items-center gap-3">
-				<div class="rounded-full bg-primary/10 p-2">
-					<BookOpenIcon class="h-5 w-5 text-primary" />
-				</div>
-				<h1 class="hidden text-3xl font-bold tracking-tight lg:block">
-					{lesson.name || 'Lectie'}
-				</h1>
-			</div>
-		</div>
-		<div class="markdown-content mb-4 px-4 md:px-0">
-			{@html marked(lesson.description)}
-		</div>
-
-		<div class="space-y-8">
-			{#each lesson.blocks as block, index}
-				{#if block.type === 'exercise'}
-					<!-- for some reason, without this div, the exercise block will stick to the one above, idk why -->
-					<div>
-						{@render exerciseBlock(block)}
-					</div>
-				{:else}
-					<div
-						class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
-					>
-						{#if block.type === 'text'}
-							{@render textBlock(block)}
-						{/if}
-						{#if block.type === 'resources'}
-							{@render resourcesBlock(block)}
-						{/if}
-						{#if block.type === 'code'}
-							{@render codeBlock(block, index)}
-						{/if}
+	{#if showSidebar}
+		<aside
+			transition:slide={{ duration: 200, axis: isMobile.current ? 'y' : 'x' }}
+			class="w-full border-b bg-card transition-all duration-300 lg:sticky lg:top-0 lg:z-10 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l"
+		>
+			<div class="flex flex-col">
+				{#if !isMobile.current}
+					<div class="flex flex-row">
+						<Button href="../" variant="ghost" class="m-0 h-[64px] w-full flex-1 py-0">
+							<ArrowLeftIcon class="mr-2 h-4 w-4" />
+							Înapoi la capitol
+						</Button>
 					</div>
 				{/if}
-			{/each}
+				<Separator />
+
+				<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
+					<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
+					<p class="mb-6 text-sm text-muted-foreground">
+						Parcurge toate lecțiile pentru a finaliza acest capitol
+					</p>
+
+					<div class="space-y-3">
+						{#each data.lessonNamesInChapter as lesson, i}
+							<a
+								href="./{lesson.id}"
+								class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
+								onclick={() => (showSidebar = false)}
+							>
+								<span
+									class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20"
+								>
+									{i + 1}
+								</span>
+								<span class="flex-1 font-medium">{lesson.name}</span>
+								{#if lesson.id === data.lesson.id}
+									<div class="h-2 w-2 rounded-full bg-primary"></div>
+								{/if}
+							</a>
+						{/each}
+					</div>
+				</div>
+				<Separator />
+				<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
+					<h3 class="mb-2 text-xl font-semibold">Progres</h3>
+					<p class="text-sm text-muted-foreground">
+						Ai completat {data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1} din
+						{data.lessonNamesInChapter.length} lecții
+					</p>
+					<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+						<div
+							class="h-full bg-primary"
+							style="width: {((data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) +
+								1) /
+								data.lessonNamesInChapter.length) *
+								100}%"
+						></div>
+					</div>
+				</div>
+			</div>
+		</aside>
+	{/if}
+
+	<main class="w-full flex-1">
+		{#if !isMobile.current}
+			{@render my_header()}
+		{/if}
+		<div class="px-4 pt-4 md:px-8">
+			<Breadcrumb.Root class="flex items-center pb-4">
+				<Breadcrumb.List>
+					{#each data.breadcrumbs as crumb, i}
+						<Breadcrumb.Item>
+							<Breadcrumb.Link href={crumb.url}>
+								{crumb.name}
+							</Breadcrumb.Link>
+						</Breadcrumb.Item>
+						{#if i < data.breadcrumbs.length - 1}
+							<Breadcrumb.Separator />
+						{/if}
+					{/each}
+				</Breadcrumb.List>
+			</Breadcrumb.Root>
+			<div class="mb-4 flex gap-4">
+				<div class="flex items-center gap-3">
+					<div class="rounded-full bg-primary/10 p-2">
+						<BookOpenIcon class="h-5 w-5 text-primary" />
+					</div>
+					{lesson.name || 'Lectie'}
+				</div>
+			</div>
+			<div class="markdown-content mb-4">
+				{@html marked(lesson.description)}
+			</div>
+
+			<div class="space-y-8">
+				{#each lesson.blocks as block, index}
+					{#if block.type === 'exercise'}
+						<!-- for some reason, without this div, the exercise block will stick to the one above, idk why -->
+						<div>
+							{@render exerciseBlock(block)}
+						</div>
+					{:else}
+						<div
+							class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
+						>
+							{#if block.type === 'text'}
+								{@render textBlock(block)}
+							{/if}
+							{#if block.type === 'resources'}
+								{@render resourcesBlock(block)}
+							{/if}
+							{#if block.type === 'code'}
+								{@render codeBlock(block, index)}
+							{/if}
+						</div>
+					{/if}
+				{/each}
+			</div>
 		</div>
 	</main>
 </div>
 
+{#snippet my_header()}
+	<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+		<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
+		<div class="flex-1"></div>
+		{#if data.user}
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<Avatar.Root>
+						<Avatar.Fallback
+							>{data
+								.user!.username.split(' ')
+								.map((name) => name[0])
+								.join('')}</Avatar.Fallback
+						>
+					</Avatar.Root>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					<DropdownMenu.Group>
+						<DropdownMenu.GroupHeading>
+							{data.user!.username}
+						</DropdownMenu.GroupHeading>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item>
+							<UserRound class="h-4 w-4" />
+							<a href={`/profile`}>Profil</a>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item onclick={toggleMode}>
+							<Sun
+								class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+							/>
+							<Moon
+								class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+							/>
+							<span class="dark:hidden">Tema luminoasa</span>
+							<span class="hidden dark:block">Tema întunecoasa</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item onclick={logout}>
+							<LogOut class="h-4 w-4 text-destructive" />
+							<span class="font-medium text-destructive">Deconectare</span>
+						</DropdownMenu.Item>
+					</DropdownMenu.Group>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+			<Button variant="ghost" onclick={() => (showSidebar = !showSidebar)}>
+				<MenuIcon class="h-4 w-4" />
+			</Button>
+		{:else}
+			<a href="/login" class="flex items-center gap-2">
+				<LogIn class="h-4 w-4" />
+				<span class="font-medium">Conectare</span>
+			</a>
+		{/if}
+	</header>
+{/snippet}
 {#snippet textBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'text' }>)}
 	<div class="markdown-content prose prose-slate max-w-none">
 		{@html marked(block.text)}

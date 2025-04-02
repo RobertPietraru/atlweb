@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
@@ -9,7 +8,12 @@
 
 <main class="min-h-[100vh] w-full py-4">
 	<div class="mb-8 space-y-4 px-4 md:px-8">
-		<h1 class="text-2xl font-bold md:text-3xl">{data.course.name}</h1>
+		<div class="flex items-center gap-2">
+			<a class="flex items-center gap-2 text-2xl font-bold md:text-3xl hover:text-primary transition-colors" href="../courses">
+				<ArrowUpRightIcon class="h-4 w-4 rotate-180" />
+				{data.course.name}
+			</a>
+		</div>
 		<p class="text-lg text-muted-foreground">{data.course.description}</p>
 	</div>
 
