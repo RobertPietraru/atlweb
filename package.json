@@ -63,6 +63,7 @@
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
+		"@sentry/sveltekit": "^9.11.0",
 		"drizzle-orm": "^0.38.4",
 		"marked": "^15.0.7",
 		"monaco-editor": "^0.52.2",
