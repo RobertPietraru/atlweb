@@ -79,4 +79,4 @@ npm run db:seed
 ```bash
 npm run dev
 ```
-8. Open your browser and navigate to `http://localhost:5173` to access the application.
+8. Open your browser and navigate to `http://localhost:5173` to access the application. 
