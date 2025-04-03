@@ -41,6 +41,28 @@
 	let currentCodeAndSubmittedCodeAreTheSame = $derived(
 		JSON.stringify($state.snapshot(code)) === JSON.stringify($state.snapshot(submittedCode))
 	);
+	let handleKeyDown = (e: KeyboardEvent) => {
+		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+			e.preventDefault();
+			activeSidebarTab = 'result';
+			if (JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))) {
+				lastRunCode = structuredClone($state.snapshot(code));
+			} else {
+				lastRunCode = null;
+				setTimeout(() => {
+					lastRunCode = structuredClone($state.snapshot(code));
+				}, 0);
+			}
+		}
+	};
+
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyDown);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', handleKeyDown);
+	});
 
 	let htmlEditor: Monaco.editor.IStandaloneCodeEditor;
 	let cssEditor: Monaco.editor.IStandaloneCodeEditor;
@@ -249,9 +271,9 @@
 						{@render exerciseDescription()}
 					</Tabs.Content>
 
-					<Tabs.Content value="result" class="h-full w-full p-4">
+					<Tabs.Content value="result" class="h-full w-full ">
 						<div class="flex h-full items-center justify-center">
-							{#if lastRunCode !== null}
+							{#if lastRunCode !== null }
 								<iframe
 									title="Code Preview"
 									class="h-full w-full"
@@ -307,13 +329,13 @@
 			<Button
 				class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 				onclick={async () => {
-					showResultView = true;
 					activeSidebarTab = 'result';
 					if (
 						JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
 					) {
 						lastRunCode = structuredClone($state.snapshot(code));
 					} else {
+
 						lastRunCode = null;
 						await new Promise((resolve) => setTimeout(resolve, 0));
 						lastRunCode = structuredClone($state.snapshot(code));
