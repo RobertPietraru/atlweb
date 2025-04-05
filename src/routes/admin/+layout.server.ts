@@ -4,7 +4,7 @@ export const load = async ({ locals, params }) => {
     const courseId = params.id;
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
-    const breadcrumbs = await adminService.getBreadcrumbs(courseId ?? null, chapterId ?? null, lessonId ?? null, null);
+    const breadcrumbs = await adminService.getBreadcrumbsAdmin(courseId ?? null, chapterId ?? null, lessonId ?? null, null);
 
     return {
         user: locals.user,
