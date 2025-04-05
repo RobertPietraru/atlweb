@@ -12,16 +12,7 @@
 	import { toggleMode } from 'mode-watcher';
 	import { slide } from 'svelte/transition';
 
-	import {
-		PlayIcon,
-		ArrowLeftIcon,
-		BookOpenIcon,
-		ArrowRightIcon,
-		MenuIcon,
-		BookOpen,
-		FileCheck,
-		PlayCircle
-	} from 'lucide-svelte';
+	import { PlayIcon, BookOpenIcon, MenuIcon, BookOpen, FileCheck, PlayCircle } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
@@ -46,11 +37,12 @@
 	let { data } = $props();
 	$effect(() => {
 		lesson = data.lesson;
-		lastRanLessonState = null;
 	});
 	let lesson = $state(data.lesson);
-	let lastRanLessonState: typeof lesson | null = $state(null);
-	let showSidebar = $state(!isMobile.current);
+	let stateOfLastRanBlocks: ((typeof lesson.blocks)[0] | null)[] = $state(
+		data.lesson.blocks.map(() => null)
+	);
+	let showSidebar = $state(true);
 	$inspect(showSidebar);
 
 	let activeTab = $state<'html' | 'css' | 'js'>('html');
@@ -301,14 +293,20 @@
 				class="w-full transition-all hover:bg-primary hover:text-primary-foreground sm:w-auto"
 				onclick={async () => {
 					if (
-						JSON.stringify($state.snapshot(lesson)) !==
-						JSON.stringify($state.snapshot(lastRanLessonState))
+						JSON.stringify($state.snapshot(lesson.blocks[index])) !==
+						JSON.stringify($state.snapshot(stateOfLastRanBlocks[index]))
 					) {
-						lastRanLessonState = structuredClone($state.snapshot(lesson));
+
+						for (let i = 0; i < lesson.blocks.length; i++) {
+							stateOfLastRanBlocks[i] = null;
+						}
+						stateOfLastRanBlocks[index] = structuredClone($state.snapshot(lesson.blocks[index]));
 					} else {
-						lastRanLessonState = null;
+						for (let i = 0; i < lesson.blocks.length; i++) {
+							stateOfLastRanBlocks[i] = null;
+						}
 						await new Promise((resolve) => setTimeout(resolve, 100));
-						lastRanLessonState = structuredClone($state.snapshot(lesson));
+						stateOfLastRanBlocks[index] = structuredClone($state.snapshot(lesson.blocks[index]));
 					}
 				}}
 			>
@@ -328,7 +326,7 @@
 				<Textarea bind:value={block.javascript} class="min-h-[200px] font-mono" />
 			</Tabs.Content>
 		</div>
-		{#if lastRanLessonState !== null}
+		{#if stateOfLastRanBlocks[index]}
 			<div class="mt-4 overflow-hidden rounded-lg border-2 bg-white">
 				<div class="border-b bg-muted/50 px-4 py-2 text-sm font-medium">Output</div>
 				<div class="h-[300px] w-full">
@@ -336,10 +334,7 @@
 						title="Code Preview"
 						class="h-full w-full"
 						srcdoc={getCodePreview(
-							lastRanLessonState!.blocks[index] as Extract<
-								(typeof lesson.blocks)[0],
-								{ type: 'code' }
-							>
+							stateOfLastRanBlocks[index] as Extract<(typeof lesson.blocks)[0], { type: 'code' }>
 						)}
 						sandbox="allow-scripts"
 					></iframe>
