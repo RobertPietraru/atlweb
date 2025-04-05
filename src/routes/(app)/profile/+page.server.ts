@@ -7,6 +7,7 @@ export const load = async ({ locals, url }) => {
     return { user: response.submissions.map(submission => ({
         ...submission,
         exercisePage: `/course/${submission.courseId}/chapter/${submission.chapterId}/lesson/${submission.lessonId}/exercise/${submission.exerciseId}`,
-    })), total: response.total };
+
+    })), total: response.total, page, limit };
 };
 
