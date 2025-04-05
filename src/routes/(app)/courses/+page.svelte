@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon } from 'lucide-svelte';
-	import { Book } from 'svelte-lucide';
+	import { Book } from 'lucide-svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';

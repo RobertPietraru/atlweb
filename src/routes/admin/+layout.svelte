@@ -7,7 +7,7 @@
 		BookOpen,
 		BookOpenText,
 		CodeXml
-	} from 'svelte-lucide';
+	} from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
