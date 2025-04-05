@@ -8,6 +8,7 @@ export const load = async ({ locals, params }) => {
 
     return {
         user: locals.user,
+        permissions: locals.permissions,
         breadcrumbs: breadcrumbs ?? []
     };
 };

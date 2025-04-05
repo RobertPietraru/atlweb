@@ -6,7 +6,7 @@
 <main class="min-h-[100vh] w-full px-8 py-4">
 	<div class="mb-8 flex items-center justify-between">
 		<h1 class="text-3xl font-bold">Courses</h1>
-		<Button href="/admin/courses/create">Create New Course</Button>
+		<Button href="/admin/courses/create" id="create-course-button">Creeaza curs nou</Button>
 	</div>
 
 	<div class="relative w-full overflow-auto">
@@ -25,7 +25,7 @@
 						<td class="p-4 align-middle">{course.chapterCount}</td>
 						<td class="p-4 align-middle">
 							<div class="flex justify-end gap-2">
-								<Button href="/admin/course/{course.id}" variant="outline" size="sm">View</Button>
+								<Button href="/admin/course/{course.id}" class="view-course-button" variant="outline" size="sm">View</Button>
 							</div>
 						</td>
 					</tr>

@@ -230,3 +230,16 @@ export function permissionToName(id: string) {
 			return 'N/A';
 	}
 }
+export const tableSchema = [
+	submission,
+	exercise,
+	lessonCodeBlock,
+	lessonResourcesBlock,
+	lessonTextBlock,
+	lesson,
+	chapter,
+	course,
+	session,
+	user_permissions,
+	user
+];

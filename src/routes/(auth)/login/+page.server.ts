@@ -26,7 +26,7 @@ export const load= async (event) => {
 
 export const actions= {
 	default: async (event) => {
-		if (await limiter.isLimited(event)) error(429, 'Prea multe incercari de logare. Te rugam sa astepti o perioada de timp.');
+		// if (await limiter.isLimited(event)) error(429, 'Prea multe incercari de logare. Te rugam sa astepti o perioada de timp.');
 		const redirectUrl = event.url.searchParams.get('redirect') || '/';
 		const form = await superValidate(event.request, zod(schema));
 		if (!form.valid) {

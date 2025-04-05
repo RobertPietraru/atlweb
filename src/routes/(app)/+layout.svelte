@@ -33,7 +33,11 @@
 	<div class="flex-1"></div>
 	{#if data.user}
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger>
+			<DropdownMenu.Trigger id="user-menu-trigger" onclick={
+				() => {
+					console.log('clicked');
+				}
+			}>
 				<Avatar.Root>
 					<Avatar.Fallback
 						>{data
@@ -51,7 +55,7 @@
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item>
 						<UserRound class="h-4 w-4" />
-						<a href={`/profile`}>Profil</a>
+						<a href={`/profile`} id="profile-button">Profil</a>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item onclick={toggleMode}>
 						<Sun
@@ -64,7 +68,7 @@
 						<span class="hidden dark:block">Tema întunecoasa</span>
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
-					<DropdownMenu.Item onclick={logout}>
+					<DropdownMenu.Item onclick={logout} id="logout-button">
 						<LogOut class="h-4 w-4 text-destructive" />
 						<span class="font-medium text-destructive">Deconectare</span>
 					</DropdownMenu.Item>
@@ -74,7 +78,7 @@
 	{:else}
 		<a href="/login" class="flex items-center gap-2">
 			<LogIn class="h-4 w-4" />
-			<span class="font-medium">Conectare</span>
+			<span class="font-medium" id="login-button">Conectare</span>
 		</a>
 	{/if}
 </header>

@@ -1,8 +1,14 @@
+import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle, } from '@sveltejs/kit';
 import type { ServerInit } from '@sveltejs/kit';
-import { authService} from '$lib/injection';
+import { authService } from '$lib/injection';
 import { sequence } from '@sveltejs/kit/hooks';
 import log from '$lib/logging';
+
+Sentry.init({
+	dsn: "https://0a2e1ef7768157821c8f0033c790384d@o4509090413936640.ingest.de.sentry.io/4509090414329936",
+	tracesSampleRate: 1
+})
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(authService.sessionCookieName);
@@ -50,7 +56,8 @@ export const authentication: Handle = async ({ event, resolve }) => {
 };
 
 
-export const handle: Handle = sequence(handleAuth, authentication);
+export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, authentication));
 export const init: ServerInit = async () => {
 	log.info('=== Starting app ===');
 };
+export const handleError = Sentry.handleErrorWithSentry();

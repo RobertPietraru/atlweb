@@ -6,6 +6,14 @@ if (!process.env.POSTGRES_URL) throw new Error('POSTGRES_URL is not set');
 const client = postgres(process.env.POSTGRES_URL, { prepare: false });
 export const db = drizzle(client);
 
+async function truncateAllTables() {
+  tables.tableSchema.forEach(async (table) => {
+    await db.delete(table);
+  })
+  console.log('Truncated all tables');
+}
+
+
 
 async function Auth(db: PostgresJsDatabase) {
   const passwordHash = await hash('password', {
@@ -31,8 +39,10 @@ async function Auth(db: PostgresJsDatabase) {
 }
 
 
-Auth(db).catch((error) => {
-  console.error('Seeding failed:', error);
-  process.exit(1);
+truncateAllTables().then(() => {
+  Auth(db).catch((error) => {
+    console.error('Seeding failed:', error);
+    process.exit(1);
+  });
 });
 

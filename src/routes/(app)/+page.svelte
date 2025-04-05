@@ -23,13 +23,14 @@
 			Platformă educațională pentru învățarea programării web într-un mod interactiv și practic
 		</h2>
 		<div class="flex justify-center gap-4">
-			<Button href="/courses" size="lg" class="px-8">
+			<Button href="/courses" size="lg" class="px-8" id="main-button">
 				Începe să înveți
 				<ArrowRightIcon class="ml-2 h-4 w-4" />
 			</Button>
 
 			<Button
 				href="https://github.com/RobertPietraru/atlweb"
+				id="github-button"
 				variant="outline"
 				size="lg"
 				class="px-8"

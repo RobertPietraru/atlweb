@@ -56,14 +56,6 @@
 		}
 	};
 
-	onMount(() => {
-		window.addEventListener('keydown', handleKeyDown);
-	});
-
-	onDestroy(() => {
-		window.removeEventListener('keydown', handleKeyDown);
-	});
-
 	let htmlEditor: Monaco.editor.IStandaloneCodeEditor;
 	let cssEditor: Monaco.editor.IStandaloneCodeEditor;
 	let jsEditor: Monaco.editor.IStandaloneCodeEditor;
@@ -79,6 +71,7 @@
 	let submitting = $state(false);
 
 	onMount(async () => {
+		window.addEventListener('keydown', handleKeyDown);
 		monaco = (await import('./monaco')).default;
 
 		htmlEditor = monaco.editor.create(htmlEditorContainer!, {
