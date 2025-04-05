@@ -92,10 +92,12 @@ export const lessonResourcesBlock = pgTable('lesson_resources_block', {
 /// a little block that contains html, css and javascript code
 export const lessonCodeBlock = pgTable('lesson_code_block', {
 	id: uuid('id').primaryKey().defaultRandom(),
+	text: text('text').notNull().default(''),
 	lessonId: uuid('lesson_id')
 		.notNull()
 		.references(() => lesson.id),
 	html: text('html').notNull(),
+
 	css: text('css').notNull(),
 	javascript: text('javascript').notNull(),
 	showOutput: boolean('show_output').notNull().default(false),

@@ -282,6 +282,11 @@
 
 {#snippet codeBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>, index: number)}
 	<Tabs.Root bind:value={activeTab} class="space-y-4">
+		{#if block.text}
+			<div class="markdown-content prose prose-slate max-w-none">
+				{@html marked(block.text)}
+			</div>
+		{/if}
 		<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 			<Tabs.List class="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1">
 				<Tabs.Trigger value="html" class="tab-trigger">HTML</Tabs.Trigger>
@@ -296,7 +301,6 @@
 						JSON.stringify($state.snapshot(lesson.blocks[index])) !==
 						JSON.stringify($state.snapshot(stateOfLastRanBlocks[index]))
 					) {
-
 						for (let i = 0; i < lesson.blocks.length; i++) {
 							stateOfLastRanBlocks[i] = null;
 						}
