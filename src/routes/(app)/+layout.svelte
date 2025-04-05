@@ -119,9 +119,7 @@
 			<nav class="flex flex-col gap-2">
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
-					<a href="https://facebook.com" class="hover:text-primary">Facebook</a>
-					<a href="https://twitter.com" class="hover:text-primary">Twitter</a>
-					<a href="https://github.com" class="hover:text-primary">GitHub</a>
+					<a href="https://github.com/RobertPietraru/atlweb" class="hover:text-primary">GitHub</a>
 				</div>
 			</nav>
 		</div>
