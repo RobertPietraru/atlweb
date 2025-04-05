@@ -24,7 +24,7 @@
 	} from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
-	import { ArrowUp, ArrowDown } from 'svelte-lucide';
+	import { ArrowUp, ArrowDown } from 'lucide-svelte';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);

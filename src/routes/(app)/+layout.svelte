@@ -4,9 +4,8 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { LogOut, LogIn, UserRound, Settings } from 'lucide-svelte';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import { SunIcon, MoonIcon, LaptopIcon, Sun, Moon } from 'lucide-svelte';
+	import { Sun, Moon } from 'lucide-svelte';
 	import { toggleMode } from 'mode-watcher';
-	import { Button } from '$lib/components/ui/button/index.js';
 
 	let { children, data } = $props();
 	const isMobile = new IsMobile();
@@ -33,11 +32,12 @@
 	<div class="flex-1"></div>
 	{#if data.user}
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger id="user-menu-trigger" onclick={
-				() => {
+			<DropdownMenu.Trigger
+				id="user-menu-trigger"
+				onclick={() => {
 					console.log('clicked');
-				}
-			}>
+				}}
+			>
 				<Avatar.Root>
 					<Avatar.Fallback
 						>{data
@@ -87,7 +87,9 @@
 	{@render children()}
 </div>
 
-<footer class="flex flex-col gap-8 border-t px-8 py-12 text-sm text-muted-foreground z-40 bg-background">
+<footer
+	class="z-40 flex flex-col gap-8 border-t bg-background px-8 py-12 text-sm text-muted-foreground"
+>
 	<div class="container grid grid-cols-1 gap-8 md:grid-cols-4">
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">ATLWEB</h3>
