@@ -324,7 +324,7 @@ export class AdminService {
         await this.db.transaction(async (tx) => {
             for (let i = 0; i < lessons.length; i++) {
                 await tx.update(table.lesson)
-                    .set({ order: i + 1 })
+                    .set({ order: i })
                     .where(eq(table.lesson.id, lessons[i]));
             }
         });
