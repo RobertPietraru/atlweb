@@ -2,10 +2,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
-	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
+	import { Card, CardContent } from '$lib/components/ui/card';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
-	import * as Dialog from '$lib/components/ui/dialog';
 	import { toast } from 'svelte-sonner';
 	import { deserialize } from '$app/forms';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
@@ -21,8 +19,6 @@
 		description: data.course.description
 	});
 
-	const { form, errors } = superForm(data.form);
-	let dialogOpen = $state(false);
 	let loading = $state(false);
 
 	function calculateNewOrder(index: number, direction: 'up' | 'down'): number {
@@ -38,39 +34,6 @@
 		// Recalculate all orders to be sequential
 		chapters = chapters.map((ch, idx) => ({ ...ch, order: idx + 1 }));
 		return chapters[index].order;
-	}
-
-	async function handleSubmit(event: SubmitEvent) {
-		event.preventDefault();
-		
-		try {
-			loading = true;
-			const formData = new FormData(event.target as HTMLFormElement);
-			const response = await fetch('?/create', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				dialogOpen = false;
-				hasChanges = false;
-			} else if (result.type === 'failure') {
-				console.error('Error creating chapter:', result.data?.message);
-				toast.error(
-					(result.data?.message as string | undefined | null) ?? 
-					'A apărut o eroare la crearea capitolului',
-					{
-						position: 'bottom-left' 
-					}
-				);
-			}
-		} catch (error) {
-			console.error('Error creating chapter:', error);
-			toast.error('A apărut o eroare la crearea capitolului');
-		} finally {
-			loading = false;
-		}
 	}
 
 	async function saveChapterOrder() {
@@ -200,7 +163,9 @@
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold tracking-tight">Capitole</h2>
 				<div class="flex gap-2">
-					<Button onclick={() => (dialogOpen = true)} id="add-chapter-button">Adaugă capitol nou</Button>
+					<form action="?/createChapter" method="POST">
+						<Button id="add-chapter-button" type="submit">Adaugă capitol nou</Button>
+					</form>
 				</div>
 			</div>
 
@@ -269,43 +234,3 @@
 	</div>
 </div>
 
-<Dialog.Root bind:open={dialogOpen}>
-	<Dialog.Content class="sm:max-w-[425px]">
-		<Dialog.Header>
-			<Dialog.Title>Adaugă capitol nou</Dialog.Title>
-		</Dialog.Header>
-		<form method="POST" class="space-y-4" onsubmit={handleSubmit}>
-			<div class="space-y-2">
-				<Label for="name">Nume capitol</Label>
-				<Input
-					id="name"
-					name="name"
-					type="text"
-					aria-invalid={$errors.name ? 'true' : 'false'}
-					required
-					bind:value={$form.name}
-				/>
-				<p class="text-destructive">{$errors.name}</p>
-			</div>
-			<div class="space-y-2">
-				<Label for="description">Descriere</Label>
-				<Input
-					id="description"
-					name="description"
-					type="text"
-					aria-invalid={$errors.description ? 'true' : 'false'}
-					required
-					bind:value={$form.description}
-				/>
-				<p class="text-destructive">{$errors.description}</p>
-			</div>
-
-			<Dialog.Footer>
-				<Button type="button" variant="outline" onclick={() => (dialogOpen = false)}>
-					Anulează
-				</Button>
-				<Button type="submit" disabled={loading}>Adaugă capitol</Button>
-			</Dialog.Footer>
-		</form>
-	</Dialog.Content>
-</Dialog.Root>

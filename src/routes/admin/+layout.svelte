@@ -44,11 +44,6 @@
 					icon: BookOpen,
 					url: '/admin/courses'
 				},
-				{
-					title: 'Exercitii',
-					icon: CodeXml,
-					url: '/admin/exercises'
-				}
 			]
 		}
 	];

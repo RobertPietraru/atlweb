@@ -34,23 +34,22 @@ export const load = async ({ locals, params }) => {
 };
 
 export const actions = {
-    create: async ({ request, locals, params }) => {
+    createChapter: async ({ locals, params }) => {
         if (!locals.user) {
             redirect(302, '/login');
         }
 
         const hasPermission = await adminService.hasPermissions(locals.user.id, ['course.edit', 'course.create']);
+
         if (!hasPermission) {
-            redirect(302, '/');
+            error(403, 'Nu ai permisiunea să creezi un capitol');
         }
 
-        const form = await superValidate(request, zod(schema));
-        if (!form.valid) {
-            return { form };
-        }
-
-        await adminService.createChapter(params.id, form.data);
-        return { form };
+        let id = await adminService.createChapter(params.id, {
+            name: 'Capitol nou',
+            description: 'Descrierea capitolului'
+        });
+        redirect(302, `/admin/course/${params.id}/chapter/${id}`);
     },
     update: async ({ request, locals, params }) => {
         const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
@@ -60,7 +59,7 @@ export const actions = {
 
 
         if (!hasPermission) {
-            error(403, 'You do not have permission to edit this course');
+            error(403, 'Nu ai permisiunea să editezi acest curs');
         }
 
         await adminService.updateCourse(params.id, {
