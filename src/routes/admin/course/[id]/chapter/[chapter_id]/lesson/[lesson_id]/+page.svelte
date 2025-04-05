@@ -98,6 +98,7 @@
 		} else if (type === 'code') {
 			block = {
 				id: '',
+				text: '',
 				html: '',
 				css: '',
 				javascript: '',
@@ -228,6 +229,7 @@
 	</div>
 	{@render addBlock(0)}
 	{#each lesson.blocks as block, index}
+
 		<div class="flex">
 			{@render manageBlock(index)}
 			<div class="flex-1">
@@ -484,6 +486,7 @@
 	<div class="flex flex-col gap-4">
 		<div class="grid grid-cols-2 gap-4">
 			<div class="flex h-full flex-col gap-4">
+				<Textarea bind:value={block.text} placeholder="Scrie textul pentru acest bloc" />
 				<Tabs.Root bind:value={activeTab}>
 					<div class="flex items-center justify-between">
 						<Tabs.List>
@@ -505,6 +508,9 @@
 			</div>
 
 			<div class="flex h-full flex-col gap-4 p-4">
+				<div class="markdown-content">
+					{@html marked(block.text)}
+				</div>
 				<Tabs.Root bind:value={activeTab}>
 					<div class="flex items-center justify-between">
 						<Tabs.List>

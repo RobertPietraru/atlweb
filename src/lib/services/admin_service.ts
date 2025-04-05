@@ -418,6 +418,7 @@ export class AdminService {
                 html: table.lessonCodeBlock.html,
                 css: table.lessonCodeBlock.css,
                 javascript: table.lessonCodeBlock.javascript,
+                text: table.lessonCodeBlock.text,
                 order: table.lessonCodeBlock.order,
             }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id))).map(block => ({
                 ...block,
@@ -518,6 +519,7 @@ export class AdminService {
             await this.db.update(table.lessonCodeBlock).set({
                 html: block.html,
                 css: block.css,
+                text: block.text,
                 javascript: block.javascript,
                 order: block.order,
             }).where(eq(table.lessonCodeBlock.id, blockId));
@@ -575,6 +577,7 @@ export class AdminService {
                 lessonId: lesson_id,
                 html: block.html,
                 css: block.css,
+                text: block.text,
                 javascript: block.javascript,
                 order: block.order,
             });
