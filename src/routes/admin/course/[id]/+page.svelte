@@ -162,7 +162,7 @@
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold tracking-tight">Informații de bază</h2>
 				{#if !isEditing}
-					<Button variant="outline" onclick={() => (isEditing = true)}>Editează</Button>
+					<Button variant="outline" onclick={() => (isEditing = true)} id="edit-course-button">Editează</Button>
 				{/if}
 			</div>
 			<Card>
@@ -200,7 +200,7 @@
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold tracking-tight">Capitole</h2>
 				<div class="flex gap-2">
-					<Button onclick={() => (dialogOpen = true)}>Adaugă capitol nou</Button>
+					<Button onclick={() => (dialogOpen = true)} id="add-chapter-button">Adaugă capitol nou</Button>
 				</div>
 			</div>
 
