@@ -176,9 +176,6 @@
 <Resizable.PaneGroup direction="horizontal">
 	<Resizable.Pane
 		defaultSize={25}
-		onResize={() => {
-			console.log('resize');
-		}}
 	>
 		<Resizable.PaneGroup direction="vertical" class="">
 			<Resizable.Pane defaultSize={50} class="p-4">
