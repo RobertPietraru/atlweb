@@ -422,12 +422,14 @@
 	</ScrollArea>
 {/snippet}
 {#snippet exerciseDescription()}
+<ScrollArea class="w-full h-full">
 	<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
 	<p>{data.exercise.description}</p>
 	<Separator class="my-4" />
 	<div class="markdown-content">
 		{@html marked(data.exercise.instructions)}
 	</div>
+</ScrollArea>
 {/snippet}
 {#snippet submitButton()}
 	<Popover.Root bind:open={submitPopupOpen}>
