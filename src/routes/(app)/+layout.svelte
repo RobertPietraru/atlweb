@@ -119,6 +119,10 @@
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">Contact</h3>
 			<nav class="flex flex-col gap-2">
+				<p class="text-muted-foreground">Prof. coordonator:</p>
+				<p class="hover:text-primary">Giocaș Afrodita</p>
+				<p class="hover:text-primary">Cardaș Cerasela</p>
+
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
 					<a href="https://github.com/RobertPietraru/atlweb" class="hover:text-primary">GitHub</a>
@@ -128,7 +132,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<p>© {new Date().getFullYear()} ATLWEB - Toate drepturile rezervate</p>
+		<p>© {2024} ATLWEB - Toate drepturile rezervate</p>
 		<p>Făcut cu ❤️ în România</p>
 	</div>
 </footer>

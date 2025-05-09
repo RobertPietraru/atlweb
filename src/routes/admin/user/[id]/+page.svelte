@@ -7,6 +7,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
 	const {
@@ -30,7 +31,6 @@
 		acc[category].push(permission);
 		return acc;
 	}, {});
-    $inspect($updateForm.username);
 </script>
 
 <div class="container mx-auto py-8">
@@ -124,6 +124,7 @@
 					updatingPermissions = true;
 					return async ({ update }) => {
 						await update();
+						await invalidateAll();
 						updatingPermissions = false;
 					};
 				}}

@@ -1,5 +1,5 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { adminService, authService } from '$lib/injection';
+import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
@@ -14,8 +14,8 @@ const permissionsSchema = z.object({
     permissions: z.array(z.string())
 });
 
-export const load = async ({ params }) => {
-    if (!await adminService.hasPermission(params.id, 'user.view')) {
+export const load = async ({ params, locals }) => {
+    if (!locals.permissions.includes('user.view')) {
         redirect(302, '/');
     }
     const user = await adminService.getUser(params.id);
@@ -35,8 +35,8 @@ export const load = async ({ params }) => {
 };
 
 export const actions = {
-    deleteUser: async ({ params }) => {
-        if (!await adminService.hasPermission(params.id, 'user.delete')) {
+    deleteUser: async ({ params, locals }) => {
+        if (!locals.permissions.includes('user.delete')) {
             error(403, 'Nu aveți permisiune să ștergeți utilizatori');
         }
         await adminService.deleteUser(params.id);
@@ -44,7 +44,7 @@ export const actions = {
     },
 
     updateUser: async (event) => {
-        if (!await adminService.hasPermission(event.params.id, 'user.edit')) {
+        if (!event.locals.permissions.includes('user.edit')) {
             error(403, 'Nu aveți permisiune să actualizați utilizatori');
         }
         const form = await superValidate(event.request, zod(updateSchema));
@@ -74,7 +74,7 @@ export const actions = {
     },
 
     updatePermissions: async (event) => {
-        if (!await adminService.hasPermission(event.params.id, 'user.edit')) {
+        if (!event.locals.permissions.includes('user.edit')) {
             error(403, 'Nu aveți permisiune să actualizați utilizatori');
         }
         const form = await superValidate(event.request, zod(permissionsSchema));
