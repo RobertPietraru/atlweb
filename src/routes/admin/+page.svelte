@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-    let { data } = $props();
+	let { data } = $props();
 </script>
 
 <div class="container mx-auto p-8">
@@ -25,17 +25,6 @@
 				</CardHeader>
 				<CardContent>
 					<a href="/admin/courses" class="text-blue-500 hover:underline">Gestionează cursurile</a>
-				</CardContent>
-			</Card>
-		{/if}
-
-		{#if data.permissions?.includes('exercise.view')}
-			<Card>
-				<CardHeader>
-					<CardTitle>Exerciții</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<a href="/admin/exercises" class="text-blue-500 hover:underline">Gestionează exercițiile</a>
 				</CardContent>
 			</Card>
 		{/if}

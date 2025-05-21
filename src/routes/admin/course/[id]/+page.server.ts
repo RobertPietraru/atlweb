@@ -3,6 +3,7 @@ import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { superValidate } from 'sveltekit-superforms';
+import { cache } from '$lib/cache.js';
 
 const schema = z.object({
     name: z.string().min(1),
@@ -49,6 +50,7 @@ export const actions = {
             name: 'Capitol nou',
             description: 'Descrierea capitolului'
         });
+        cache.courses = null;
         redirect(302, `/admin/course/${params.id}/chapter/${id}`);
     },
     update: async ({ request, locals, params }) => {

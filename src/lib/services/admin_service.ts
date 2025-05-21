@@ -631,26 +631,26 @@ export class AdminService {
             .select({
                 submission: table.submission,
                 exercise: {
-                        id: table.exercise.id,
-                        lessonId: table.exercise.lessonId,
-                        name: table.exercise.name,
-                    },
-                    lesson: {
-                        id: table.lesson.id,
-                        chapterId: table.lesson.chapterId
-                    },
-                    chapter: {
-                        id: table.chapter.id,
-                    }
-                })
-                .from(table.submission)
-                .leftJoin(table.exercise, eq(table.submission.exerciseId, table.exercise.id))
-                .leftJoin(table.lesson, eq(table.exercise.lessonId, table.lesson.id))
-                .leftJoin(table.chapter, eq(table.lesson.chapterId, table.chapter.id))
-                .where(and(eq(table.submission.userId, user_id), eq(table.submission.checked, false)))
-                .orderBy(desc(table.submission.submissionDate))
-                .limit(limit)
-                .offset((page - 1) * limit)
+                    id: table.exercise.id,
+                    lessonId: table.exercise.lessonId,
+                    name: table.exercise.name,
+                },
+                lesson: {
+                    id: table.lesson.id,
+                    chapterId: table.lesson.chapterId
+                },
+                chapter: {
+                    id: table.chapter.id,
+                }
+            })
+            .from(table.submission)
+            .leftJoin(table.exercise, eq(table.submission.exerciseId, table.exercise.id))
+            .leftJoin(table.lesson, eq(table.exercise.lessonId, table.lesson.id))
+            .leftJoin(table.chapter, eq(table.lesson.chapterId, table.chapter.id))
+            .where(and(eq(table.submission.userId, user_id), eq(table.submission.checked, false)))
+            .orderBy(desc(table.submission.submissionDate))
+            .limit(limit)
+            .offset((page - 1) * limit)
         return {
             submissions: submissions.map(submission => ({
                 ...submission.submission,
