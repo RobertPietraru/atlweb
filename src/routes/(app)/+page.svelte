@@ -1,20 +1,14 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { ArrowRightIcon, BookOpenIcon, CodeIcon, UsersIcon, Github } from 'lucide-svelte';
-	import { mode } from 'mode-watcher';
-	let gradient = $derived(
-		$mode === 'dark'
-			? 'from-[#a22604] via-[#e34211] to-[#fb5b27]'
-			: 'from-[#2563eb] via-[#3b82f6] to-[#60a5fa]'
-	);
+	import { ArrowRightIcon, BookOpenIcon, UsersIcon, Github } from 'lucide-svelte';
 </script>
 
 <section class="container grid gap-10 py-20 md:py-32">
 	<div class="space-y-6 text-center">
 		<main class="text-center text-5xl font-bold md:text-6xl">
 			<h1 class="font-bold">
-				ATLWEB - <span class="bg-gradient-to-r {gradient} bg-clip-text text-transparent"
+				ATLWEB - <span class="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] dark:from-[#a22604] dark:via-[#e34211] dark:to-[#fb5b27] bg-clip-text text-transparent"
 					>Învață programare web</span
 				>
 			</h1>
@@ -99,18 +93,9 @@
 	</div>
 </section>
 
-{#if $mode === 'dark'}
-	<img
-		src="/laurian.png"
-		alt="Colegiul Naţional „A. T. Laurian” Botoşani"
-		class="fixed bottom-0 right-0 -z-10 object-cover opacity-20 dark:opacity-10 dark:md:opacity-50"
-		style="height: calc(100vh - 4rem);"
-	/>
-{:else}
-	<img
-		src="/laurian_light.png"
-		alt="Colegiul Naţional „A. T. Laurian” Botoşani"
-		class="fixed bottom-0 right-0 -z-50 object-cover"
-		style="height: calc(100vh - 4rem);"
-	/>
-{/if}
+<img
+	src="/laurian.png"
+	alt="Colegiul Naţional „A. T. Laurian” Botoşani"
+	class="fixed bottom-0 right-0 -z-10 object-cover opacity-20 md:opacity-50"
+	style="height: calc(100vh - 4rem);"
+/>

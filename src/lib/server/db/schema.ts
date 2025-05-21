@@ -20,12 +20,11 @@ export const permissionsList = [
 	'course.create',
 	'course.edit',
 	'course.delete',
-	'course.view',
 
+	'course.view',
 	'course.create',
 	'course.edit',
 	'course.delete',
-	'course.view',
 
 	'user.create',
 	'user.edit',

@@ -15,6 +15,7 @@ export const load = async ({ locals, params }) => {
     });
     return {
         user: locals.user,
+        canViewAdminPage: locals.permissions.includes('course.view'),
         breadcrumbs: breadcrumbs
     };
 };

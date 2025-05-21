@@ -7,7 +7,7 @@ const client = postgres(process.env.POSTGRES_URL, { prepare: false });
 export const db = drizzle(client);
 
 async function Auth(db: PostgresJsDatabase) {
-  const passwordHash = await hash('Password123!', {
+  const passwordHash = await hash('password', {
     memoryCost: 19456,
     timeCost: 2,
     outputLen: 32,
@@ -16,7 +16,7 @@ async function Auth(db: PostgresJsDatabase) {
 
   // Insert users
   await db.insert(tables.user).values([
-    { email: 'g.admin@pietrocka.com', username: 'Giocaș Afrodita', passwordHash: passwordHash },
+    { email: 'robert@pietrocka.com', username: 'Robert Pietraru 2 ', passwordHash: passwordHash },
   ]);
 
   const users = await db.select().from(tables.user);

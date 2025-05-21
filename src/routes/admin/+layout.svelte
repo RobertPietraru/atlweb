@@ -14,12 +14,25 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import Sun from '@lucide/svelte/icons/sun';
 	import Moon from '@lucide/svelte/icons/moon';
-
-	import { toggleMode } from 'mode-watcher';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import {onMount } from 'svelte';
 
-    import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	const isMobile = new IsMobile();
+	let isDarkTheme = $state(false);
+	onMount(() => {
+		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
+	});
+	$effect(() => {
+		const htmlEl = document.documentElement;
+		if (isDarkTheme) {
+			localStorage.setItem('isDarkTheme', 'true');
+			htmlEl.classList.add('dark');
+		} else {
+			localStorage.setItem('isDarkTheme', 'false');
+			htmlEl.classList.remove('dark');
+		}
+	});
 
 	let { children, data } = $props();
 
@@ -43,7 +56,7 @@
 					title: 'Cursuri',
 					icon: BookOpen,
 					url: '/admin/courses'
-				},
+				}
 			]
 		}
 	];
@@ -149,7 +162,13 @@
 				</Breadcrumb.List>
 			</Breadcrumb.Root>
 			<div class="flex-1"></div>
-			<Button onclick={toggleMode} variant="ghost" size="icon" >
+			<Button
+				onclick={() => {
+					isDarkTheme = !isDarkTheme;
+				}}
+				variant="ghost"
+				size="icon"
+			>
 				<Sun
 					class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 				/>
