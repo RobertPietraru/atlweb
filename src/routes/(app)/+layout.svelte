@@ -65,7 +65,7 @@
 			<span class="sr-only">Toggle theme</span>
 		</Button>
 		{#if !data.user}
-			<Button href="/auth/login" variant="outline">Autentifica-te</Button>
+			<Button href="/login" variant="outline">Autentifica-te</Button>
 		{:else}
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger
@@ -114,7 +114,7 @@
 					</DropdownMenu.Label>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item>
-						<UserRound class="h-4 w-4" />
+						<UserRound class="mr-2.5 h-4 w-4" />
 						<a href="/profile" id="profile-button">Profil</a>
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />

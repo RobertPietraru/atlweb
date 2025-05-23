@@ -1,12 +1,8 @@
 <script lang="ts">
 	import {
-		House,
 		UsersRound,
 		LogOut,
-		PersonStanding,
 		BookOpen,
-		BookOpenText,
-		CodeXml
 	} from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';

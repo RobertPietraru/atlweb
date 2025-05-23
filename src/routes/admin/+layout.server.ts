@@ -6,10 +6,10 @@ export const load = async ({ locals, params }) => {
     const lessonId = params.lesson_id;
     const breadcrumbs = await adminService.getBreadcrumbsAdmin(courseId ?? null, chapterId ?? null, lessonId ?? null, null);
 
-    console.log(locals.permissions);
+    console.log(locals.user!.permissions);
     return {
         user: locals.user,
-        permissions: locals.permissions,
+        permissions: locals.user!.permissions,
         breadcrumbs: breadcrumbs ?? []
     };
 };

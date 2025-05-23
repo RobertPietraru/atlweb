@@ -52,56 +52,30 @@ export class AdminService {
         return result.id;
     }
 
-    async getUserPermissions(userId: table.Id): Promise<table.Permission[]> {
-        const permissions = await this.db.select({
-            permission: table.user_permissions.permission,
-        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
-        return permissions.map(permission => permission.permission as table.Permission);
-    }
-
     async getUsers() {
         const users = await this.db.select({
             id: table.user.id,
             username: table.user.username,
+            permissions: table.user.permissions,
             email: table.user.email,
         }).from(table.user);
 
-        const usersWithPermissions = await Promise.all(users.map(async (user) => {
-            const permissions = await this.db.select({
-                permission: table.user_permissions.permission
-            }).from(table.user_permissions).where(eq(table.user_permissions.user, user.id));
-
-            return {
-                ...user,
-                permissions: permissions.map(p => p.permission)
-            };
-        }));
-        return usersWithPermissions;
+        return users;
     }
 
-    async getUser(userId: table.Id): Promise<(table.User & { permissions: table.Permission[] }) | null> {
-        const user = await this.db.select({
+    async getUser(userId: table.Id): Promise<table.User | null> {
+        const users = await this.db.select({
             id: table.user.id,
             username: table.user.username,
             email: table.user.email,
+            permissions: table.user.permissions,
         }).from(table.user).where(eq(table.user.id, userId)).limit(1);
 
-        if (user.length === 0) {
+        if (users.length === 0) {
             return null;
         }
 
-        const permissions = await this.db.select({
-            permission: table.user_permissions.permission
-        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
-
-        const result = {
-            id: user[0].id,
-            username: user[0].username,
-            email: user[0].email,
-            permissions: permissions.map(p => p.permission as table.Permission)
-        };
-
-        return result;
+        return users[0];
     }
 
     async deleteUser(userId: table.Id): Promise<void> {
@@ -110,25 +84,9 @@ export class AdminService {
             await tx.delete(table.session).where(eq(table.session.userId, userId));
             // submissions
             await tx.delete(table.submission).where(eq(table.submission.userId, userId));
-            // user permissions
-            await tx.delete(table.user_permissions).where(eq(table.user_permissions.user, userId));
             // user
             await tx.delete(table.user).where(eq(table.user.id, userId));
         });
-    }
-
-    async hasPermission(userId: table.Id, permission: table.Permission): Promise<boolean> {
-        const permissions = await this.db.select({
-            permission: table.user_permissions.permission
-        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
-        return permissions.some(p => p.permission === permission);
-    }
-
-    async hasPermissions(userId: table.Id, permissions: table.Permission[]): Promise<boolean> {
-        const userPermissions = await this.db.select({
-            permission: table.user_permissions.permission
-        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
-        return permissions.every(p => userPermissions.some(up => up.permission === p));
     }
 
     async updateUser(userId: table.Id, { email, username }: { email: string, username: string }): Promise<table.Id | 'unknown' | 'emailAlreadyExists' | 'usernameAlreadyExists'> {
@@ -159,11 +117,10 @@ export class AdminService {
         return userId;
     }
 
-    async updateUserPermissions(userId: table.Id, permissions: table.Permission[]) {
-        await this.db.transaction(async (tx) => {
-            await tx.delete(table.user_permissions).where(eq(table.user_permissions.user, userId));
-            await tx.insert(table.user_permissions).values(permissions.map(p => ({ user: userId, permission: p })));
-        });
+    async updateUserPermissions(userId: table.Id, permissions: string[]) {
+        this.db.update(table.user).set({
+            permissions: permissions
+        }).where(eq(table.user.id, userId));
     }
 
     async createCourse(name: string, description: string): Promise<table.Id> {

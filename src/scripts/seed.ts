@@ -16,14 +16,41 @@ async function Auth(db: PostgresJsDatabase) {
 
   // Insert users
   await db.insert(tables.user).values([
-    { email: 'robert@pietrocka.com', username: 'Robert Pietraru 2 ', passwordHash: passwordHash },
-  ]);
+    {
+      email: 'admin@pietrocka.com',
+      username: 'Robert Pietraru 3 ',
+      passwordHash: passwordHash,
+      permissions: [
+        'exercise.create',
+        'exercise.edit',
+        'exercise.delete',
+        'exercise.view',
+        'lesson.create',
+        'lesson.edit',
+        'lesson.delete',
+        'lesson.view',
+        'chapter.create',
+        'chapter.edit',
+        'chapter.delete',
+        'chapter.view',
+        'course.create',
+        'course.edit',
+        'course.delete',
 
-  const users = await db.select().from(tables.user);
-  await db.insert(tables.user_permissions).values(tables.permissionsList.map(permission => ({
-    user: users[0].id,
-    permission: permission,
-  })));
+        'course.view',
+        'course.create',
+        'course.edit',
+        'course.delete',
+
+        'user.create',
+        'user.edit',
+        'user.delete',
+        'user.view',
+
+        'submission.solve',
+      ],
+    },
+  ]);
 
   console.log('Seeding complete!');
   process.exit(0);

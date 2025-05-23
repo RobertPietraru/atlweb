@@ -15,7 +15,8 @@ export const load = async ({ locals }) => {
 		redirect(302, '/login');
 	}
 
-	const hasPermission = await adminService.hasPermission(locals.user.id, 'course.create');
+	const hasPermission = locals.user!.permissions.includes('course.create')
+
 
 	if (!hasPermission) {
 		redirect(302, '/');

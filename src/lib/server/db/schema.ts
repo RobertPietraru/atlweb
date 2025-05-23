@@ -150,17 +150,8 @@ export const user = pgTable('user', {
 	email: text('email').notNull().unique(),
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash').notNull(),
+	permissions: text('permissions').array().notNull().default([]),
 });
-
-export const user_permissions = pgTable('user_permissions', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	user: uuid('user_id')
-		.notNull()
-		.references(() => user.id),
-	permission: text('permission'),
-});
-
-
 
 // Session
 export const session = pgTable('session', {
@@ -173,7 +164,6 @@ export const session = pgTable('session', {
 
 export type Session = typeof session.$inferSelect;
 export type User = Omit<typeof user.$inferSelect, 'passwordHash'>;
-export type Permission = typeof permissionsList[number];
 export type Exercise = typeof exercise.$inferSelect;
 export type Submission = typeof submission.$inferSelect;
 export type Id = string;
@@ -241,6 +231,5 @@ export const tableSchema = [
 	chapter,
 	course,
 	session,
-	user_permissions,
 	user
 ];
