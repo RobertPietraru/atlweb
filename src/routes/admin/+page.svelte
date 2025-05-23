@@ -7,7 +7,7 @@
 	<h1 class="mb-8 text-3xl font-bold">Dashboard administrativ</h1>
 
 	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{#if data.permissions?.includes('user.view')}
+		{#if data.canViewAdminUsersPage}
 			<Card>
 				<CardHeader>
 					<CardTitle>Utilizatori</CardTitle>
@@ -18,7 +18,7 @@
 			</Card>
 		{/if}
 
-		{#if data.permissions?.includes('course.view')}
+		{#if data.canViewAdminCoursesPage}
 			<Card>
 				<CardHeader>
 					<CardTitle>Cursuri</CardTitle>

@@ -5,11 +5,9 @@ export const load = async ({ locals, params }) => {
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
     const breadcrumbs = await adminService.getBreadcrumbsAdmin(courseId ?? null, chapterId ?? null, lessonId ?? null, null);
-
-    console.log(locals.user!.permissions);
     return {
         user: locals.user,
-        permissions: locals.user!.permissions,
+        canViewAdminPage: locals.user?.permissions.includes('course.view'),
         breadcrumbs: breadcrumbs ?? []
     };
 };

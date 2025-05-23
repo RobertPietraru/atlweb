@@ -10,7 +10,6 @@
 	import { goto } from '$app/navigation';
 
 	let { children, data } = $props();
-	const isMobile = new IsMobile();
 	let isDarkTheme = $state(false);
 	let logoutLoading = $state(false);
 	onMount(() => {
