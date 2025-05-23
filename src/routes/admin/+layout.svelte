@@ -1,13 +1,11 @@
 <script lang="ts">
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { ShieldUser, LogOut, LogIn, UserRound, Settings, Loader2 } from 'lucide-svelte';
-	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import { ShieldUser, LogOut, UserRound, Loader2 } from 'lucide-svelte';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 
 	let { children, data } = $props();
 	let isDarkTheme = $state(false);
@@ -42,7 +40,6 @@
 		}
 	}
 </script>
-
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
 	<div class="flex-1"></div>
@@ -149,7 +146,22 @@
 	</div>
 </header>
 
-<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl bg-muted/50">
+<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl bg-muted/50 container space-y-4 py-4">
+	<Breadcrumb.Root class="flex items-center">
+		<Breadcrumb.List>
+			<Breadcrumb.Separator />
+			{#each data.breadcrumbs as crumb, i}
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href={crumb.url}>
+						{crumb.name}
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				{#if i < data.breadcrumbs.length - 1}
+					<Breadcrumb.Separator />
+				{/if}
+			{/each}
+		</Breadcrumb.List>
+	</Breadcrumb.Root>
 	{@render children()}
 </div>
 
@@ -198,7 +210,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<p>© {2024} ATLWEB - Toate drepturile rezervate</p>
+		<p>©2025 ATLWEB - Toate drepturile rezervate</p>
 		<p>Făcut cu ❤️ în România</p>
 	</div>
 </footer>
