@@ -146,7 +146,7 @@
 	</div>
 </header>
 
-<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl bg-muted/50 container space-y-4 py-4">
+<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl container space-y-4 py-4">
 	<Breadcrumb.Root class="flex items-center">
 		<Breadcrumb.List>
 			<Breadcrumb.Separator />

@@ -1,5 +1,3 @@
-import { adminService } from "$lib/injection";
-
 export const load = async ({ locals, params }) => {
     return {
         user: locals.user,

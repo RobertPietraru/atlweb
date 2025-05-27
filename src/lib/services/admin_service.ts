@@ -732,65 +732,6 @@ export class AdminService {
         return breadcrumbs;
     }
 
-    async getBreadcrumbsAdmin(courseId: table.Id | null, chapterId: table.Id | null, lessonId: table.Id | null, exerciseId: table.Id | null) {
-        const breadcrumbs: { name: string, url: string }[] = [];
-        if (courseId) {
-            const name = await this.db.select({
-                name: table.course.name,
-            }).from(table.course).where(eq(table.course.id, courseId)).limit(1);
-            if (name.length === 0) {
-                return null;
-            }
-            breadcrumbs.push({
-                name: name[0].name,
-                url: `/admin/course/${courseId}`,
-            });
-        } else {
-            return breadcrumbs;
-        }
-        if (chapterId) {
-            const name = await this.db.select({
-                name: table.chapter.name,
-            }).from(table.chapter).where(eq(table.chapter.id, chapterId)).limit(1);
-            if (name.length === 0) {
-                return null;
-            }
-            breadcrumbs.push({
-                name: name[0].name,
-                url: `/admin/course/${courseId}/chapter/${chapterId}`,
-            });
-        } else {
-            return breadcrumbs;
-        }
-        if (lessonId) {
-            const name = await this.db.select({
-                name: table.lesson.name,
-            }).from(table.lesson).where(eq(table.lesson.id, lessonId)).limit(1);
-            if (name.length === 0) {
-                return null;
-            }
-            breadcrumbs.push({
-                name: name[0].name,
-                url: `/admin/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}`,
-            });
-        } else {
-            return breadcrumbs;
-        }
-        if (exerciseId) {
-            const name = await this.db.select({
-                name: table.exercise.name,
-            }).from(table.exercise).where(eq(table.exercise.id, exerciseId)).limit(1);
-            if (name.length === 0) {
-                return null;
-            }
-            breadcrumbs.push({
-                name: name[0].name,
-                url: `/admin/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/exercise/${exerciseId}`,
-            });
-        }
-        return breadcrumbs;
-    }
-
     async completeSubmission(submissionId: table.Id, params: {
         html: string,
         css: string,

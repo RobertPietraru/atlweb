@@ -198,7 +198,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<p>© {2024} ATLWEB - Toate drepturile rezervate</p>
+		<p>© {2025} ATLWEB - Toate drepturile rezervate</p>
 		<p>Făcut cu ❤️ în România</p>
 	</div>
 </footer>

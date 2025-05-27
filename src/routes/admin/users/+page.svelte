@@ -1,18 +1,10 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { enhance } from '$app/forms';
-	import {
-		DropdownMenu,
-		DropdownMenuContent,
-		DropdownMenuItem,
-		DropdownMenuTrigger
-	} from '$lib/components/ui/dropdown-menu';
-	import { MoreHorizontal } from 'lucide-svelte';
 
 	let { data } = $props();
 </script>
 
-<main class="min-h-[100vh] w-full px-8 py-4">
+<main class="min-h-[100vh] w-full py-4">
 	<div class="mb-8 flex items-center justify-between">
 		<h1 class="text-3xl font-bold">Users</h1>
 		<Button href="/admin/users/create">Create New User</Button>
