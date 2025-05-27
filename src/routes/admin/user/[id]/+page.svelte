@@ -20,20 +20,23 @@
 	let updatingUser = $state(false);
 	let updatingPermissions = $state(false);
 	let deleting = $state(false);
-    let isLoading = $derived(updatingUser || updatingPermissions || deleting);
+	let isLoading = $derived(updatingUser || updatingPermissions || deleting);
 
 	// Group permissions by category
-	const groupedPermissions = data.allPermissions.reduce((acc: Record<string, string[]>, permission: string) => {
-		const category = permission.split('.')[0];
-		if (!acc[category]) {
-			acc[category] = [];
-		}
-		acc[category].push(permission);
-		return acc;
-	}, {});
+	const groupedPermissions = data.allPermissions.reduce(
+		(acc: Record<string, string[]>, permission: string) => {
+			const category = permission.split('.')[0];
+			if (!acc[category]) {
+				acc[category] = [];
+			}
+			acc[category].push(permission);
+			return acc;
+		},
+		{}
+	);
 </script>
 
-<div class="container mx-auto py-8">
+<div class="py-8">
 	<h1 class="mb-8 text-3xl font-bold">Editează utilizator: {$updateForm.username}</h1>
 
 	{#if $updateMessage}
@@ -45,9 +48,9 @@
 	<div class="grid gap-8 md:grid-cols-2">
 		<div>
 			<h2 class="mb-4 text-xl font-semibold">Informații de bază</h2>
-			<form 
-				method="POST" 
-				action="?/updateUser" 
+			<form
+				method="POST"
+				action="?/updateUser"
 				class="space-y-4"
 				use:enhance={() => {
 					updatingUser = true;
@@ -92,9 +95,9 @@
 				</Button>
 			</form>
 
-			<form 
-				method="POST" 
-				action="?/deleteUser" 
+			<form
+				method="POST"
+				action="?/deleteUser"
 				class="mt-8"
 				use:enhance={() => {
 					deleting = true;
@@ -116,9 +119,9 @@
 
 		<div>
 			<h2 class="mb-4 text-xl font-semibold">Permisiuni</h2>
-			<form 
-				method="POST" 
-				action="?/updatePermissions" 
+			<form
+				method="POST"
+				action="?/updatePermissions"
 				class="space-y-6"
 				use:enhance={() => {
 					updatingPermissions = true;
@@ -131,7 +134,7 @@
 			>
 				{#each Object.entries(groupedPermissions) as [category, permissions]}
 					<div class="space-y-2">
-						<h3 class="capitalize font-medium">{category}</h3>
+						<h3 class="font-medium capitalize">{category}</h3>
 						<div class="grid grid-cols-2 gap-2">
 							{#each permissions as permission}
 								<div class="flex items-center space-x-2">

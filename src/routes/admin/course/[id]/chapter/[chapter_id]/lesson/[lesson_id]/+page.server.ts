@@ -3,7 +3,7 @@ import { adminService } from '$lib/injection';
 import type { LessonWithBlocks } from '$lib/services/admin_service.js';
 
 export const load = async ({ locals, params }) => {
-    const hasPermission = await adminService.hasPermission(locals.user!.id, 'lesson.view');
+    const hasPermission = locals.user!.permissions.includes('lesson.view')
 
     if (!hasPermission) {
         error(403, 'You do not have modify to view this lesson');

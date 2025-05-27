@@ -6,17 +6,8 @@ if (!process.env.POSTGRES_URL) throw new Error('POSTGRES_URL is not set');
 const client = postgres(process.env.POSTGRES_URL, { prepare: false });
 export const db = drizzle(client);
 
-// async function truncateAllTables() {
-//   tables.tableSchema.forEach(async (table) => {
-//     await db.delete(table);
-//   })
-//   console.log('Truncated all tables');
-// }
-
-
-
 async function Auth(db: PostgresJsDatabase) {
-  const passwordHash = await hash('Password123!', {
+  const passwordHash = await hash('password', {
     memoryCost: 19456,
     timeCost: 2,
     outputLen: 32,
@@ -25,14 +16,41 @@ async function Auth(db: PostgresJsDatabase) {
 
   // Insert users
   await db.insert(tables.user).values([
-    { email: 'g.admin@pietrocka.com', username: 'Giocaș Afrodita', passwordHash: passwordHash },
-  ]);
+    {
+      email: 'admin@pietrocka.com',
+      username: 'Robert Pietraru 3 ',
+      passwordHash: passwordHash,
+      permissions: [
+        'exercise.create',
+        'exercise.edit',
+        'exercise.delete',
+        'exercise.view',
+        'lesson.create',
+        'lesson.edit',
+        'lesson.delete',
+        'lesson.view',
+        'chapter.create',
+        'chapter.edit',
+        'chapter.delete',
+        'chapter.view',
+        'course.create',
+        'course.edit',
+        'course.delete',
 
-  const users = await db.select().from(tables.user);
-  await db.insert(tables.user_permissions).values(tables.permissionsList.map(permission => ({
-    user: users[0].id,
-    permission: permission,
-  })));
+        'course.view',
+        'course.create',
+        'course.edit',
+        'course.delete',
+
+        'user.create',
+        'user.edit',
+        'user.delete',
+        'user.view',
+
+        'submission.solve',
+      ],
+    },
+  ]);
 
   console.log('Seeding complete!');
   process.exit(0);

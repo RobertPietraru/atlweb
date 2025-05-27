@@ -15,7 +15,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	if (!sessionToken) {
 		event.locals.user = null;
 		event.locals.session = null;
-		event.locals.permissions = [];
+		authService.deleteSessionTokenCookie(event);
 		return resolve(event);
 	}
 
@@ -23,9 +23,6 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	if (session) {
 		authService.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		/// get the user permissions
-		const permissions = await authService.getUserPermissions(user.id);
-		event.locals.permissions = permissions;
-
 		event.locals.user = user;
 		event.locals.session = session;
 	} else {
@@ -33,7 +30,6 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 		event.locals.user = null;
 		event.locals.session = null;
-		event.locals.permissions = [];
 	}
 
 

@@ -103,19 +103,12 @@ export class AuthService {
         return session;
     }
 
-    async getUserPermissions(userId: table.Id)  : Promise<table.Permission[]> {
-        const permissions = await this.db.select({
-            permission: table.user_permissions.permission,
-        }).from(table.user_permissions).where(eq(table.user_permissions.user, userId));
-        return permissions.map(permission => permission.permission as table.Permission);
-    }
-
     async validateSessionToken(token: string): Promise<SessionValidationResult> {
         const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
         /// get user and role and session
         const [result] = await this.db
             .select({
-                user: { id: table.user.id, username: table.user.username, email: table.user.email },
+                user: { id: table.user.id, username: table.user.username, email: table.user.email, permissions: table.user.permissions },
                 session: table.session,
             })
             .from(table.session)

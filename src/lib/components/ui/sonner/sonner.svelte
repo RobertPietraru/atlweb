@@ -1,12 +1,17 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import { Toaster as Sonner, type ToasterProps as SonnerProps } from "svelte-sonner";
-	import { mode } from "mode-watcher";
 
 	let restProps: SonnerProps = $props();
+	let isDarkTheme = $state(false);
+
+	onMount(() => {
+		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
+	});
 </script>
 
 <Sonner
-	theme={$mode}
+	theme={isDarkTheme ? 'dark': 'light'}
 	class="toaster group"
 	toastOptions={{
 		classes: {

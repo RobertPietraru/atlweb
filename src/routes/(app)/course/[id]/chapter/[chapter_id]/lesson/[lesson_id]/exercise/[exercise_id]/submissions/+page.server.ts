@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         redirect(302, '/login?redirect=/course/' + params.id + '/chapter/' + params.chapter_id + '/lesson/' + params.lesson_id + '/exercise/' + params.exercise_id);
     }
 
-    if (!locals.permissions.includes('submission.solve')) {
+    if (!locals.user!.permissions.includes('submission.solve')) {
         error(403, 'Nu ai permisiunea sa rezolvi exercitiile');
     }
 
@@ -68,7 +68,7 @@ export const actions= {
             error(400, 'Nu ai trimis codul');
         }
 
-        if (!locals.permissions.includes('submission.solve')) {
+        if (!locals.user!.permissions.includes('submission.solve')) {
             error(401, 'Nu ai permisiunea sa rezolvi raspunsul');
         }
         await adminService.completeSubmission(submissionId as string, {

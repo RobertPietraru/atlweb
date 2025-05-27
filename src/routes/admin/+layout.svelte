@@ -1,52 +1,28 @@
 <script lang="ts">
-	import {
-		House,
-		UsersRound,
-		LogOut,
-		PersonStanding,
-		BookOpen,
-		BookOpenText,
-		CodeXml
-	} from 'lucide-svelte';
-	import { page } from '$app/stores';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { ShieldUser, LogOut, UserRound, Loader2 } from 'lucide-svelte';
+	import { Sun, Moon } from 'lucide-svelte';
+	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
-	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import Sun from '@lucide/svelte/icons/sun';
-	import Moon from '@lucide/svelte/icons/moon';
-
-	import { toggleMode } from 'mode-watcher';
-	import { Button } from '$lib/components/ui/button/index.js';
-
-    import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
-	const isMobile = new IsMobile();
 
 	let { children, data } = $props();
-
-	const navMain = [
-		{
-			title: 'Users',
-			url: '/admin/users',
-			items: [
-				{
-					title: 'Users',
-					icon: UsersRound,
-					url: '/admin/users'
-				}
-			]
-		},
-		{
-			title: 'Cursuri',
-			url: '/admin/courses',
-			items: [
-				{
-					title: 'Cursuri',
-					icon: BookOpen,
-					url: '/admin/courses'
-				},
-			]
+	let isDarkTheme = $state(false);
+	let logoutLoading = $state(false);
+	onMount(() => {
+		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
+	});
+	$effect(() => {
+		const htmlEl = document.documentElement;
+		if (isDarkTheme) {
+			localStorage.setItem('isDarkTheme', 'true');
+			htmlEl.classList.add('dark');
+		} else {
+			localStorage.setItem('isDarkTheme', 'false');
+			htmlEl.classList.remove('dark');
 		}
-	];
+	});
 
 	async function logout() {
 		const res = await fetch('/api/auth/logout', {
@@ -63,104 +39,178 @@
 			console.error('Failed to logout');
 		}
 	}
-
-	let sidebarRef: HTMLElement | null = $state(null);
 </script>
+<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
+	<div class="flex-1"></div>
 
-<Sidebar.Provider>
-	<Sidebar.Root bind:ref={sidebarRef}>
-		<Sidebar.Header>
-			<a class="text-3xl font-bold transition-colors hover:text-muted" href="/"> ADMIN </a>
-		</Sidebar.Header>
-		<Sidebar.Content class="space-y-3">
-			{#each navMain as group (group.title)}
-				<Sidebar.Group class="space-y-3">
-					<Sidebar.GroupLabel class="px-2 text-sm font-medium text-muted-foreground"
-						>{group.title}</Sidebar.GroupLabel
-					>
-
-					<Sidebar.GroupContent>
-						<Sidebar.Menu class="space-y-1">
-							{#each group.items as item (item.title)}
-								<Sidebar.MenuItem>
-									<Sidebar.MenuButton isActive={$page.url.pathname.includes(item.url)}>
-										{#snippet child({ props })}
-											<a
-												href={item.url}
-												{...props}
-												class={`flex items-center gap-3 rounded-lg px-2 py-2 transition-colors ${$page.url.pathname.includes(item.url) ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
-											>
-												<svelte:component this={item.icon} class="h-4 w-4" />
-												<span class="font-medium">{item.title}</span>
-											</a>
-										{/snippet}
-									</Sidebar.MenuButton>
-								</Sidebar.MenuItem>
-							{/each}
-						</Sidebar.Menu>
-					</Sidebar.GroupContent>
-				</Sidebar.Group>
-			{/each}
-		</Sidebar.Content>
-		<Sidebar.Footer class="mt-auto pt-6">
-			<Sidebar.Menu>
-				<Sidebar.MenuItem>
-					<Sidebar.MenuButton>
-						{#snippet child({ props })}
-							<button
-								{...props}
-								onclick={logout}
-								class="flex w-full items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-destructive/10"
+	<div class="flex items-center gap-1 md:gap-3">
+		<Button
+			onclick={() => {
+				isDarkTheme = !isDarkTheme;
+			}}
+			variant="ghost"
+			size="icon"
+		>
+			<Sun
+				class="absolute h-[1.2rem] w-[1.2rem] transition-all duration-500 ease-in-out dark:translate-y-8 dark:rotate-180 dark:scale-75 dark:opacity-0"
+			/>
+			<Moon
+				class="h-[1.2rem] w-[1.2rem] translate-y-8 rotate-180 scale-75 opacity-0 transition-all duration-500 ease-in-out dark:translate-y-0 dark:rotate-0 dark:scale-100 dark:opacity-100"
+			/>
+			<span class="sr-only">Toggle theme</span>
+		</Button>
+		{#if !data.user}
+			<Button href="/login" variant="outline">Autentifica-te</Button>
+		{:else}
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger
+					class={buttonVariants({
+						variant: 'default',
+						class: 'aspect-square rounded-full bg-accent text-accent-foreground hover:bg-accent/60'
+					})}
+				>
+					{#if data.user.username}
+						<div class="flex h-8 w-8 items-center justify-center">
+							{data.user.username
+								.split(' ')
+								.map((name: string) => name[0])
+								.join('')
+								.toUpperCase()}
+						</div>
+					{/if}
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content align="end" class="w-56">
+					<DropdownMenu.Label>
+						<div class="flex items-center gap-2">
+							<div
+								class="aspect-square rounded-full bg-accent text-accent-foreground hover:bg-accent/60"
 							>
-								<LogOut class="h-4 w-4 text-red-500" />
-								<span class="font-medium text-red-500">Deconectare</span>
-							</button>
-						{/snippet}
-					</Sidebar.MenuButton>
-				</Sidebar.MenuItem>
-			</Sidebar.Menu>
-		</Sidebar.Footer>
-		<Sidebar.Rail />
-	</Sidebar.Root>
-	<Sidebar.Inset>
-		<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-			<Sidebar.Trigger class="-ml-1" />
-			<Separator orientation="vertical" class="mr-2 h-4" />
-			<Breadcrumb.Root>
-				<Breadcrumb.List>
-					{#each data.breadcrumbs as crumb, i}
-						<Breadcrumb.Item>
-							<Breadcrumb.Link href={crumb.url}>
-								{#if isMobile.current}
-									{#if crumb.name.length > 20}
-										{crumb.name.slice(0, 10)}...{crumb.name.slice(-10)}
-									{:else}
-										{crumb.name}
-									{/if}
-								{:else}
-									{crumb.name}
+								{#if data.user.username}
+									<div class=" flex h-10 w-10 items-center justify-center">
+										{data.user.username
+											.split(' ')
+											.map((name: string) => name[0])
+											.join('')
+											.toUpperCase()}
+									</div>
 								{/if}
-							</Breadcrumb.Link>
-						</Breadcrumb.Item>
-						{#if i < data.breadcrumbs.length - 1}
-							<Breadcrumb.Separator />
+							</div>
+							<div class="flex flex-col gap-1 px-2 py-1.5">
+								<p class="truncate text-sm font-medium">{data.user.username}</p>
+								<p class="text-xs capitalize text-muted-foreground">
+									{#if data.canViewAdminPage}
+										Cont de administrator
+									{:else}
+										Utilizator
+									{/if}
+								</p>
+							</div>
+						</div>
+					</DropdownMenu.Label>
+					<DropdownMenu.Separator />
+					<DropdownMenu.Item>
+						<UserRound class="mr-2.5 h-4 w-4" />
+						<a href="/profile" id="profile-button">Profil</a>
+					</DropdownMenu.Item>
+					<DropdownMenu.Separator />
+					{#if data.canViewAdminPage}
+						<DropdownMenu.Item
+							class="flex items-center {window.location.pathname.startsWith('/admin')
+								? 'bg-accent'
+								: ''}"
+							onclick={() => goto('/admin')}
+							disabled={logoutLoading}
+						>
+							<ShieldUser class="mr-2.5 h-4 w-4" />
+							<span>Administrator</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Separator />
+					{/if}
+
+					<DropdownMenu.Item
+						class="flex items-center text-destructive focus:text-destructive"
+						onclick={logout}
+						disabled={logoutLoading}
+					>
+						{#if logoutLoading}
+							<Loader2 class="mr-2.5 h-4 w-4 animate-spin" />
+						{:else}
+							<LogOut class="mr-2.5 h-4 w-4" />
 						{/if}
-					{/each}
-				</Breadcrumb.List>
-			</Breadcrumb.Root>
-			<div class="flex-1"></div>
-			<Button onclick={toggleMode} variant="ghost" size="icon" >
-				<Sun
-					class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-				/>
-				<Moon
-					class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-				/>
-				<span class="sr-only">Toggle theme</span>
-			</Button>
-		</header>
-		<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl bg-muted/50">
-			{@render children()}
+						<span>Log out</span>
+					</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		{/if}
+	</div>
+</header>
+
+<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl container space-y-4 py-4">
+	<Breadcrumb.Root class="flex items-center">
+		<Breadcrumb.List>
+			<Breadcrumb.Separator />
+			{#each data.breadcrumbs as crumb, i}
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href={crumb.url}>
+						{crumb.name}
+					</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				{#if i < data.breadcrumbs.length - 1}
+					<Breadcrumb.Separator />
+				{/if}
+			{/each}
+		</Breadcrumb.List>
+	</Breadcrumb.Root>
+	{@render children()}
+</div>
+
+<footer
+	class="z-40 flex flex-col gap-8 border-t bg-background px-8 py-12 text-sm text-muted-foreground"
+>
+	<div class="container grid grid-cols-1 gap-8 md:grid-cols-4">
+		<div class="flex flex-col gap-4">
+			<h3 class="text-lg font-semibold">ATLWEB</h3>
+			<p class="max-w-xs">
+				Platforma educațională pentru învățarea programării web într-un mod interactiv și practic.
+			</p>
 		</div>
-	</Sidebar.Inset>
-</Sidebar.Provider>
+
+		<div class="flex flex-col gap-4">
+			<h3 class="text-lg font-semibold">Navigare</h3>
+			<nav class="flex flex-col gap-2">
+				<a href="/" class="hover:text-primary">Acasă</a>
+				<a href="/courses" class="hover:text-primary">Cursuri</a>
+				<a href="/profile" class="hover:text-primary">Profil</a>
+			</nav>
+		</div>
+
+		<div class="flex flex-col gap-4">
+			<h3 class="text-lg font-semibold">Legal</h3>
+			<nav class="flex flex-col gap-2">
+				<a href="/terms" class="hover:text-primary">Termeni și Condiții</a>
+				<a href="/privacy" class="hover:text-primary">Politica de Confidențialitate</a>
+				<a href="/cookies" class="hover:text-primary">Politica de Cookie-uri</a>
+			</nav>
+		</div>
+
+		<div class="flex flex-col gap-4">
+			<h3 class="text-lg font-semibold">Contact</h3>
+			<nav class="flex flex-col gap-2">
+				<p class="text-muted-foreground">Prof. coordonator:</p>
+				<p class="hover:text-primary">Giocaș Afrodita</p>
+				<p class="hover:text-primary">Cardaș Cerasela</p>
+
+				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
+				<div class="flex gap-4">
+					<a href="https://github.com/RobertPietraru/atlweb" class="hover:text-primary">GitHub</a>
+				</div>
+			</nav>
+		</div>
+	</div>
+
+	<div class="container flex items-center justify-between border-t pt-8">
+		<p>©2025 ATLWEB - Toate drepturile rezervate</p>
+		<p>Făcut cu ❤️ în România</p>
+	</div>
+</footer>

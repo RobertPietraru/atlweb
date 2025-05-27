@@ -9,7 +9,6 @@
 	import { LogOut, LogIn, UserRound, Settings } from 'lucide-svelte';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Sun, Moon } from 'lucide-svelte';
-	import { toggleMode } from 'mode-watcher';
 	import { slide } from 'svelte/transition';
 
 	import { PlayIcon, BookOpenIcon, MenuIcon, BookOpen, FileCheck, PlayCircle } from 'lucide-svelte';
@@ -70,6 +69,20 @@
 
 		return html_content;
 	}
+	let isDarkTheme = $state(false);
+	onMount(() => {
+		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
+	});
+	$effect(() => {
+		const htmlEl = document.documentElement;
+		if (isDarkTheme) {
+			localStorage.setItem('isDarkTheme', 'true');
+			htmlEl.classList.add('dark');
+		} else {
+			localStorage.setItem('isDarkTheme', 'false');
+			htmlEl.classList.remove('dark');
+		}
+	});
 </script>
 
 {@render my_header()}
@@ -208,7 +221,11 @@
 							<UserRound class="h-4 w-4" />
 							<a href={`/profile`}>Profil</a>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item onclick={toggleMode}>
+						<DropdownMenu.Item
+							onclick={() => {
+								isDarkTheme = !isDarkTheme;
+							}}
+						>
 							<Sun
 								class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
 							/>

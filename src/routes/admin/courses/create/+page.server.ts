@@ -3,6 +3,7 @@ import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
+import { cache } from '$lib/cache';
 
 const schema = z.object({
 	name: z.string().max(100, 'Course name must be at most 100 characters'),
@@ -14,7 +15,8 @@ export const load = async ({ locals }) => {
 		redirect(302, '/login');
 	}
 
-	const hasPermission = await adminService.hasPermission(locals.user.id, 'course.create');
+	const hasPermission = locals.user!.permissions.includes('course.create')
+
 
 	if (!hasPermission) {
 		redirect(302, '/');
@@ -33,6 +35,7 @@ export const actions = {
 
 		const { name, description } = form.data;
 		const result = await adminService.createCourse(name, description);
+        cache.courses = null;
 		
 		if (result === 'nameAlreadyExists') {
 			setError(form, 'name', 'A course with this name already exists');

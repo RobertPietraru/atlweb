@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     const submissions = await adminService.getSubmissions(params.exercise_id);
     const lesson = await adminService.getLessonNameAndId(params.lesson_id);
     
-    const isHelper = locals.permissions.includes('submission.solve');
+    const isHelper = locals.user!.permissions.includes('submission.solve');
     if (!exercise) {
         error(404, 'Exercise not found');
     }

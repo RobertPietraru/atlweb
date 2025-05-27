@@ -1,15 +1,54 @@
-import { adminService } from "$lib/injection";
 
-export const load = async ({ locals, params }) => {
+export const load = async ({ locals, params, url }) => {
     const courseId = params.id;
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
-    const breadcrumbs = await adminService.getBreadcrumbsAdmin(courseId ?? null, chapterId ?? null, lessonId ?? null, null);
+    let breadcrumbs: { name: string, url: string }[] = [];
 
-    console.log(locals.permissions);
+    breadcrumbs.push({
+        name: 'Panou de administrator',
+        url: '/admin'
+    });
+
+    if (url.pathname.includes('/course')) {
+        breadcrumbs.push({
+            name: 'Cursuri',
+            url: '/admin/courses'
+        });
+
+        if (url.pathname.includes('/create')) {
+            breadcrumbs.push({
+                name: 'Curs nou',
+                url: '/admin/courses/create'
+            });
+        }
+    }
+
+    if (courseId) {
+        breadcrumbs.push({
+            name: 'Curs',
+            url: `/admin/course/${courseId}`
+        });
+    }
+
+    if (chapterId) {
+        breadcrumbs.push({
+            name: 'Capitol',
+            url: `/admin/course/${courseId}/chapter/${chapterId}`
+        });
+
+    }
+    if (lessonId) {
+        breadcrumbs.push({
+            name: 'Lectie',
+            url: `/admin/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}`
+        });
+    }
+
+
     return {
         user: locals.user,
-        permissions: locals.permissions,
-        breadcrumbs: breadcrumbs ?? []
+        canViewAdminPage: locals.user?.permissions.includes('course.view'),
+        breadcrumbs: breadcrumbs
     };
 };

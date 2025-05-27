@@ -17,8 +17,7 @@ export const load = async ({ locals, params }) => {
     if (!locals.user) {
         redirect(302, '/login');
     }
-
-    const hasPermission = await adminService.hasPermission(locals.user.id, 'chapter.view');
+    const hasPermission = locals.user!.permissions.includes('chapter.view')
 
     if (!hasPermission) {
         redirect(302, '/');
@@ -43,7 +42,7 @@ export const load = async ({ locals, params }) => {
 
 export const actions = {
     create: async ({ locals, params }) => {
-        const hasPermission = await adminService.hasPermissions(locals.user!.id, ['lesson.edit', 'lesson.create']);
+        const hasPermission = locals.user!.permissions.includes('lesson.edit') && locals.user!.permissions.includes('lesson.create')
         if (!hasPermission) {
             error(403, 'Nu ai permisiune să creezi lecții');
         }
@@ -52,7 +51,7 @@ export const actions = {
 
     },
     manageLessons: async ({ request, locals, params }) => {
-        const hasPermission = await adminService.hasPermission(locals.user!.id, 'lesson.edit');
+        const hasPermission = locals.user!.permissions.includes('lesson.edit')
         if (!hasPermission) {
             redirect(302, '/');
         }
@@ -79,7 +78,7 @@ export const actions = {
         return { success: true };
     },
     update: async ({ request, locals, params }) => {
-        const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
+        const hasPermission = locals.user!.permissions.includes('course.edit')
         const formData = await request.formData();
         const name = formData.get('name');
         const description = formData.get('description');

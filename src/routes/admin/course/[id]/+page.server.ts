@@ -3,6 +3,7 @@ import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { superValidate } from 'sveltekit-superforms';
+import { cache } from '$lib/cache.js';
 
 const schema = z.object({
     name: z.string().min(1),
@@ -14,9 +15,7 @@ const reorderSchema = z.object({
 });
 
 export const load = async ({ locals, params }) => {
-    const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.view');
-
-    if (!hasPermission) {
+    if (!locals.user!.permissions.includes('course.view')) {
         error(403, 'You do not have permission to view this course');
     }
 
@@ -39,7 +38,7 @@ export const actions = {
             redirect(302, '/login');
         }
 
-        const hasPermission = await adminService.hasPermissions(locals.user.id, ['course.edit', 'course.create']);
+        const hasPermission = locals.user!.permissions.includes('course.edit') && locals.user!.permissions.includes('course.create')
 
         if (!hasPermission) {
             error(403, 'Nu ai permisiunea să creezi un capitol');
@@ -49,10 +48,11 @@ export const actions = {
             name: 'Capitol nou',
             description: 'Descrierea capitolului'
         });
+        cache.courses = null;
         redirect(302, `/admin/course/${params.id}/chapter/${id}`);
     },
     update: async ({ request, locals, params }) => {
-        const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
+        const hasPermission = locals.user!.permissions.includes('course.edit') 
         const formData = await request.formData();
         const name = formData.get('name');
         const description = formData.get('description');
@@ -71,7 +71,7 @@ export const actions = {
 
     },
     manageChapters: async ({ request, locals, params }) => {
-        const hasPermission = await adminService.hasPermission(locals.user!.id, 'course.edit');
+        const hasPermission = locals.user!.permissions.includes('course.edit')
         if (!hasPermission) {
             redirect(302, '/');
         }
