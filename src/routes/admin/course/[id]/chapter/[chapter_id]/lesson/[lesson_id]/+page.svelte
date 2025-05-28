@@ -29,6 +29,9 @@
 	let { data } = $props();
 	let lesson = $state(data.lesson);
 	let oldLesson = $state(data.lesson);
+	$effect(() => {
+		oldLesson = structuredClone($state.snapshot(data.lesson));
+	});
 
 	let isSaved = $derived(
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
@@ -44,7 +47,11 @@
 		saving = true;
 		try {
 			const formdata = new FormData();
-			formdata.append('lesson', JSON.stringify(lesson));
+			formdata.append('lesson', JSON.stringify({
+				name: lesson.name !== oldLesson.name ? lesson.name : undefined,
+				teaser: lesson.teaser !== oldLesson.teaser ? lesson.teaser : undefined,
+				blocks: JSON.stringify($state.snapshot(lesson).blocks) !== JSON.stringify($state.snapshot(oldLesson).blocks) ? lesson.blocks : undefined
+			}));
 
 			const response = await fetch('?/updateLesson', {
 				method: 'POST',
@@ -57,7 +64,6 @@
 					position: 'bottom-left'
 				});
 				console.log(result.data);
-				lesson = result.data?.lesson as typeof lesson;
 				oldLesson = structuredClone($state.snapshot(lesson));
 			} else {
 				toast.error('A apărut o eroare la salvarea lecției', {
@@ -143,10 +149,6 @@
 <main class="p-8">
 	<div class="mb-6 flex items-center justify-between">
 		<div class="flex items-center gap-6">
-			<Button variant="ghost" href="../" class="transition-colors hover:bg-gray-100/50">
-				<span class="mr-2">←</span>
-				<span>Înapoi la capitol</span>
-			</Button>
 			<h1 class="text-3xl font-bold tracking-tight">Editare lecție</h1>
 		</div>
 		<Button
@@ -185,16 +187,6 @@
 						class="min-h-[100px]"
 					/>
 				</div>
-
-				<div class="space-y-2">
-					<Label for="description">Descriere</Label>
-					<Textarea
-						id="description"
-						bind:value={lesson.description}
-						placeholder="Scrie descrierea lecției (markdown)"
-						class="min-h-[200px]"
-					/>
-				</div>
 			</div>
 		</Card>
 
@@ -205,8 +197,6 @@
 					<h2 class="text-2xl font-bold">{lesson.name || 'Titlul lecției'}</h2>
 					<h3 class="markdown-content mt-2">{lesson.teaser}</h3>
 				</div>
-
-				<div class="markdown-content mt-2">{@html marked(lesson.description)}</div>
 			</div>
 		</Card>
 	</div>

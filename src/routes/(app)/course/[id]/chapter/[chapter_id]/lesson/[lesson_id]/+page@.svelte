@@ -114,9 +114,6 @@
 					<h1 class="text-2xl font-bold">{lesson.name || 'Lectie'}</h1>
 				</div>
 			</div>
-			<div class="markdown-content mb-4">
-				{@html marked(lesson.description)}
-			</div>
 
 			<div class="space-y-8">
 				{#each lesson.blocks as block, index}

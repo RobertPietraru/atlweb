@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { adminService } from '$lib/injection';
 
 export const load = async ({ locals, params }) => {
-    const lesson = await adminService.getLessonWithBlocks(params.lesson_id, locals.user?.id ?? null);
+    const { lesson, exercises } = await adminService.getLessonWithBlocks(params.lesson_id, locals.user?.id ?? null);
     const lessonNamesInChapter = await adminService.getLessonNamesInChapter(params.chapter_id);
     const courseId = params.id;
     const chapterId = params.chapter_id;
@@ -19,7 +19,7 @@ export const load = async ({ locals, params }) => {
 
     return {
         lesson,
-
+        exercises,
         user: locals.user,
         breadcrumbs: breadcrumbs,
         courseId: params.id,

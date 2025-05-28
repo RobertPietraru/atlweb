@@ -229,7 +229,6 @@ export class AdminService {
         const [lesson] = await this.db.insert(table.lesson).values({
             name: '',
             chapterId,
-            description: '',
             teaser: '',
             order: index,
         }).returning({ id: table.lesson.id });
@@ -307,7 +306,6 @@ export class AdminService {
             id: table.lesson.id,
             name: table.lesson.name,
             teaser: table.lesson.teaser,
-            description: table.lesson.description,
             blocks: table.lesson.blocks,
         }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
 
@@ -339,7 +337,6 @@ export class AdminService {
             id: table.lesson.id,
             name: table.lesson.name,
             teaser: table.lesson.teaser,
-            description: table.lesson.description,
             blocks: table.lesson.blocks,
         }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
 
@@ -377,11 +374,10 @@ export class AdminService {
             id: table.lesson.id,
         }).from(table.lesson).where(eq(table.lesson.chapterId, chapter_id)).orderBy(table.lesson.order);
     }
-    async updateLesson(lesson_id: table.Id, params: { name?: string, teaser?: string, description?: string, blocks?: table.LessonBlock[] }) {
+    async updateLesson(lesson_id: table.Id, params: { name?: string, teaser?: string, blocks?: table.LessonBlock[] }) {
         await this.db.update(table.lesson).set({
             name: params.name,
             teaser: params.teaser,
-            description: params.description,
             blocks: params.blocks,
         }).where(eq(table.lesson.id, lesson_id));
     }

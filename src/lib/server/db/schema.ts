@@ -57,7 +57,6 @@ export const lesson = pgTable('lesson', {
 	name: text('name').notNull(),
 	teaser: text('teaser').notNull(),
 	/// markdown
-	description: text('description').notNull(),
 	chapterId: uuid('chapter_id')
 		.notNull()
 		.references(() => chapter.id),
