@@ -8,26 +8,27 @@
 	let { data } = $props();
 </script>
 
-<main class="min-h-[100vh] w-full px-8 py-4">
-	<Breadcrumb.Root class="flex items-center">
-		<Breadcrumb.List>
-			<Breadcrumb.Separator />
-			{#each data.breadcrumbs as crumb, i}
-				<Breadcrumb.Item>
-					<Breadcrumb.Link href={crumb.url}>
-						{crumb.name}
-					</Breadcrumb.Link>
-				</Breadcrumb.Item>
-				{#if i < data.breadcrumbs.length - 1}
-					<Breadcrumb.Separator />
-				{/if}
-			{/each}
-		</Breadcrumb.List>
-	</Breadcrumb.Root>
-	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-2xl font-bold md:text-3xl">Cursuri</h1>
+<main class="min-h-[100vh] w-full px-4 py-4 md:px-8">
+	<div class="mb-8 space-y-4">
+		<Breadcrumb.Root class="flex items-center">
+			<Breadcrumb.List>
+				<Breadcrumb.Separator />
+				{#each data.breadcrumbs as crumb, i}
+					<Breadcrumb.Item>
+						<Breadcrumb.Link href={crumb.url}>
+							{crumb.name}
+						</Breadcrumb.Link>
+					</Breadcrumb.Item>
+					{#if i < data.breadcrumbs.length - 1}
+						<Breadcrumb.Separator />
+					{/if}
+				{/each}
+			</Breadcrumb.List>
+		</Breadcrumb.Root>
+		<div class="mb-8 flex items-center justify-between">
+			<h1 class="text-2xl font-bold md:text-3xl">Cursuri</h1>
+		</div>
 	</div>
-
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 		{#each data.courses as course}
 			<a href="/course/{course.id}" class="h-full">

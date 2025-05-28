@@ -4,7 +4,6 @@
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
-	const isMobile = new IsMobile();
 	let { data } = $props();
 </script>
 
