@@ -32,7 +32,6 @@ export const actions= {
         const javascript = formData.get('javascript') ?? '';
         const exerciseId = params.exercise_id;
         const needHelp = formData.get('needHelp') ?? 'false';
-        const anonymous = formData.get('anonymous') ?? 'false';
         if (!html && !css && !javascript ) {
             return fail(400, { message: 'Nu ai trimis codul' });
         }
@@ -45,7 +44,6 @@ export const actions= {
             html: html as string,
             css: css as string,
             needHelp: needHelp === 'true',
-            anonymous: anonymous === 'true',
             javascript: javascript as string,
         });
 

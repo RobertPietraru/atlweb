@@ -367,11 +367,11 @@
 
 {#snippet exerciseBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>)}
 	<a
-		href="./{data.lesson.id}/exercise/{block.id}"
+		href="/{data.lesson.id}/exercise/{block.exerciseId}"
 		class="block transition-all duration-200 hover:scale-[1.02]"
 	>
 		<Card
-			class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {block.isSolved
+			class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {block.hasSubmission
 				? 'bg-primary/10'
 				: ''}"
 		>
@@ -387,7 +387,7 @@
 			</div>
 			<div class="flex items-center justify-end gap-2 px-4 pb-4">
 				<div class="flex items-center gap-1.5">
-					{#if block.isSolved}
+					{#if block.hasSubmission}
 						<FileCheck class="h-4 w-4 text-primary" />
 						<span class="animate-pulse text-sm font-medium text-primary"> Soluție trimisă </span>
 					{:else}

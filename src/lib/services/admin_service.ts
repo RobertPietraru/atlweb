@@ -1,5 +1,5 @@
 import { hash } from '@node-rs/argon2';
-import { eq, sql, and, desc, asc } from 'drizzle-orm';
+import { eq, sql, and, desc, asc, arrayContains, inArray } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -161,27 +161,6 @@ export class AdminService {
         const lessons = await this.db.select({
             id: table.lesson.id,
             name: table.lesson.name,
-            order: table.lesson.order
-        }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId)).orderBy(table.lesson.order);
-        return {
-            ...chapter[0],
-            lessons
-        };
-    }
-
-    async getChapterPreview(chapterId: table.Id) {
-        const chapter = await this.db.select({
-            id: table.chapter.id,
-            name: table.chapter.name,
-            order: table.chapter.order,
-            description: table.chapter.description,
-        }).from(table.chapter).where(eq(table.chapter.id, chapterId)).limit(1);
-        if (chapter.length === 0) {
-            return null;
-        }
-        const lessons = await this.db.select({
-            id: table.lesson.id,
-            name: table.lesson.name,
             teaser: table.lesson.teaser,
             order: table.lesson.order
         }).from(table.lesson).where(eq(table.lesson.chapterId, chapterId)).orderBy(table.lesson.order);
@@ -287,17 +266,7 @@ export class AdminService {
         });
     }
     async deleteLesson(id: table.Id) {
-        await this.db.transaction(async (tx) => {
-            await tx.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, id));
-            await tx.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, id));
-            await tx.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, id));
-            const exercises = await tx.select({ id: table.exercise.id }).from(table.exercise).where(eq(table.exercise.lessonId, id));
-            for (const exercise of exercises) {
-                await tx.delete(table.submission).where(eq(table.submission.exerciseId, exercise.id));
-            }
-            await tx.delete(table.exercise).where(eq(table.exercise.lessonId, id));
-            await tx.delete(table.lesson).where(eq(table.lesson.id, id));
-        });
+        await this.db.delete(table.lesson).where(eq(table.lesson.id, id));
     }
     async getPreviousAndNextLesson(lesson_id: table.Id) {
         const lesson = await this.db.select({
@@ -334,87 +303,41 @@ export class AdminService {
         };
     }
     async getLessonWithBlocks(lesson_id: table.Id, userId: table.Id | null) {
-        const lesson = await this.db.select({
+        let lesson = await this.db.select({
             id: table.lesson.id,
             name: table.lesson.name,
             teaser: table.lesson.teaser,
             description: table.lesson.description,
+            blocks: table.lesson.blocks,
         }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+
         if (lesson.length === 0) {
             return null;
         }
-        /// get all text blocks
-        const textBlocks = (await this.db.select(
-            {
-                id: table.lessonTextBlock.id,
-                text: table.lessonTextBlock.text,
-                order: table.lessonTextBlock.order,
-            }).from(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, lesson_id))).map(block => ({
-                ...block,
-                type: 'text'
-            }));
 
-        /// get all resources
-        const resources = (await this.db.select(
-            {
-                id: table.lessonResourcesBlock.id,
-                title: table.lessonResourcesBlock.title,
-                content: table.lessonResourcesBlock.content,
-                urls: table.lessonResourcesBlock.urls,
-                urlLabels: table.lessonResourcesBlock.urlLabels,
-                order: table.lessonResourcesBlock.order,
-            }).from(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, lesson_id))).map(block => ({
-                ...block,
-                type: 'resources'
-            }));
-
-        /// get all code blocks
-        const codeBlocks = (await this.db.select(
-            {
-                id: table.lessonCodeBlock.id,
-                html: table.lessonCodeBlock.html,
-                css: table.lessonCodeBlock.css,
-                javascript: table.lessonCodeBlock.javascript,
-                text: table.lessonCodeBlock.text,
-                order: table.lessonCodeBlock.order,
-            }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id))).map(block => ({
-                ...block,
-                type: 'code'
-            }));
-
-        const exercises = (await this.db.select({
+        const exercises = await this.db.select({
             id: table.exercise.id,
             name: table.exercise.name,
-            order: table.exercise.order,
             description: table.exercise.description,
-            instructions: table.exercise.instructions,
-            initialHtml: table.exercise.initialHtml,
-            initialCss: table.exercise.initialCss,
-            initialJavascript: table.exercise.initialJavascript,
+            hasSubmission: table.submission.id,
+        }).from(table.exerciseLesson)
+            .where(eq(table.exerciseLesson.lessonId, lesson_id))
+            .leftJoin(table.exercise, eq(table.exercise.id, table.exerciseLesson.exerciseId))
+            .leftJoin(table.submission, and(eq(table.exercise.id, table.submission.exerciseId), userId ? eq(table.submission.userId, userId) : undefined));
 
-        }).from(table.exercise).where(eq(table.exercise.lessonId, lesson_id))).map(block => ({
-            ...block,
-            type: 'exercise'
-        }));
-        const exercisesWithStatus = await Promise.all(exercises.map(async block => {
-            if (userId == null) return block;
-            const submissionCount = await this.db.select({
-                count: sql<number>`count(*)`
-            })
-                .from(table.submission)
-                .where(and(eq(table.submission.exerciseId, block.id), eq(table.submission.userId, userId)));
-            return {
-                ...block,
-                isSolved: submissionCount[0].count > 0
-            };
-        }));
-
-
-        const blocks = [...textBlocks, ...resources, ...codeBlocks, ...exercisesWithStatus] as table.LessonBlock[];
-        blocks.sort((a, b) => a.order - b.order);
         return {
             ...lesson[0],
-            blocks
+            blocks: lesson[0].blocks.map(block => {
+                if (block.type === 'exercise') {
+                    const exercise = exercises.find(exercise => exercise.id === block.exerciseId);
+                    return {
+                        ...block,
+                        ...exercise,
+                        hasSubmission: Boolean(exercise?.hasSubmission),
+                    }
+                }
+                return block;
+            })
         };
     }
 
@@ -431,126 +354,7 @@ export class AdminService {
             description: params.description,
         }).where(eq(table.lesson.id, lesson_id));
     }
-    async getBlockIdsOfLesson(lesson_id: table.Id) {
-        const textBlocks = (await this.db.select(
-            {
-                id: table.lessonTextBlock.id,
-            }).from(table.lessonTextBlock).where(eq(table.lessonTextBlock.lessonId, lesson_id)));
 
-        /// get all resources
-        const resources = (await this.db.select(
-            {
-                id: table.lessonResourcesBlock.id,
-            }).from(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.lessonId, lesson_id)));
-
-
-        /// get all code blocks
-        const codeBlocks = (await this.db.select(
-            {
-                id: table.lessonCodeBlock.id,
-            }).from(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.lessonId, lesson_id)));
-
-        const exercises = await this.db.select({
-            id: table.exercise.id,
-        }).from(table.exercise).where(eq(table.exercise.lessonId, lesson_id));
-
-
-        return [...textBlocks, ...resources, ...codeBlocks, ...exercises].map(block => block.id);
-    }
-
-    async updateBlock(blockId: table.Id, block: table.LessonBlock) {
-        if (block.type === 'text') {
-            await this.db.update(table.lessonTextBlock).set({
-                text: block.text,
-                order: block.order,
-            }).where(eq(table.lessonTextBlock.id, blockId));
-        } else if (block.type === 'resources') {
-            await this.db.update(table.lessonResourcesBlock).set({
-                title: block.title,
-                content: block.content,
-                urls: block.urls,
-                urlLabels: block.urlLabels,
-                order: block.order,
-            }).where(eq(table.lessonResourcesBlock.id, blockId));
-        } else if (block.type === 'code') {
-            await this.db.update(table.lessonCodeBlock).set({
-                html: block.html,
-                css: block.css,
-                text: block.text,
-                javascript: block.javascript,
-                order: block.order,
-            }).where(eq(table.lessonCodeBlock.id, blockId));
-        } else if (block.type === 'exercise') {
-            await this.db.update(table.exercise).set({
-                name: block.name,
-                description: block.description,
-                instructions: block.instructions,
-                initialHtml: block.initialHtml,
-                initialCss: block.initialCss,
-                initialJavascript: block.initialJavascript,
-                order: block.order,
-            }).where(eq(table.exercise.id, blockId));
-        }
-    }
-
-    async deleteBlock(blockId: table.Id) {
-        let deleted = [];
-        deleted = await this.db.delete(table.lessonTextBlock).where(eq(table.lessonTextBlock.id, blockId));
-        if (deleted.length !== 0) {
-            return;
-        }
-        deleted = await this.db.delete(table.lessonResourcesBlock).where(eq(table.lessonResourcesBlock.id, blockId));
-        if (deleted.length !== 0) {
-            return;
-        }
-        deleted = await this.db.delete(table.lessonCodeBlock).where(eq(table.lessonCodeBlock.id, blockId));
-        if (deleted.length !== 0) {
-            return;
-        }
-        /// delete all submissions for this exercise
-        await this.db.delete(table.submission).where(eq(table.submission.exerciseId, blockId));
-        /// delete the exercise
-        await this.db.delete(table.exercise).where(eq(table.exercise.id, blockId));
-    }
-
-    async createBlock(lesson_id: table.Id, block: table.LessonBlock) {
-        if (block.type === 'text') {
-            await this.db.insert(table.lessonTextBlock).values({
-                lessonId: lesson_id,
-                text: block.text,
-                order: block.order,
-            });
-        } else if (block.type === 'resources') {
-            await this.db.insert(table.lessonResourcesBlock).values({
-                lessonId: lesson_id,
-                title: block.title,
-                content: block.content,
-                urls: block.urls,
-                urlLabels: block.urlLabels,
-                order: block.order,
-            });
-        } else if (block.type === 'code') {
-            await this.db.insert(table.lessonCodeBlock).values({
-                lessonId: lesson_id,
-                html: block.html,
-                css: block.css,
-                text: block.text,
-                javascript: block.javascript,
-                order: block.order,
-            });
-        } else if (block.type === 'exercise') {
-            await this.db.insert(table.exercise).values({
-                lessonId: lesson_id,
-                description: block.description,
-                order: block.order,
-                name: block.name,
-                instructions: block.instructions,
-                initialHtml: block.initialHtml,
-                initialCss: block.initialCss,
-                initialJavascript: block.initialJavascript,
-            });
-        }
-    }
 
     async getExercise(exercise_id: table.Id) {
         const exercise = await this.db.select().from(table.exercise).where(eq(table.exercise.id, exercise_id)).limit(1);
@@ -575,59 +379,11 @@ export class AdminService {
         return await this.db.select().from(table.submission).where(eq(table.submission.exerciseId, exercise_id)).orderBy(desc(table.submission.submissionDate));
     }
 
-    async getYourUnsolvedSubmissions(user_id: table.Id, page: number, limit: number) {
-        const count = await this.db.select({ count: sql<number>`count(*)` }).from(table.submission).where(eq(table.submission.userId, user_id));
-
-        if (count.length === 0 || count[0].count === 0) {
-            return {
-                submissions: [],
-                total: 0,
-            };
-        }
-        const submissions = await this.db
-            .select({
-                submission: table.submission,
-                exercise: {
-                    id: table.exercise.id,
-                    lessonId: table.exercise.lessonId,
-                    name: table.exercise.name,
-                },
-                lesson: {
-                    id: table.lesson.id,
-                    chapterId: table.lesson.chapterId
-                },
-                chapter: {
-                    id: table.chapter.id,
-                }
-            })
-            .from(table.submission)
-            .leftJoin(table.exercise, eq(table.submission.exerciseId, table.exercise.id))
-            .leftJoin(table.lesson, eq(table.exercise.lessonId, table.lesson.id))
-            .leftJoin(table.chapter, eq(table.lesson.chapterId, table.chapter.id))
-            .where(and(eq(table.submission.userId, user_id), eq(table.submission.checked, false)))
-            .orderBy(desc(table.submission.submissionDate))
-            .limit(limit)
-            .offset((page - 1) * limit)
-        return {
-            submissions: submissions.map(submission => ({
-                ...submission.submission,
-                chapterId: submission.lesson?.chapterId,
-                exerciseId: submission.exercise?.id,
-                lessonId: submission.lesson?.id,
-                courseId: submission.chapter?.id,
-                exerciseName: submission.exercise?.name,
-            })),
-            total: count[0].count,
-            page: page,
-            limit: limit,
-        };
-    }
-
     async getSubmissionsToCheck(exercise_id: table.Id) {
         const list = await this.db
             .select({
                 submission: table.submission,
-                user: table.user,
+                username: table.user.username,
             })
             .from(table.submission)
             .leftJoin(table.user, eq(table.submission.userId, table.user.id))
@@ -641,12 +397,9 @@ export class AdminService {
             .orderBy(asc(table.submission.submissionDate))
             .limit(5);
 
-        return list.map(item => (item.submission.anonymous || !item.user ? {
+        return list.map(item => ({
             ...item.submission,
-            username: null,
-        } : {
-            ...item.submission,
-            username: item.user?.username,
+            username: item.username,
         }));
     }
 
@@ -655,7 +408,6 @@ export class AdminService {
         css: string,
         javascript: string,
         needHelp: boolean,
-        anonymous: boolean,
     }) {
         const [submission] = await this.db.insert(table.submission).values({
             exerciseId,
@@ -665,7 +417,6 @@ export class AdminService {
             cssCode: params.css,
             javascriptCode: params.javascript,
             needHelp: params.needHelp,
-            anonymous: params.anonymous,
         }).returning();
         return submission;
     }
@@ -732,7 +483,7 @@ export class AdminService {
         return breadcrumbs;
     }
 
-    async completeSubmission(submissionId: table.Id, params: {
+    async markSubmissionAsChecked(submissionId: table.Id, params: {
         html: string,
         css: string,
         javascript: string,

@@ -4,7 +4,7 @@
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
 
 	let { data } = $props();
-	let submissions = $state(data.user);
+	let submissions = $state(data.submissions);
 </script>
 
 <div class="container py-8">
@@ -18,13 +18,12 @@
 					<Table.Head>Status</Table.Head>
 					<Table.Head>Trimis</Table.Head>
 					<Table.Head>Ajutor</Table.Head>
-					<Table.Head>Anonim</Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
 				{#each submissions as submission}
 					<Table.Row class="p-8">
-						<Table.Cell><a href={submission.exercisePage} class="text-primary underline">{submission.exerciseName}</a></Table.Cell>
+						<Table.Cell><a href="/" class="text-primary underline">Placehodler</a></Table.Cell>
 						<Table.Cell>
 							{#if submission.checked}
 								<span class="text-green-600">Verificat</span>
@@ -34,7 +33,6 @@
 						</Table.Cell>
 						<Table.Cell>{new Date(submission.submissionDate).toLocaleDateString()}</Table.Cell>
 						<Table.Cell>{submission.needHelp ? 'Da' : 'Nu'}</Table.Cell>
-						<Table.Cell>{submission.anonymous ? 'Da' : 'Nu'}</Table.Cell>
 					</Table.Row>
 				{/each}
 			</Table.Body>

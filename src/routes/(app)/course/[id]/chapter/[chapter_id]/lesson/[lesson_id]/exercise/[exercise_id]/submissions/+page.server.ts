@@ -12,12 +12,16 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     }
 
     const exercise = await adminService.getExercise(params.exercise_id);
-    const submissions = await adminService.getSubmissionsToCheck(params.exercise_id);
-    const lesson = await adminService.getLessonNameAndId(params.lesson_id);
-    
     if (!exercise) {
         error(404, 'Exercise not found');
     }
+    const lesson = await adminService.getLessonNameAndId(params.lesson_id);
+    if (!lesson) {
+        error(404, 'Lesson not found');
+    }
+    const submissions = await adminService.getSubmissionsToCheck(params.exercise_id);
+
+
 
     return {
         exercise,
@@ -26,16 +30,15 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     };
 };
 
-export const actions= {
-    submit: async ({ request, params ,locals}) => {
+export const actions = {
+    submit: async ({ request, params, locals }) => {
         const formData = await request.formData();
         const html = formData.get('html') ?? '';
         const css = formData.get('css') ?? '';
         const javascript = formData.get('javascript') ?? '';
         const exerciseId = params.exercise_id;
         const needHelp = formData.get('needHelp') ?? 'false';
-        const anonymous = formData.get('anonymous') ?? 'false';
-        if (!html && !css && !javascript ) {
+        if (!html && !css && !javascript) {
             return fail(400, { message: 'Nu ai trimis codul' });
         }
 
@@ -47,7 +50,6 @@ export const actions= {
             html: html as string,
             css: css as string,
             needHelp: needHelp === 'true',
-            anonymous: anonymous === 'true',
             javascript: javascript as string,
         });
 
@@ -56,7 +58,7 @@ export const actions= {
         }
     },
 
-    solve: async ({ request, params ,locals}) => {
+    solve: async ({ request, params, locals }) => {
         const formData = await request.formData();
         const submissionId = formData.get('submissionId') ?? '';
 
@@ -71,7 +73,7 @@ export const actions= {
         if (!locals.user!.permissions.includes('submission.solve')) {
             error(401, 'Nu ai permisiunea sa rezolvi raspunsul');
         }
-        await adminService.completeSubmission(submissionId as string, {
+        await adminService.markSubmissionAsChecked(submissionId as string, {
             html: html as string,
             css: css as string,
             javascript: javascript as string,

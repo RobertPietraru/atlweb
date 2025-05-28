@@ -146,7 +146,7 @@
 		return html_content;
 	}
 
-	async function submitCode(params: { needHelp: boolean; anonymous: boolean }) {
+	async function submitCode(params: { needHelp: boolean }) {
 		try {
 			submitting = true;
 			submitPopupOpen = false;
@@ -155,7 +155,6 @@
 			formData.append('css', code.css);
 			formData.append('javascript', code.javascript);
 			formData.append('needHelp', params.needHelp.toString());
-			formData.append('anonymous', params.anonymous.toString());
 			const response = await fetch('?/submit', {
 				method: 'POST',
 				body: formData
@@ -230,10 +229,7 @@
 </script>
 
 <Resizable.PaneGroup direction="horizontal">
-	<Resizable.Pane
-		defaultSize={25}
-		
-	>
+	<Resizable.Pane defaultSize={25}>
 		<Resizable.PaneGroup direction="vertical" class="">
 			<Resizable.Pane defaultSize={50}>
 				<Tabs.Root class="h-full" bind:value={activeSidebarTab}>
@@ -264,7 +260,7 @@
 
 					<Tabs.Content value="result" class="h-full w-full ">
 						<div class="flex h-full items-center justify-center">
-							{#if lastRunCode !== null }
+							{#if lastRunCode !== null}
 								<iframe
 									title="Code Preview"
 									class="h-full w-full"
@@ -326,7 +322,6 @@
 					) {
 						lastRunCode = structuredClone($state.snapshot(code));
 					} else {
-
 						lastRunCode = null;
 						await new Promise((resolve) => setTimeout(resolve, 0));
 						lastRunCode = structuredClone($state.snapshot(code));
@@ -356,7 +351,6 @@
 					<th class="py-2 text-left"></th>
 					<th class="py-2 text-left">Data</th>
 					<th class="py-2 text-left">Status</th>
-					<th class="py-2 text-left">Anonim</th>
 					<th class="py-2 text-left"></th>
 				</tr>
 			</thead>
@@ -394,13 +388,6 @@
 							{/if}
 						</td>
 						<td class="py-2">
-							{#if submission.anonymous}
-								<span class="text-gray-500">Da</span>
-							{:else}
-								<span class="text-gray-500">Nu</span>
-							{/if}
-						</td>
-						<td class="py-2">
 							<Button
 								variant="ghost"
 								size="icon"
@@ -422,14 +409,14 @@
 	</ScrollArea>
 {/snippet}
 {#snippet exerciseDescription()}
-<ScrollArea class="w-full h-full">
-	<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
-	<p>{data.exercise.description}</p>
-	<Separator class="my-4" />
-	<div class="markdown-content">
-		{@html marked(data.exercise.instructions)}
-	</div>
-</ScrollArea>
+	<ScrollArea class="h-full w-full">
+		<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
+		<p>{data.exercise.description}</p>
+		<Separator class="my-4" />
+		<div class="markdown-content">
+			{@html marked(data.exercise.instructions)}
+		</div>
+	</ScrollArea>
 {/snippet}
 {#snippet submitButton()}
 	<Popover.Root bind:open={submitPopupOpen}>
@@ -452,7 +439,7 @@
 				variant="ghost"
 				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
 				class="w-full justify-start rounded-t-md"
-				onclick={() => submitCode({ needHelp: false, anonymous: false })}
+				onclick={() => submitCode({ needHelp: false})}
 			>
 				<CheckIcon class="size-4" />
 				Trimite
@@ -464,20 +451,10 @@
 				variant="ghost"
 				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
 				class="w-full justify-start rounded-b-none"
-				onclick={() => submitCode({ needHelp: true, anonymous: false })}
+				onclick={() => submitCode({ needHelp: true })}
 			>
 				<HelpCircleIcon class="size-4" />
 				Cere ajutor
-			</Button>
-
-			<Button
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				variant="ghost"
-				class="w-full justify-start rounded-b-md"
-				onclick={() => submitCode({ needHelp: true, anonymous: true })}
-			>
-				<UserIcon class="size-4" />
-				Cere ajutor anonim
 			</Button>
 		</Popover.Content>
 	</Popover.Root>
