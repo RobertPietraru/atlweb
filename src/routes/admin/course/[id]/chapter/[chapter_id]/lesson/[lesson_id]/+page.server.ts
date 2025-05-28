@@ -9,7 +9,7 @@ export const load = async ({ locals, params }) => {
         error(403, 'You do not have modify to view this lesson');
     }
 
-    const lesson = await adminService.getLessonWithBlocks(params.lesson_id, null);
+    const { lesson, exercises } = await adminService.getLessonForEditor(params.lesson_id, null);
 
     if (!lesson) {
         error(404, 'Lesson not found');
@@ -17,6 +17,7 @@ export const load = async ({ locals, params }) => {
 
     return {
         lesson,
+        exercises,
         courseId: params.id,
         chapterId: params.chapter_id,
     };
@@ -32,10 +33,9 @@ export const actions = {
             name: lesson.name,
             teaser: lesson.teaser,
             description: lesson.description,
+            blocks: lesson.blocks,
         });
 
-        const modifiedLesson = await adminService.getLessonWithBlocks(params.lesson_id, null);
-
-        return { success: true, lesson: modifiedLesson };
+        return { success: true };
     }
 };

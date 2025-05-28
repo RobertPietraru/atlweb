@@ -320,24 +320,54 @@ export class AdminService {
             name: table.exercise.name,
             description: table.exercise.description,
             hasSubmission: table.submission.id,
-        }).from(table.exerciseLesson)
-            .where(eq(table.exerciseLesson.lessonId, lesson_id))
-            .leftJoin(table.exercise, eq(table.exercise.id, table.exerciseLesson.exerciseId))
+        }).from(table.exercise)
             .leftJoin(table.submission, and(eq(table.exercise.id, table.submission.exerciseId), userId ? eq(table.submission.userId, userId) : undefined));
 
         return {
-            ...lesson[0],
-            blocks: lesson[0].blocks.map(block => {
-                if (block.type === 'exercise') {
-                    const exercise = exercises.find(exercise => exercise.id === block.exerciseId);
-                    return {
-                        ...block,
-                        ...exercise,
-                        hasSubmission: Boolean(exercise?.hasSubmission),
-                    }
-                }
-                return block;
-            })
+            lesson: {
+                ...lesson[0],
+                blocks: lesson[0].blocks.filter(block => block.type !== 'exercise' || exercises.find(exercise => exercise.id === block.exerciseId)),
+            },
+            exercises: exercises.map(exercise => ({
+                ...exercise,
+                hasSubmission: Boolean(exercise.hasSubmission),
+            }))
+        };
+    }
+    async getLessonForEditor(lesson_id: table.Id, userId: table.Id | null) {
+        let lesson = await this.db.select({
+            id: table.lesson.id,
+            name: table.lesson.name,
+            teaser: table.lesson.teaser,
+            description: table.lesson.description,
+            blocks: table.lesson.blocks,
+        }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
+
+        if (lesson.length === 0) {
+            return {
+                lesson: null,
+                exercises: []
+            };
+        }
+        const exerciseIds = lesson[0].blocks.filter(block => block.type === 'exercise').map(block => block.exerciseId);
+
+        const exercises = await this.db.select({
+            id: table.exercise.id,
+            name: table.exercise.name,
+            description: table.exercise.description,
+            hasSubmission: table.submission.id,
+        }).from(table.exercise).where(inArray(table.exercise.id, exerciseIds))
+            .leftJoin(table.submission, and(eq(table.exercise.id, table.submission.exerciseId), userId ? eq(table.submission.userId, userId) : undefined));
+
+        return {
+            lesson: {
+                ...lesson[0],
+                blocks: lesson[0].blocks.filter(block => block.type !== 'exercise' || exercises.find(exercise => exercise.id === block.exerciseId)),
+            },
+            exercises: exercises.map(exercise => ({
+                ...exercise,
+                hasSubmission: Boolean(exercise.hasSubmission),
+            }))
         };
     }
 
@@ -347,11 +377,12 @@ export class AdminService {
             id: table.lesson.id,
         }).from(table.lesson).where(eq(table.lesson.chapterId, chapter_id)).orderBy(table.lesson.order);
     }
-    async updateLesson(lesson_id: table.Id, params: { name: string, teaser: string, description: string }) {
+    async updateLesson(lesson_id: table.Id, params: { name?: string, teaser?: string, description?: string, blocks?: table.LessonBlock[] }) {
         await this.db.update(table.lesson).set({
             name: params.name,
             teaser: params.teaser,
             description: params.description,
+            blocks: params.blocks,
         }).where(eq(table.lesson.id, lesson_id));
     }
 

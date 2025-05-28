@@ -29,10 +29,13 @@
 	let { data } = $props();
 	let lesson = $state(data.lesson);
 	let oldLesson = $state(data.lesson);
+
 	let isSaved = $derived(
 		JSON.stringify($state.snapshot(lesson)) == JSON.stringify($state.snapshot(oldLesson))
 	);
 	let visiblePopupIndex = $state<number | null>(null);
+	/// the indexes of the blocks that are currently running code
+	let currentlyRunningCode: number[] = $state([]);
 	let activeTab = $state<'html' | 'css' | 'js'>('html');
 
 	let saving = $state(false);
@@ -72,63 +75,43 @@
 	}
 
 	function insertBlock(type: 'text' | 'resources' | 'code' | 'exercise', index: number) {
+		/// stop all running code
+		currentlyRunningCode = [];
 		/// remove all visible popups
 		visiblePopupIndex = null;
 		let block: (typeof lesson.blocks)[0];
 
 		if (type === 'text') {
 			block = {
-				id: '',
 				text: '',
-				order: index,
 				type: 'text'
 			};
 			lesson.blocks.splice(index, 0, block);
 		} else if (type === 'resources') {
 			block = {
-				id: '',
 				title: '',
 				content: '',
 				urls: [],
 				urlLabels: [],
-				order: index,
 				type: 'resources'
 			};
 			lesson.blocks.splice(index, 0, block);
 		} else if (type === 'code') {
 			block = {
-				id: '',
 				text: '',
 				html: '',
 				css: '',
 				javascript: '',
-				order: index,
-				type: 'code',
-				showOutput: false
+				type: 'code'
 			};
 			lesson.blocks.splice(index, 0, block);
 		} else if (type === 'exercise') {
 			block = {
-				id: '',
-				isSolved: false,
 				type: 'exercise',
-				name: '',
-				description: '',
-				instructions: '',
-				initialHtml: '',
-				initialCss: '',
-				initialJavascript: '',
-				order: index,
-				creationDate: new Date()
+				exerciseId: ''
 			};
 			lesson.blocks.splice(index, 0, block);
 		}
-
-		// Update order of all blocks after insertion
-		lesson.blocks = lesson.blocks.map((b, i) => ({
-			...b,
-			order: i
-		}));
 	}
 	function getCodePreview(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>) {
 		const css = block.css ?? '';
@@ -229,7 +212,6 @@
 	</div>
 	{@render addBlock(0)}
 	{#each lesson.blocks as block, index}
-
 		<div class="flex">
 			{@render manageBlock(index)}
 			<div class="flex-1">
@@ -240,11 +222,18 @@
 					{@render resourcesBlock(block)}
 				{/if}
 				{#if block.type === 'code'}
-					{@render codeBlock(block)}
+					{@render codeBlock(block, index)}
 				{/if}
 
 				{#if block.type === 'exercise'}
-					{@render exerciseBlock(block)}
+					{@const exercise = data.exercises.find((exercise) => exercise.id === block.exerciseId)}
+					{#if exercise}
+						{@render exerciseBlock(exercise)}
+					{:else}
+						<div class="flex h-full flex-col gap-4 p-4">
+							<p class="text-lg text-muted-foreground">Exercițiul nu există</p>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</div>
@@ -482,7 +471,7 @@
 	</div>
 {/snippet}
 
-{#snippet codeBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>)}
+{#snippet codeBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'code' }>, index: number)}
 	<div class="flex flex-col gap-4">
 		<div class="grid grid-cols-2 gap-4">
 			<div class="flex h-full flex-col gap-4">
@@ -532,14 +521,14 @@
 				<Button
 					variant="outline"
 					onclick={() => {
-						block.showOutput = true;
+						currentlyRunningCode.push(index);
 					}}
 				>
 					<PlayIcon class="mr-2 h-4 w-4" />
 					Run
 				</Button>
 
-				{#if block.showOutput}
+				{#if currentlyRunningCode.includes(index)}
 					<div class="flex h-full flex-col gap-4 p-4">
 						<iframe title="Code Preview" class="h-full w-full" srcdoc={getCodePreview(block)}
 						></iframe>
@@ -550,45 +539,24 @@
 	</div>
 {/snippet}
 
-{#snippet exerciseBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>)}
+{#snippet exerciseBlock(exercise: typeof data.exercises[0])}
 	<div class="flex flex-col gap-4">
 		<div class="grid grid-cols-2 gap-4">
 			<div class="flex h-full flex-col gap-4">
-				<Textarea bind:value={block.name} placeholder="Nume" />
-				<Textarea bind:value={block.description} placeholder="Descriere (va aparea in lectie)" />
-				<Textarea
-					bind:value={block.instructions}
-					placeholder="Instructiuni (vor aparea in pagina de exercitiu)"
-				/>
-				<Tabs.Root bind:value={activeTab}>
-					<div class="flex items-center justify-between">
-						<Tabs.List>
-							<Tabs.Trigger value="html">HTML</Tabs.Trigger>
-							<Tabs.Trigger value="css">CSS</Tabs.Trigger>
-							<Tabs.Trigger value="js">JavaScript</Tabs.Trigger>
-						</Tabs.List>
-					</div>
-					<Tabs.Content value="html">
-						<Textarea bind:value={block.initialHtml} placeholder="Initial HTML" />
-					</Tabs.Content>
-					<Tabs.Content value="css">
-						<Textarea bind:value={block.initialCss} placeholder="Initial CSS" />
-					</Tabs.Content>
-					<Tabs.Content value="js">
-						<Textarea bind:value={block.initialJavascript} placeholder="Initial JavaScript" />
-					</Tabs.Content>
-				</Tabs.Root>
+				<div class="flex items-center justify-center p-8">
+					<p class="text-lg text-muted-foreground">🚧 Această secțiune este în lucru</p>
+				</div>
 			</div>
 
 			<div class="flex h-full flex-col gap-4 p-4">
 				<Card class="space-y-4">
 					<div class="flex items-center gap-2 px-4 pt-4">
 						<BookOpen class="h-5 w-5 text-primary" />
-						<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
+						<h3 class="text-lg font-semibold">Exercițiu: {exercise.name}</h3>
 					</div>
 					<Separator />
 					<div class="flex items-start gap-2 px-4">
-						<p class="text-sm text-muted-foreground">{block.description}</p>
+						<p class="text-sm text-muted-foreground">{exercise.description}</p>
 					</div>
 					<div class="flex items-center justify-end gap-2 px-4 pb-4">
 						<div class="flex items-center gap-1.5">
@@ -604,9 +572,6 @@
 						</Button>
 					</div>
 				</Card>
-				<div class="markdown-content">
-					{@html marked(block.instructions)}
-				</div>
 			</div>
 		</div>
 	</div>
@@ -640,7 +605,7 @@
 	}
 
 	:global(.markdown-content code) {
-		@apply bg-muted text-muted-foreground p-1;
+		@apply bg-muted p-1 text-muted-foreground;
 	}
 	:global(.markdown-content pre) {
 		@apply bg-muted p-1 text-muted-foreground;
@@ -649,5 +614,4 @@
 	:global(.markdown-content hr) {
 		@apply my-4;
 	}
-
 </style>

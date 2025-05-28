@@ -79,7 +79,6 @@ export type LessonBlock = {
 	html: string
 	css: string
 	javascript: string
-	runnable: boolean
 	text: string
 } | {
 	type: 'exercise'
@@ -98,15 +97,6 @@ export const exercise = pgTable('exercise', {
 	initialHtml: text('initial_html').notNull(),
 	initialCss: text('initial_css').notNull(),
 	initialJavascript: text('initial_javascript').notNull(),
-});
-
-export const exerciseLesson = pgTable('exercise_lesson', {
-	exerciseId: uuid('exercise_id')
-		.notNull()
-		.references(() => exercise.id),
-	lessonId: uuid('lesson_id')
-		.notNull()
-		.references(() => lesson.id),
 });
 
 export const submission = pgTable('submission', {
