@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	const isMobile = new IsMobile();
 	let { data } = $props();
 </script>
 
@@ -11,7 +11,7 @@
 	<div class="mb-8 space-y-4 px-4 md:px-8">
 		<Breadcrumb.Root class="flex items-center">
 			<Breadcrumb.List>
-			<Breadcrumb.Separator />
+				<Breadcrumb.Separator />
 				{#each data.breadcrumbs as crumb, i}
 					<Breadcrumb.Item>
 						<Breadcrumb.Link href={crumb.url}>
@@ -24,15 +24,20 @@
 				{/each}
 			</Breadcrumb.List>
 		</Breadcrumb.Root>
-		<div class="flex items-center justify-between">
-			<h1 class="text-2xl font-bold md:text-3xl">{data.chapter.name}</h1>
+		<div class="flex items-center gap-2">
+			<a
+				class="flex items-center gap-2 text-2xl font-bold transition-colors hover:text-primary md:text-3xl"
+				href="../courses"
+			>
+				{data.course.name}
+			</a>
 		</div>
-		<p class="text-lg text-muted-foreground">{data.chapter.description}</p>
+		<p class="text-lg text-muted-foreground">{data.course.description}</p>
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:px-8 lg:grid-cols-3">
-		{#each data.chapter.lessons as lesson}
-			<a href="/course/{data.courseId}/chapter/{data.chapter.id}/lesson/{lesson.id}" class="h-full">
+		{#each data.course.chapters as chapter}
+			<a href="/courses/{data.course.id}/chapters/{chapter.id}" class="h-full">
 				<Card
 					class="group flex h-full cursor-pointer flex-col overflow-hidden border-2 transition-all hover:scale-[1.02] hover:border-primary hover:shadow-lg"
 				>
@@ -43,7 +48,7 @@
 									<BookOpenIcon class="h-5 w-5 text-primary" />
 								</div>
 								<h2 class="text-2xl font-bold tracking-tight group-hover:text-primary">
-									{lesson.name}
+									{chapter.name}
 								</h2>
 							</div>
 							<div
@@ -52,20 +57,23 @@
 								<ArrowUpRightIcon class="h-4 w-4 text-primary" />
 							</div>
 						</div>
-						<p class="text-sm text-muted-foreground">{lesson.teaser}</p>
+						<p class="text-sm text-muted-foreground">{chapter.description}</p>
 					</CardContent>
 					<CardFooter class="border-t bg-muted/50 p-4">
 						<div class="flex w-full items-center justify-between">
 							<div class="flex items-center gap-2">
 								<div class="flex items-center gap-1 text-sm text-muted-foreground">
-									<PlayIcon class="h-4 w-4" />
-									<span>Lecția {lesson.order + 1}</span>
+									<BookOpenIcon class="h-4 w-4" />
+									<span>
+										{chapter.lessonCount}
+										{chapter.lessonCount === 1 ? 'lecție' : 'lecții'}
+									</span>
 								</div>
 							</div>
 							<div
 								class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-hover:bg-primary group-hover:text-primary-foreground"
 							>
-								Începe lecția
+								Începe capitolul
 							</div>
 						</div>
 					</CardFooter>

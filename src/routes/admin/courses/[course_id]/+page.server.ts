@@ -49,7 +49,7 @@ export const actions = {
             description: 'Descrierea capitolului'
         });
         cache.courses = null;
-        redirect(302, `/admin/course/${params.course_id}/chapter/${id}`);
+        redirect(302, `/admin/courses/${params.course_id}/chapters/${id}`);
     },
     update: async ({ request, locals, params }) => {
         const hasPermission = locals.user!.permissions.includes('course.edit') 

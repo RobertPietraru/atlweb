@@ -33,21 +33,21 @@ export const load = async ({ locals, params, url }) => {
     if (courseId) {
         breadcrumbs.push({
             name: 'Curs',
-            url: `/admin/course/${courseId}`
+            url: `/admin/courses/${courseId}`
         });
     }
 
     if (chapterId) {
         breadcrumbs.push({
             name: 'Capitol',
-            url: `/admin/course/${courseId}/chapter/${chapterId}`
+            url: `/admin/courses/${courseId}/chapters/${chapterId}`
         });
 
     }
     if (lessonId) {
         breadcrumbs.push({
             name: 'Lectie',
-            url: `/admin/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}`
+            url: `/admin/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`
         });
     }
 

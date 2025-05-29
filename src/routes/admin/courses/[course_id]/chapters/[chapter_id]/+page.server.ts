@@ -47,7 +47,7 @@ export const actions = {
             error(403, 'Nu ai permisiune să creezi lecții');
         }
         const lessonId = await adminService.createLesson(params.chapter_id);
-        redirect(302, `/admin/course/${params.course_id}/chapter/${params.chapter_id}/lesson/${lessonId}`);
+        redirect(302, `/admin/courses/${params.course_id}/chapters/${params.chapter_id}/lessons/${lessonId}`);
 
     },
     manageLessons: async ({ request, locals, params }) => {

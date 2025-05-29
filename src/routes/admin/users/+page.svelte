@@ -46,7 +46,7 @@
 						</td>
 						<td class="p-4 align-middle">
 							<div class="flex justify-end gap-2">
-								<Button href="/admin/user/{user.id}" variant="outline" size="sm">View</Button>
+								<Button href="/admin/users/{user.id}" variant="outline" size="sm">View</Button>
 							</div>
 						</td>
 					</tr>

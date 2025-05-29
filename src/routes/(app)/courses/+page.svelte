@@ -31,7 +31,7 @@
 	</div>
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 		{#each data.courses as course}
-			<a href="/course/{course.id}" class="h-full">
+			<a href="/courses/{course.id}" class="h-full">
 				<Card
 					class="group flex h-full cursor-pointer flex-col overflow-hidden border-2 transition-all hover:scale-[1.02] hover:border-primary hover:shadow-lg"
 				>

@@ -539,7 +539,7 @@ export class AdminService {
             }
             breadcrumbs.push({
                 name: name[0].name,
-                url: `/course/${courseId}`,
+                url: `/courses/${courseId}`,
             });
         } else {
             return breadcrumbs;
@@ -553,7 +553,7 @@ export class AdminService {
             }
             breadcrumbs.push({
                 name: name[0].name,
-                url: `/course/${courseId}/chapter/${chapterId}`,
+                url: `/courses/${courseId}/chapters/${chapterId}`,
             });
         } else {
             return breadcrumbs;
@@ -567,7 +567,7 @@ export class AdminService {
             }
             breadcrumbs.push({
                 name: name[0].name,
-                url: `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}`,
+                url: `/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`,
             });
         } else {
             return breadcrumbs;
