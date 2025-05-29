@@ -362,7 +362,7 @@
 	<ScrollArea class="h-full w-full ">
 		<Input bind:value={form.title} class="mb-4 w-full" placeholder="Titlu" />
 		<Textarea bind:value={form.summary} class=" mb-4 w-full" placeholder="Rezumat" />
-		<div class="bg-white" style="border-radius: 4px;">
+		<div class="bg-white" style="border-radius: 4px; color: black">
 			<MarkdownEditor bind:value={form.instructions} {carta} />
 		</div>
 	</ScrollArea>
@@ -403,6 +403,6 @@
 	/* Only if you didn't specify a custom code theme */
 	html.dark .shiki,
 	html.dark .shiki span {
-		color: var(--shiki-dark) !important;
+		/* color: var(--shiki-dark) !important; */
 	}
 </style>

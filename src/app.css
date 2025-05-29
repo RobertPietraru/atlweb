@@ -91,19 +91,15 @@
   }
 
   h2 {
-    @apply text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+    @apply text-3xl font-semibold tracking-tight ;
   }
 
   h3 {
     @apply text-2xl font-semibold tracking-tight;
   }
 
-  p {
-    @apply leading-7 [&:not(:first-child)]:mt-6;
-  }
-
   ul {
-    @apply my-6 ml-6 list-disc [&>li]:mt-2;
+    @apply ml-6 list-disc [&>li]:mt-2;
   }
 
   blockquote {

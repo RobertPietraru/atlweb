@@ -33,6 +33,8 @@ export const permissionsList = [
 
 	'submission.solve',
 ] as const;
+
+
 export const course = pgTable('course', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
