@@ -5,6 +5,9 @@ import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
 export class AdminService {
+    async deleteExercise(exercise_id: table.Id) {
+        await this.db.delete(table.exercise).where(eq(table.exercise.id, exercise_id));
+    }
     async updateChapter(chapter_id: table.Id, params: { name: string, description: string }) {
         await this.db.update(table.chapter).set({
             name: params.name,
@@ -234,6 +237,23 @@ export class AdminService {
             initialJavascript: params.initialJavascript,
         }).returning({ id: table.exercise.id });
         return exercise.id;
+    }
+    async updateExercise(exercise_id: table.Id, params: {
+        title?: string;
+        summary?: string;
+        instructions?: string;
+        initialHtml?: string;
+        initialCss?: string;
+        initialJavascript?: string;
+    }) {
+        await this.db.update(table.exercise).set({
+            title: params.title,
+            summary: params.summary,
+            instructions: params.instructions,
+            initialHtml: params.initialHtml,
+            initialCss: params.initialCss,
+            initialJavascript: params.initialJavascript,
+        }).where(eq(table.exercise.id, exercise_id));
     }
 
     async createLesson(chapterId: table.Id) {

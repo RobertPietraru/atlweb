@@ -4,20 +4,26 @@
 	import 'carta-md/default.css';
 
 	import { onDestroy, onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { PlayIcon } from 'lucide-svelte';
-	import { toast } from 'svelte-sonner';
+	import { Loader2, PlayIcon, SaveIcon } from '@lucide/svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { deserialize } from '$app/forms';
 	let { data } = $props();
 	const carta = new Carta({} as Options);
 
 	let code = $state({
+		html: data.exercise.initialHtml,
+		css: data.exercise.initialCss,
+		javascript: data.exercise.initialJavascript
+	});
+	let lastSavedCode = $state({
 		html: data.exercise.initialHtml,
 		css: data.exercise.initialCss,
 		javascript: data.exercise.initialJavascript
@@ -27,6 +33,22 @@
 		summary: data.exercise.summary,
 		instructions: data.exercise.instructions
 	});
+	let lastSavedForm = $state({
+		title: data.exercise.title,
+		summary: data.exercise.summary,
+		instructions: data.exercise.instructions
+	});
+	let isSaving = $state(false);
+
+	let isSaved = $derived(
+		JSON.stringify($state.snapshot(lastSavedCode)) === JSON.stringify($state.snapshot(code)) &&
+			JSON.stringify($state.snapshot(lastSavedForm)) === JSON.stringify($state.snapshot(form))
+	);
+	let codeHasChanged = $derived(
+		JSON.stringify($state.snapshot(lastSavedCode)) !== JSON.stringify($state.snapshot(code))
+	);
+	$inspect(form);
+	$inspect(lastSavedForm);
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
 	let handleKeyDown = (e: KeyboardEvent) => {
@@ -56,6 +78,58 @@
 	/// different tabs
 	let activeSidebarTab: 'result' | 'description' = $state('description');
 
+	async function save() {
+		try {
+			isSaving = true;
+			const formData = new FormData();
+			if (code.html !== lastSavedCode.html) {
+				formData.append('html', code.html);
+			}
+			if (code.css !== lastSavedCode.css) {
+				formData.append('css', code.css);
+			}
+			if (code.javascript !== lastSavedCode.javascript) {
+				formData.append('javascript', code.javascript);
+			}
+			if (form.title !== lastSavedForm.title) {
+				formData.append('title', form.title);
+			}
+			if (form.summary !== lastSavedForm.summary) {
+				formData.append('summary', form.summary);
+			}
+			if (form.instructions !== lastSavedForm.instructions) {
+				formData.append('instructions', form.instructions);
+			}
+
+			const response = await fetch('?/update', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
+				toast.success('Exercitiul a fost salvat cu succes');
+
+				lastSavedCode = structuredClone($state.snapshot(code));
+				lastSavedForm = structuredClone($state.snapshot(form));
+
+				console.log(result.data);
+			} else if (result.type === 'failure') {
+				toast.error(
+					(result.data?.message as string | undefined | null) ??
+						'A apărut o eroare la salvarea exercitiului',
+					{
+						position: 'bottom-left'
+					}
+				);
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error('A apărut o eroare la salvarea exercitiului');
+		} finally {
+			isSaving = false;
+		}
+	}
 	onMount(async () => {
 		window.addEventListener('keydown', handleKeyDown);
 		monaco = (await import('./monaco.js')).default;
@@ -79,9 +153,9 @@
 			language: 'javascript'
 		});
 
-		const htmlModel = monaco.editor.createModel('', 'html');
-		const cssModel = monaco.editor.createModel('', 'css');
-		const jsModel = monaco.editor.createModel('', 'javascript');
+		const htmlModel = monaco.editor.createModel(data.exercise.initialHtml, 'html');
+		const cssModel = monaco.editor.createModel(data.exercise.initialCss, 'css');
+		const jsModel = monaco.editor.createModel(data.exercise.initialJavascript, 'javascript');
 
 		htmlEditor.setModel(htmlModel);
 		cssEditor.setModel(cssModel);
@@ -155,11 +229,11 @@
 						</Tabs.Content>
 
 						<Tabs.Content value="result" class="h-full w-full ">
-							<div class="flex h-full items-center justify-center">
+							<div class="flex h-full items-center justify-center ">
 								{#if lastRunCode !== null}
 									<iframe
 										title="Code Preview"
-										class="h-full w-full"
+										class="h-full w-full bg-white"
 										srcdoc={getCodePreview(lastRunCode)}
 										sandbox="allow-scripts"
 									></iframe>
@@ -198,9 +272,17 @@
 				>
 			</Tabs.List>
 			<div class="flex-1"></div>
+			<Button disabled={isSaved || isSaving} onclick={save}>
+				{#if isSaving}
+					<Loader2 class="size-4 animate-spin" />
+				{:else}
+					<SaveIcon class="size-4" />
+				{/if}
+				<span>Salveaza</span>
+			</Button>
 
 			<Button
-				class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				disabled={isSaving}
 				onclick={async () => {
 					activeSidebarTab = 'result';
 					if (
@@ -241,7 +323,6 @@
 {/snippet}
 
 <style>
-
 	:global(.overflow-table) {
 		@apply my-6 w-full overflow-y-auto;
 	}

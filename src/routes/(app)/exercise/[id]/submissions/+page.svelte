@@ -123,6 +123,7 @@
 		html_content += `<sc` + `ript>`;
 		html_content += `${javascript}</sc` + `ript>`;
 		html_content += `</ht` + `ml>`;
+		console.log('html_content', html_content);
 
 		return html_content;
 	}
@@ -269,6 +270,7 @@
 						if (
 							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
 						) {
+							alert('asdf')
 							lastRunCode = structuredClone($state.snapshot(code));
 						} else {
 							lastRunCode = null;
