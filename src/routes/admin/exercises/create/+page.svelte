@@ -250,6 +250,10 @@
 {/snippet}
 
 <style>
+
+	:global(.overflow-table) {
+		@apply my-6 w-full overflow-y-auto;
+	}
 	:global(.markdown-content a) {
 		@apply text-blue-500;
 	}

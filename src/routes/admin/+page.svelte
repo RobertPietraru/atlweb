@@ -22,7 +22,7 @@
 				</div>
 			</div>
 			<h2 class="mb-2 text-2xl font-semibold">Cursuri</h2>
-			<p class="text-muted-foreground">Gestionează cursurile</p>
+			<h4 class="text-muted-foreground">Gestionează cursurile</h4>
 		</a>
 	{/if}
 	{#if data.canViewAdminCoursesPage}
@@ -39,7 +39,7 @@
 				</div>
 			</div>
 			<h2 class="mb-2 text-2xl font-semibold">Exerciții</h2>
-			<p class="text-muted-foreground">Gestionează exercițiile</p>
+			<h4 class="text-muted-foreground">Gestionează exercițiile</h4>
 		</a>
 	{/if}
 
@@ -57,7 +57,7 @@
 				</div>
 			</div>
 			<h2 class="mb-2 text-2xl font-semibold">Utilizatori</h2>
-			<p class="text-muted-foreground">Gestionează utilizatorii</p>
+			<h4 class="text-muted-foreground">Gestionează utilizatorii</h4>
 		</a>
 	{/if}
 </div>

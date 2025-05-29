@@ -97,14 +97,14 @@
 								{/if}
 							</div>
 							<div class="flex flex-col gap-1 px-2 py-1.5">
-								<p class="truncate text-sm font-medium">{data.user.username}</p>
-								<p class="text-xs capitalize text-muted-foreground">
+								<span class="truncate text-sm font-medium">{data.user.username}</span>
+								<span class="text-xs capitalize text-muted-foreground">
 									{#if data.canViewAdminPage}
 										Cont de administrator
 									{:else}
 										Utilizator
 									{/if}
-								</p>
+								</span>
 							</div>
 						</div>
 					</DropdownMenu.Label>
@@ -191,7 +191,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<p>© {2025} ATLWEB - Toate drepturile rezervate</p>
-		<p>Făcut cu ❤️ în România</p>
+		<span>© {2025} ATLWEB - Toate drepturile rezervate</span>
+		<span>Făcut cu ❤️ în România</span>
 	</div>
 </footer>
