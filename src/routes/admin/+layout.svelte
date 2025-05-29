@@ -148,7 +148,7 @@
 	</div>
 </header>
 
-<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl  {removeContainer ? 'px-4' : 'container'} space-y-4 py-4">
+<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl  {removeContainer ? 'pl-4' : 'container'} space-y-4 py-4">
 	<Breadcrumb.Root class="flex items-center">
 		<Breadcrumb.List>
 			<Breadcrumb.Separator />

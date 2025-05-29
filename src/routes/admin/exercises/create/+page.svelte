@@ -1,16 +1,21 @@
 <script lang="ts">
+	import { Carta, MarkdownEditor, type Options } from 'carta-md';
+	// Component default theme
+	import 'carta-md/default.css';
+
 	import { onDestroy, onMount } from 'svelte';
+
 	import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { marked } from 'marked';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { PlayIcon } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	let { data } = $props();
+	const carta = new Carta({} as Options);
 
 	let code = $state({
 		html: '',
@@ -135,7 +140,7 @@
 	});
 </script>
 
-<main class="min-h-[100vh] w-full mx-0">
+<main class="mx-0 min-h-[100vh] w-full">
 	<Resizable.PaneGroup direction="horizontal">
 		<Resizable.Pane defaultSize={25}>
 			<Resizable.PaneGroup direction="vertical" class="">
@@ -154,7 +159,7 @@
 							>
 						</Tabs.List>
 
-						<Tabs.Content value="description" class="h-full w-full p-4">
+						<Tabs.Content value="description" class="h-full w-full pr-2">
 							{@render exerciseDescription()}
 						</Tabs.Content>
 
@@ -180,101 +185,71 @@
 		</Resizable.Pane>
 		<Resizable.Handle withHandle />
 	</Resizable.PaneGroup>
-	{#snippet editor()}
-		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
-			<div class="flex items-center gap-4">
-				<Tabs.List class="m-0 p-0">
-					<Tabs.Trigger
-						value="html"
-						class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
-						>HTML</Tabs.Trigger
-					>
-					<Tabs.Trigger
-						value="css"
-						class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
-						>CSS</Tabs.Trigger
-					>
-					<Tabs.Trigger
-						value="javascript"
-						class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
-						>JavaScript</Tabs.Trigger
-					>
-				</Tabs.List>
-				<div class="flex-1"></div>
-
-				<Button
-					class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-					onclick={async () => {
-						activeSidebarTab = 'result';
-						if (
-							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
-						) {
-							lastRunCode = structuredClone($state.snapshot(code));
-						} else {
-							lastRunCode = null;
-							await new Promise((resolve) => setTimeout(resolve, 0));
-							lastRunCode = structuredClone($state.snapshot(code));
-						}
-					}}
-				>
-					<PlayIcon class="size-4" />
-					<span>Ruleaza</span>
-				</Button>
-			</div>
-			<Tabs.Content value="html" class="mt-0 h-full w-full ">
-				<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
-			</Tabs.Content>
-			<Tabs.Content value="css" class="mt-0 h-full w-full ">
-				<div bind:this={cssEditorContainer} class="h-full w-full" id="css-editor"></div>
-			</Tabs.Content>
-			<Tabs.Content value="javascript" class="mt-0 h-full w-full ">
-				<div bind:this={jsEditorContainer} class="h-full w-full" id="javascript-editor"></div>
-			</Tabs.Content>
-		</Tabs.Root>
-	{/snippet}
-
-	{#snippet exerciseDescription()}
-		<ScrollArea class="h-full w-full">
-			<Textarea bind:value={form.title} class="h-full w-full" />
-			<Textarea bind:value={form.summary} class="h-full w-full" />
-			<Separator class="my-4" />
-			<Textarea bind:value={form.instructions} class="h-full w-full" />
-			<Separator class="my-4" />
-			<div class="markdown-content">
-				{@html marked(form.instructions)}
-			</div>
-		</ScrollArea>
-	{/snippet}
 </main>
+{#snippet editor()}
+	<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
+		<div class="flex items-center gap-4">
+			<Tabs.List class="m-0 p-0">
+				<Tabs.Trigger
+					value="html"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
+					>HTML</Tabs.Trigger
+				>
+				<Tabs.Trigger
+					value="css"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
+					>CSS</Tabs.Trigger
+				>
+				<Tabs.Trigger
+					value="javascript"
+					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
+					>JavaScript</Tabs.Trigger
+				>
+			</Tabs.List>
+			<div class="flex-1"></div>
+
+			<Button
+				class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+				onclick={async () => {
+					activeSidebarTab = 'result';
+					if (
+						JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
+					) {
+						lastRunCode = structuredClone($state.snapshot(code));
+					} else {
+						lastRunCode = null;
+						await new Promise((resolve) => setTimeout(resolve, 0));
+						lastRunCode = structuredClone($state.snapshot(code));
+					}
+				}}
+			>
+				<PlayIcon class="size-4" />
+				<span>Ruleaza</span>
+			</Button>
+		</div>
+		<Tabs.Content value="html" class="mt-0 h-full w-full ">
+			<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
+		</Tabs.Content>
+		<Tabs.Content value="css" class="mt-0 h-full w-full ">
+			<div bind:this={cssEditorContainer} class="h-full w-full" id="css-editor"></div>
+		</Tabs.Content>
+		<Tabs.Content value="javascript" class="mt-0 h-full w-full ">
+			<div bind:this={jsEditorContainer} class="h-full w-full" id="javascript-editor"></div>
+		</Tabs.Content>
+	</Tabs.Root>
+{/snippet}
+
+{#snippet exerciseDescription()}
+	<ScrollArea class="h-full w-full ">
+		<Input bind:value={form.title} class="mb-4 w-full" placeholder="Titlu" />
+		<Textarea bind:value={form.summary} class=" mb-4 w-full" placeholder="Rezumat" />
+		<div class="bg-white" style="border-radius: 4px;">
+			<MarkdownEditor bind:value={form.instructions} {carta} />
+		</div>
+	</ScrollArea>
+{/snippet}
 
 <style>
-	:global(.markdown-content h1) {
-		@apply text-2xl font-bold;
-	}
-	:global(.markdown-content h2) {
-		@apply text-xl font-bold;
-	}
-
-	:global(.markdown-content h3) {
-		@apply text-lg font-bold;
-	}
-
-	:global(.markdown-content p) {
-		@apply mb-4;
-	}
-
-	:global(.markdown-content ul) {
-		@apply mb-4 list-inside list-disc;
-	}
-
-	:global(.markdown-content li) {
-		@apply mb-2;
-	}
-
-	:global(.markdown-content hr) {
-		@apply my-4;
-	}
-
 	:global(.markdown-content a) {
 		@apply text-blue-500;
 	}
@@ -286,5 +261,26 @@
 	}
 	:global(.tab-trigger) {
 		@apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm;
+	}
+	:global(.carta-font-code) {
+		font-family: '...', monospace;
+		font-size: 1.1rem;
+		line-height: 1.1rem;
+		letter-spacing: normal;
+	}
+	html.dark .carta-theme__default {
+		--border-color: var(--border-color-dark);
+		--selection-color: var(--selection-color-dark);
+		--focus-outline: var(--focus-outline-dark);
+		--hover-color: var(--hover-color-dark);
+		--caret-color: var(--caret-color-dark);
+		--text-color: var(--text-color-dark);
+	}
+
+	/* Code dark mode */
+	/* Only if you didn't specify a custom code theme */
+	html.dark .shiki,
+	html.dark .shiki span {
+		color: var(--shiki-dark) !important;
 	}
 </style>
