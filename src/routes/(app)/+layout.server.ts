@@ -4,8 +4,7 @@ export const load = async ({ locals, params }) => {
     const courseId = params.id;
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
-    const exerciseId = params.exercise_id;
-    const breadcrumbs = await adminService.getBreadcrumbs(courseId ?? null, chapterId ?? null, lessonId ?? null, exerciseId ?? null) ?? [];
+    const breadcrumbs = await adminService.getBreadcrumbs(courseId ?? null, chapterId ?? null, lessonId ?? null) ?? [];
     breadcrumbs.unshift({
         name: 'Cursuri',
         url: '/courses'

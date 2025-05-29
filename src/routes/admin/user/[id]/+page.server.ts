@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { permissionsList } from '$lib/server/db/schema';
-
+import type * as table from '$lib/server/db/schema';
 const updateSchema = z.object({
     email: z.string().max(320, 'Email must be at most 320 characters'),
     username: z.string().max(100, 'Username must be at most 100 characters'),
@@ -81,7 +81,7 @@ export const actions = {
         if (!form.valid) {
             return fail(400, { form });
         }
-        await adminService.updateUserPermissions(event.params.id, form.data.permissions);
+        await adminService.updateUserPermissions(event.params.id, form.data.permissions.filter(permission => permissionsList.includes(permission as table.Permissions)) as table.Permissions[]);
         return { form };
     }
 };

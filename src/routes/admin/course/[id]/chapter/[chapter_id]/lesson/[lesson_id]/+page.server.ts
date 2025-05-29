@@ -28,7 +28,9 @@ export const actions = {
         const formData = await request.formData();
 
         const lesson = JSON.parse(formData.get('lesson') as unknown as string) as Partial<LessonWithBlocks['lesson']>;
-        console.log(lesson);
+        if (!lesson) {
+            error(400, 'Lesson is required');
+        }
 
         await adminService.updateLesson(params.lesson_id, {
             name: lesson.name,

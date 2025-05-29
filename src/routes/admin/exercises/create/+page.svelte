@@ -6,41 +6,24 @@
 	import { marked } from 'marked';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { page } from '$app/state';
-	import {
-		CheckIcon,
-		ChevronDown,
-		EyeIcon,
-		HelpCircleIcon,
-		Loader2,
-		PlayIcon,
-		Send,
-		TrashIcon,
-		UserIcon
-	} from 'lucide-svelte';
-	import { deserialize } from '$app/forms';
+	import { PlayIcon } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
-	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	let { data } = $props();
 
 	let code = $state({
-		html: data.exercise.initialHtml,
-		css: data.exercise.initialCss,
-		javascript: data.exercise.initialJavascript
+		html: '',
+		css: '',
+		javascript: ''
 	});
-	let submitPopupOpen = $state(false);
-	let submitPopupRef = $state<HTMLButtonElement | null>(null);
-
-	let submissions = $state(data.submissions);
-	let deleting = $state<string[]>([]);
-	$inspect(deleting);
+	let form = $state({
+		title: '',
+		summary: '',
+		instructions: ''
+	});
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
-	let submittedCode: { html: string; css: string; javascript: string } | null = $state(null);
-	let currentCodeAndSubmittedCodeAreTheSame = $derived(
-		JSON.stringify($state.snapshot(code)) === JSON.stringify($state.snapshot(submittedCode))
-	);
 	let handleKeyDown = (e: KeyboardEvent) => {
 		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 			e.preventDefault();
@@ -66,9 +49,7 @@
 
 	let activeCodeTab: 'html' | 'css' | 'javascript' = $state('html');
 	/// different tabs
-	let activeSidebarTab: 'result' | 'submissions' | 'description' = $state('description');
-
-	let submitting = $state(false);
+	let activeSidebarTab: 'result' | 'description' = $state('description');
 
 	onMount(async () => {
 		window.addEventListener('keydown', handleKeyDown);
@@ -93,9 +74,9 @@
 			language: 'javascript'
 		});
 
-		const htmlModel = monaco.editor.createModel(data.exercise.initialHtml, 'html');
-		const cssModel = monaco.editor.createModel(data.exercise.initialCss, 'css');
-		const jsModel = monaco.editor.createModel(data.exercise.initialJavascript, 'javascript');
+		const htmlModel = monaco.editor.createModel('', 'html');
+		const cssModel = monaco.editor.createModel('', 'css');
+		const jsModel = monaco.editor.createModel('', 'javascript');
 
 		htmlEditor.setModel(htmlModel);
 		cssEditor.setModel(cssModel);
@@ -146,80 +127,6 @@
 		return html_content;
 	}
 
-	async function submitCode(params: { needHelp: boolean }) {
-		try {
-			submitting = true;
-			submitPopupOpen = false;
-			const formData = new FormData();
-			formData.append('html', code.html);
-			formData.append('css', code.css);
-			formData.append('javascript', code.javascript);
-			formData.append('needHelp', params.needHelp.toString());
-			const response = await fetch('?/submit', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				submittedCode = structuredClone($state.snapshot(code));
-				toast.success('Codul a fost trimis cu succes');
-
-				console.log(result.data);
-				submissions = [result.data?.submission as (typeof submissions)[0], ...submissions];
-			} else if (result.type === 'failure') {
-				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la trimiterea codului',
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			console.error(error);
-			toast.error('A apărut o eroare la trimiterea codului');
-		} finally {
-			submitting = false;
-		}
-	}
-
-	async function deleteSubmission(submissionId: string) {
-		try {
-			const formData = new FormData();
-			deleting.push(submissionId);
-			formData.append('submissionId', submissionId);
-			const response = await fetch('?/delete', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				toast.success('Raspunsul a fost sters cu succes');
-				submissions.splice(
-					submissions.findIndex((submission) => submission.id === submissionId),
-					1
-				);
-			} else if (result.type === 'failure') {
-				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la stergerea raspunsului',
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			toast.error('A apărut o eroare la stergerea raspunsului');
-		} finally {
-			deleting.splice(
-				deleting.findIndex((id) => id === submissionId),
-				1
-			);
-		}
-	}
-
 	onDestroy(() => {
 		monaco?.editor.getModels().forEach((model) => model.dispose());
 		htmlEditor?.dispose();
@@ -244,15 +151,7 @@
 							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
 							>Rezultat</Tabs.Trigger
 						>
-						<Tabs.Trigger
-							value="submissions"
-							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-							>Solutii</Tabs.Trigger
-						>
 					</Tabs.List>
-					<Tabs.Content value="submissions" class="h-full w-full p-4">
-						{@render submissionsTable()}
-					</Tabs.Content>
 
 					<Tabs.Content value="description" class="h-full w-full p-4">
 						{@render exerciseDescription()}
@@ -302,17 +201,6 @@
 			</Tabs.List>
 			<div class="flex-1"></div>
 
-			{#if data.isHelper}
-				<Button
-					class="flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm hover:bg-secondary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
-					href="./{data.exercise.id}/submissions"
-				>
-					<UserIcon class="size-4" />
-					<span>Solutii</span>
-				</Button>
-			{/if}
-			{@render submitButton()}
-
 			<Button
 				class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 				onclick={async () => {
@@ -343,144 +231,19 @@
 		</Tabs.Content>
 	</Tabs.Root>
 {/snippet}
-{#snippet submissionsTable()}
-	<ScrollArea class="h-full w-full">
-		<table class="w-full border-collapse">
-			<thead>
-				<tr class="border-b">
-					<th class="py-2 text-left"></th>
-					<th class="py-2 text-left">Data</th>
-					<th class="py-2 text-left">Status</th>
-					<th class="py-2 text-left"></th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each submissions as submission}
-					<tr class="border-b hover:bg-muted/50">
-						<td class="py-2">
-							<Button
-								variant="ghost"
-								size="icon"
-								class="size-6"
-								onclick={() => {
-									setCode({
-										css: submission.cssCode,
-										html: submission.htmlCode,
-										javascript: submission.javascriptCode
-									});
-								}}
-							>
-								<EyeIcon class="size-4" />
-							</Button>
-						</td>
-						<td class="py-2">
-							{new Date(submission.submissionDate).toLocaleString().split(',')[1]}
-						</td>
-						<td class="py-2">
-							{#if submission.needHelp}
-								{#if submission.checked}
-									<span class="text-green-500">Verificat</span>
-								{:else}
-									<span class="text-yellow-500">Ajutor solicitat</span>
-								{/if}
-							{:else}
-								<span class="text-green-500">Trimis</span>
-							{/if}
-						</td>
-						<td class="py-2">
-							<Button
-								variant="ghost"
-								size="icon"
-								class="rounded-full bg-destructive text-destructive-foreground"
-								onclick={() => deleteSubmission(submission.id)}
-								disabled={deleting.includes(submission.id)}
-							>
-								{#if deleting.includes(submission.id)}
-									<Loader2 class="size-4 animate-spin" />
-								{:else}
-									<TrashIcon class="size-4" />
-								{/if}
-							</Button>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</ScrollArea>
-{/snippet}
+
 {#snippet exerciseDescription()}
 	<ScrollArea class="h-full w-full">
-		<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
-		<p>{data.exercise.description}</p>
+		<Textarea bind:value={form.title} class="h-full w-full" />
+		<Textarea bind:value={form.summary} class="h-full w-full" />
+		<Separator class="my-4" />
+		<Textarea bind:value={form.instructions} class="h-full w-full" />
 		<Separator class="my-4" />
 		<div class="markdown-content">
-			{@html marked(data.exercise.instructions)}
+			{@html marked(form.instructions)}
 		</div>
 	</ScrollArea>
 {/snippet}
-{#snippet submitButton()}
-	<Popover.Root bind:open={submitPopupOpen}>
-		<Popover.Trigger
-			bind:ref={submitPopupRef}
-			disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-		>
-			{#snippet child({ props })}
-				<Button {...props} aria-expanded={submitPopupOpen} class="h-10">
-					{#if submitting}
-						<Loader2 class="size-4 animate-spin" />
-					{:else}
-						<Send class="size-4" />
-					{/if}
-				</Button>
-			{/snippet}
-		</Popover.Trigger>
-		<Popover.Content class=" w-[250px] space-y-0 rounded-md p-0">
-			<Button
-				variant="ghost"
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				class="w-full justify-start rounded-t-md"
-				onclick={() => submitCode({ needHelp: false})}
-			>
-				<CheckIcon class="size-4" />
-				Trimite
-			</Button>
-
-			<Separator class="my-2" />
-
-			<Button
-				variant="ghost"
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				class="w-full justify-start rounded-b-none"
-				onclick={() => submitCode({ needHelp: true })}
-			>
-				<HelpCircleIcon class="size-4" />
-				Cere ajutor
-			</Button>
-		</Popover.Content>
-	</Popover.Root>
-{/snippet}
-<svelte:head>
-	<title>{data.exercise.name} | atl.vercel.app</title>
-	<meta name="description" content={data.exercise.description} />
-	<meta property="og_site_name" content="atl.vercel.app" />
-	<meta property="og:url" content="https://atl.vercel.app{page.url.pathname.toString()}" />
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={data.exercise.name} />
-	<meta property="og:description" content={data.exercise.description} />
-
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta property="twitter:domain" content="atl.vercel.app" />
-	<meta property="twitter:url" content="https://atl.vercel.app{page.url.pathname.toString()}" />
-	<meta name="twitter:title" content={data.exercise.name} />
-	<meta name="twitter:description" content={data.exercise.description} />
-	{@html `<script type="application/ld+json">{
-   "@context": "https://schema.org",
-   "@type": "Website",
-   "name": "${data.exercise.name} | atl.vercel.app",
-   "url": "https://atl.vercel.app${page.url.pathname}",
-   "description": "${data.exercise.description}"
-   }</script>`}
-</svelte:head>
 
 <style>
 	:global(.markdown-content h1) {

@@ -1,9 +1,6 @@
 <script lang="ts">
-	import {
-		ArrowUpRightIcon,
-		LibraryBig,
-		UsersRound
-	} from '@lucide/svelte';
+	import { ArrowUpRightIcon, LibraryBig, UsersRound } from '@lucide/svelte';
+	import { BrainCircuit } from 'lucide-svelte';
 
 	let { data } = $props();
 </script>
@@ -11,7 +8,7 @@
 <h1 class="mb-8 text-3xl font-bold">Panou administrativ</h1>
 
 <div class="grid gap-6 md:grid-cols-3">
-	{#if data.canViewAdminUsersPage}
+	{#if data.canViewAdminCoursesPage}
 		<a
 			href="/admin/courses"
 			class="group flex h-full cursor-pointer flex-col overflow-hidden border-2 p-6 transition-all hover:scale-[1.02] hover:border-primary hover:shadow-lg"
@@ -26,6 +23,23 @@
 			</div>
 			<h2 class="mb-2 text-2xl font-semibold">Cursuri</h2>
 			<p class="text-muted-foreground">Gestionează cursurile</p>
+		</a>
+	{/if}
+	{#if data.canViewAdminCoursesPage}
+		<a
+			href="/admin/exercises"
+			class="group flex h-full cursor-pointer flex-col overflow-hidden border-2 p-6 transition-all hover:scale-[1.02] hover:border-primary hover:shadow-lg"
+		>
+			<div class="flex justify-between">
+				<BrainCircuit class="mb-4 h-12 w-12" />
+				<div
+					class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100"
+				>
+					<ArrowUpRightIcon class="h-4 w-4 text-primary" />
+				</div>
+			</div>
+			<h2 class="mb-2 text-2xl font-semibold">Exerciții</h2>
+			<p class="text-muted-foreground">Gestionează exercițiile</p>
 		</a>
 	{/if}
 

@@ -542,11 +542,11 @@
 				<Card class="space-y-4">
 					<div class="flex items-center gap-2 px-4 pt-4">
 						<BookOpen class="h-5 w-5 text-primary" />
-						<h3 class="text-lg font-semibold">Exercițiu: {exercise.name}</h3>
+						<h3 class="text-lg font-semibold">Exercițiu: {exercise.title}</h3>
 					</div>
 					<Separator />
 					<div class="flex items-start gap-2 px-4">
-						<p class="text-sm text-muted-foreground">{exercise.description}</p>
+						<p class="text-sm text-muted-foreground">{exercise.summary}</p>
 					</div>
 					<div class="flex items-center justify-end gap-2 px-4 pb-4">
 						<div class="flex items-center gap-1.5">

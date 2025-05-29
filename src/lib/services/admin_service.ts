@@ -1,5 +1,5 @@
 import { hash } from '@node-rs/argon2';
-import { eq, sql, and, desc, asc, arrayContains, inArray } from 'drizzle-orm';
+import { eq, sql, and, desc, asc, arrayContains, inArray, like, ilike, or } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { assert } from '$lib/assert';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -117,7 +117,7 @@ export class AdminService {
         return userId;
     }
 
-    async updateUserPermissions(userId: table.Id, permissions: string[]) {
+    async updateUserPermissions(userId: table.Id, permissions: table.Permissions[]) {
         this.db.update(table.user).set({
             permissions: permissions
         }).where(eq(table.user.id, userId));
@@ -217,6 +217,24 @@ export class AdminService {
         }).returning({ id: table.chapter.id });
         return chapter.id;
     }
+    async createExercise(params: {
+        title: string;
+        summary: string;
+        instructions: string;
+        initialHtml: string;
+        initialCss: string;
+        initialJavascript: string;
+    }) {
+        const [exercise] = await this.db.insert(table.exercise).values({
+            title: params.title,
+            summary: params.summary,
+            instructions: params.instructions,
+            initialHtml: params.initialHtml,
+            initialCss: params.initialCss,
+            initialJavascript: params.initialJavascript,
+        }).returning({ id: table.exercise.id });
+        return exercise.id;
+    }
 
     async createLesson(chapterId: table.Id) {
         const lessonCount = await this.db.select({
@@ -310,13 +328,16 @@ export class AdminService {
         }).from(table.lesson).where(eq(table.lesson.id, lesson_id)).limit(1);
 
         if (lesson.length === 0) {
-            return null;
+            return {
+                lesson: null,
+                exercises: []
+            };
         }
 
         const exercises = await this.db.select({
             id: table.exercise.id,
-            name: table.exercise.name,
-            description: table.exercise.description,
+            title: table.exercise.title,
+            summary: table.exercise.summary,
             hasSubmission: table.submission.id,
         }).from(table.exercise)
             .leftJoin(table.submission, and(eq(table.exercise.id, table.submission.exerciseId), userId ? eq(table.submission.userId, userId) : undefined));
@@ -350,8 +371,8 @@ export class AdminService {
 
         const exercises = await this.db.select({
             id: table.exercise.id,
-            name: table.exercise.name,
-            description: table.exercise.description,
+            title: table.exercise.title,
+            summary: table.exercise.summary,
             hasSubmission: table.submission.id,
         }).from(table.exercise).where(inArray(table.exercise.id, exerciseIds))
             .leftJoin(table.submission, and(eq(table.exercise.id, table.submission.exerciseId), userId ? eq(table.submission.userId, userId) : undefined));
@@ -389,6 +410,42 @@ export class AdminService {
             return null;
         }
         return exercise[0];
+    }
+    async getExercises(params: {
+        page: number,
+        pageSize: number,
+        search?: string,
+    }) {
+        const query = this.db.select({
+            id: table.exercise.id,
+            title: table.exercise.title,
+            summary: table.exercise.summary,
+        }).from(table.exercise).where(
+            params.search ?
+                or(
+                    ilike(table.exercise.title, `%${params.search}%`),
+                    ilike(table.exercise.summary, `%${params.search}%`),
+                    ilike(table.exercise.instructions, `%${params.search}%`),
+                )
+            : undefined
+        );
+
+        const totalQuery = await this.db.select({
+            count: sql<number>`count(*)`
+        }).from(table.exercise).where(
+            params.search ?
+                or(
+                    ilike(table.exercise.title, `%${params.search}%`),
+                    ilike(table.exercise.summary, `%${params.search}%`),
+                    ilike(table.exercise.instructions, `%${params.search}%`),
+                )
+            : undefined
+        );
+        const total = totalQuery[0].count;
+        return {
+            exercises: await query.limit(params.pageSize).offset(params.page * params.pageSize),
+            total,
+        };
     }
 
     async getLessonNameAndId(lesson_id: table.Id) {
@@ -451,7 +508,7 @@ export class AdminService {
     async deleteSubmission(submissionId: table.Id) {
         await this.db.delete(table.submission).where(eq(table.submission.id, submissionId));
     }
-    async getBreadcrumbs(courseId: table.Id | null, chapterId: table.Id | null, lessonId: table.Id | null, exerciseId: table.Id | null) {
+    async getBreadcrumbs(courseId: table.Id | null, chapterId: table.Id | null, lessonId: table.Id | null) {
         const breadcrumbs: { name: string, url: string }[] = [];
         if (courseId) {
             const name = await this.db.select({
@@ -494,18 +551,6 @@ export class AdminService {
             });
         } else {
             return breadcrumbs;
-        }
-        if (exerciseId) {
-            const name = await this.db.select({
-                name: table.exercise.name,
-            }).from(table.exercise).where(eq(table.exercise.id, exerciseId)).limit(1);
-            if (name.length === 0) {
-                return null;
-            }
-            breadcrumbs.push({
-                name: name[0].name,
-                url: `/course/${courseId}/chapter/${chapterId}/lesson/${lessonId}/exercise/${exerciseId}`,
-            });
         }
         return breadcrumbs;
     }

@@ -87,9 +87,9 @@ export type LessonBlock = {
 
 export const exercise = pgTable('exercise', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	name: text('name').notNull(),
+	title: text('name').notNull(),
 	creationDate: timestamp('creation_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	description: text('description').notNull(),
+	summary: text('summary').notNull(),
 	/// markdown
 	instructions: text('instructions').notNull(),
 	/// the starter code for the exercise
@@ -125,7 +125,7 @@ export const user = pgTable('user', {
 	email: text('email').notNull().unique(),
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash').notNull(),
-	permissions: text('permissions').array().notNull().default([]),
+	permissions: text('permissions').$type<Permissions[]>().array().notNull().default([]),
 });
 
 // Session

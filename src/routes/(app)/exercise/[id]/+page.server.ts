@@ -4,41 +4,33 @@ import { adminService } from '$lib/injection';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user) {
-        redirect(302, '/login?redirect=/course/' + params.id + '/chapter/' + params.chapter_id + '/lesson/' + params.lesson_id + '/exercise/' + params.exercise_id);
+        redirect(302, '/login?redirect=/exercise/' + params.id);
     }
 
-    if (!locals.user!.permissions.includes('submission.solve')) {
-        error(403, 'Nu ai permisiunea sa rezolvi exercitiile');
-    }
-
-    const exercise = await adminService.getExercise(params.exercise_id);
+    const exercise = await adminService.getExercise(params.id);
+    const submissions = await adminService.getSubmissions(params.id);
+    
+    const isHelper = locals.user!.permissions.includes('submission.solve');
     if (!exercise) {
         error(404, 'Exercise not found');
     }
-    const lesson = await adminService.getLessonNameAndId(params.lesson_id);
-    if (!lesson) {
-        error(404, 'Lesson not found');
-    }
-    const submissions = await adminService.getSubmissionsToCheck(params.exercise_id);
-
-
 
     return {
+        isHelper,
         exercise,
-        lesson,
         submissions,
     };
 };
 
-export const actions = {
-    submit: async ({ request, params, locals }) => {
+export const actions= {
+    submit: async ({ request, params ,locals}) => {
         const formData = await request.formData();
         const html = formData.get('html') ?? '';
         const css = formData.get('css') ?? '';
         const javascript = formData.get('javascript') ?? '';
-        const exerciseId = params.exercise_id;
+        const exerciseId = params.id;
         const needHelp = formData.get('needHelp') ?? 'false';
-        if (!html && !css && !javascript) {
+        if (!html && !css && !javascript ) {
             return fail(400, { message: 'Nu ai trimis codul' });
         }
 
@@ -58,26 +50,16 @@ export const actions = {
         }
     },
 
-    solve: async ({ request, params, locals }) => {
+    delete: async ({ request, params ,locals}) => {
         const formData = await request.formData();
         const submissionId = formData.get('submissionId') ?? '';
-
-        const html = formData.get('html') ?? '';
-        const css = formData.get('css') ?? '';
-        const javascript = formData.get('javascript') ?? '';
-
         if (!submissionId) {
             error(400, 'Nu ai trimis codul');
         }
-
-        if (!locals.user!.permissions.includes('submission.solve')) {
-            error(401, 'Nu ai permisiunea sa rezolvi raspunsul');
+        if (!locals.user) {
+            error(401, 'Nu ai permisiunea sa stergei raspunsul');
         }
-        await adminService.markSubmissionAsChecked(submissionId as string, {
-            html: html as string,
-            css: css as string,
-            javascript: javascript as string,
-        });
+        await adminService.deleteSubmission(submissionId as string);
 
         return {
             success: true

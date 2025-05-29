@@ -6,7 +6,7 @@ export const load = async ({ locals, params, url }) => {
     let breadcrumbs: { name: string, url: string }[] = [];
 
     breadcrumbs.push({
-        name: 'Panou de administrator',
+        name: 'Panou administrativ',
         url: '/admin'
     });
 

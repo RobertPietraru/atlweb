@@ -179,8 +179,8 @@
 	>
 		<Resizable.PaneGroup direction="vertical" class="">
 			<Resizable.Pane defaultSize={50} class="p-4">
-				<h1 class="flex-1 text-xl font-bold">{data.exercise.name}</h1>
-				<p>{data.exercise.description}</p>
+				<h1 class="flex-1 text-xl font-bold">{data.exercise.title}</h1>
+				<p>{data.exercise.summary}</p>
 				<Separator class="my-4" />
 				<div class="markdown-content">
 					{@html marked(data.exercise.instructions)}

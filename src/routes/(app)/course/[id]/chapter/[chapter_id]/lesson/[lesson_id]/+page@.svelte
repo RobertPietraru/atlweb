@@ -119,9 +119,14 @@
 				{#each lesson.blocks as block, index}
 					{#if block.type === 'exercise'}
 						<!-- for some reason, without this div, the exercise block will stick to the one above, idk why -->
-						<div>
-							{@render exerciseBlock(block)}
-						</div>
+						{@const exercise = data.exercises.find((e) => e.id === block.exerciseId)}
+						{#if exercise}
+							{@render exerciseBlock(exercise)}
+						{:else}
+							<div class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6">
+								<p class="text-muted-foreground">Exercițiu nu a fost găsit</p>
+							</div>
+						{/if}
 					{:else}
 						<div
 							class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
@@ -362,13 +367,13 @@
 	</Tabs.Root>
 {/snippet}
 
-{#snippet exerciseBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>)}
+{#snippet exerciseBlock(exercise: (typeof data.exercises)[0])}
 	<a
-		href="/{data.lesson.id}/exercise/{block.exerciseId}"
+		href="/exercise/{exercise.id}"
 		class="block transition-all duration-200 hover:scale-[1.02]"
 	>
 		<Card
-			class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {block.hasSubmission
+			class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {exercise.hasSubmission
 				? 'bg-primary/10'
 				: ''}"
 		>
@@ -376,15 +381,15 @@
 				<BookOpen
 					class="h-5 w-5 text-primary transition-transform duration-200 group-hover:scale-110"
 				/>
-				<h3 class="text-lg font-semibold">Exercițiu: {block.name}</h3>
+				<h3 class="text-lg font-semibold">Exercițiu: {exercise.title}</h3>
 			</div>
 			<Separator />
 			<div class="flex items-start gap-2 px-4">
-				<p class="text-sm text-muted-foreground">{block.description}</p>
+				<p class="text-sm text-muted-foreground">{exercise.summary}</p>
 			</div>
 			<div class="flex items-center justify-end gap-2 px-4 pb-4">
 				<div class="flex items-center gap-1.5">
-					{#if block.hasSubmission}
+					{#if exercise.hasSubmission}
 						<FileCheck class="h-4 w-4 text-primary" />
 						<span class="animate-pulse text-sm font-medium text-primary"> Soluție trimisă </span>
 					{:else}
@@ -408,18 +413,18 @@
 
 <svelte:head>
 	<title>{lesson.name} | atl.vercel.app</title>
-	<meta name="description" content={lesson.description} />
+	<meta name="description" content={lesson.teaser} />
 	<meta property="og_site_name" content="“atl.vercel.app”" />
 	<meta property="og:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content={lesson.name} />
-	<meta property="og:description" content={lesson.description} />
+	<meta property="og:description" content={lesson.teaser} />
 
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta property="twitter:domain" content="“atl.vercel.app" />
 	<meta property="twitter:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
 	<meta name="twitter:title" content={lesson.name} />
-	<meta name="twitter:description" content={lesson.description} />
+	<meta name="twitter:description" content={lesson.teaser} />
 	{@html `  <script type="application/ld+json">{
    "@context": "https://schema.org",
    "@type": "Website",
