@@ -263,7 +263,7 @@
 							{#if lastRunCode !== null}
 								<iframe
 									title="Code Preview"
-									class="h-full w-full"
+									class="h-full w-full bg-white"
 									srcdoc={getCodePreview(lastRunCode)}
 									sandbox="allow-scripts"
 								></iframe>

@@ -7,6 +7,7 @@ export const load = async ({ locals, params }) => {
     const courseId = params.course_id;
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
+    console.log(params);
     const breadcrumbs = await adminService.getBreadcrumbs(courseId ?? null, chapterId ?? null, lessonId ?? null) ?? [];
     breadcrumbs.unshift({
         name: 'Cursuri',

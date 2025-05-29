@@ -566,7 +566,7 @@ export class AdminService {
                 return null;
             }
             breadcrumbs.push({
-                name: name[0].name,
+                name: name[0].name || 'Lectie',
                 url: `/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`,
             });
         } else {
