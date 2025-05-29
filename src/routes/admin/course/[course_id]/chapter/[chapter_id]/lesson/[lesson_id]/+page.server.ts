@@ -39,5 +39,13 @@ export const actions = {
         });
 
         return { success: true };
+    },
+    searchExercise: async ({ request, locals, params }) => {
+        const formData = await request.formData();
+        const exerciseId = formData.get('exerciseId') as string;
+
+        const exercise = await adminService.getExercise(exerciseId);
+
+        return { exercise };
     }
 };

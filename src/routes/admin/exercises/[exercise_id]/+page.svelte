@@ -10,7 +10,7 @@
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Loader2, PlayIcon, SaveIcon, TrashIcon } from '@lucide/svelte';
+	import { Loader2, PlayIcon, SaveIcon, TrashIcon, Clipboard } from '@lucide/svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -255,7 +255,7 @@
 						</Tabs.Content>
 
 						<Tabs.Content value="result" class="h-full w-full ">
-							<div class="flex h-full items-center justify-center ">
+							<div class="flex h-full items-center justify-center">
 								{#if lastRunCode !== null}
 									<iframe
 										title="Code Preview"
@@ -298,6 +298,16 @@
 				>
 			</Tabs.List>
 			<div class="flex-1"></div>
+
+			<Button
+				disabled={isSaving}
+				onclick={() => {
+					navigator.clipboard.writeText(data.exercise.id);
+					toast.success('ID-ul exercitiului a fost copiat in clipboard');
+				}}
+			>
+				<Clipboard class="size-4" />
+			</Button>
 
 			<Button disabled={isSaving} onclick={deleteExercise} variant="destructive">
 				{#if isSaving}

@@ -25,10 +25,12 @@
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
 	import { ArrowUp, ArrowDown } from 'lucide-svelte';
+	import { Search } from '@lucide/svelte';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
 	let oldLesson = $state(data.lesson);
+	let exercises = $state(data.exercises);
 	$effect(() => {
 		oldLesson = structuredClone($state.snapshot(data.lesson));
 	});
@@ -42,16 +44,24 @@
 	let activeTab = $state<'html' | 'css' | 'js'>('html');
 
 	let saving = $state(false);
+	let searching = $state(false);
 
 	async function saveLesson() {
 		saving = true;
 		try {
 			const formdata = new FormData();
-			formdata.append('lesson', JSON.stringify({
-				name: lesson.name !== oldLesson.name ? lesson.name : undefined,
-				teaser: lesson.teaser !== oldLesson.teaser ? lesson.teaser : undefined,
-				blocks: JSON.stringify($state.snapshot(lesson).blocks) !== JSON.stringify($state.snapshot(oldLesson).blocks) ? lesson.blocks : undefined
-			}));
+			formdata.append(
+				'lesson',
+				JSON.stringify({
+					name: lesson.name !== oldLesson.name ? lesson.name : undefined,
+					teaser: lesson.teaser !== oldLesson.teaser ? lesson.teaser : undefined,
+					blocks:
+						JSON.stringify($state.snapshot(lesson).blocks) !==
+						JSON.stringify($state.snapshot(oldLesson).blocks)
+							? lesson.blocks
+							: undefined
+				})
+			);
 
 			const response = await fetch('?/updateLesson', {
 				method: 'POST',
@@ -63,7 +73,6 @@
 				toast.success('Lecția a fost salvată cu succes', {
 					position: 'bottom-left'
 				});
-				console.log(result.data);
 				oldLesson = structuredClone($state.snapshot(lesson));
 			} else {
 				toast.error('A apărut o eroare la salvarea lecției', {
@@ -77,6 +86,44 @@
 			});
 		} finally {
 			saving = false;
+		}
+	}
+	async function searchExercise(exerciseId: string) {
+		if (exercises.find((exercise) => exercise.id === exerciseId)) {
+			return;
+		}
+		searching = true;
+		try {
+			const formdata = new FormData();
+			formdata.append('exerciseId', exerciseId);
+
+			const response = await fetch('?/searchExercise', {
+				method: 'POST',
+				body: formdata
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'success') {
+				toast.success('Exercițiul a fost găsit cu succes', {
+					position: 'bottom-left'
+				});
+				exercises.push(result.data?.exercise as unknown as (typeof exercises)[0]);
+			} else if (result.type === 'error') {
+				toast.error('A apărut o eroare la căutarea exercițiului', {
+					position: 'bottom-left'
+				});
+			} else if (result.type === 'failure') {
+				toast.error('Exercițiul nu există', {
+					position: 'bottom-left'
+				});
+			}
+		} catch (error) {
+			console.error('Error saving lesson:', error);
+			toast.error('A apărut o eroare la căutarea exercițiului', {
+				position: 'bottom-left'
+			});
+		} finally {
+			searching = false;
 		}
 	}
 
@@ -146,7 +193,7 @@
 	}
 </script>
 
-<main class="p-8">
+<main class="py-8">
 	<div class="mb-6 flex items-center justify-between">
 		<div class="flex items-center gap-6">
 			<h1 class="text-3xl font-bold tracking-tight">Editare lecție</h1>
@@ -216,20 +263,15 @@
 				{/if}
 
 				{#if block.type === 'exercise'}
-					{@const exercise = data.exercises.find((exercise) => exercise.id === block.exerciseId)}
-					{#if exercise}
-						{@render exerciseBlock(exercise)}
-					{:else}
-						<div class="flex h-full flex-col gap-4 p-4">
-							<p class="text-lg text-muted-foreground">Exercițiul nu există</p>
-						</div>
-					{/if}
+					{@render exerciseBlock(block, index)}
+
 				{/if}
 			</div>
 		</div>
 		{@render addBlock(index + 1)}
 	{/each}
 </main>
+
 {#snippet addBlock(index: number)}
 	<div class="relative -mb-4 -mt-4" id="adder">
 		<div class="group flex justify-center">
@@ -529,12 +571,22 @@
 	</div>
 {/snippet}
 
-{#snippet exerciseBlock(exercise: typeof data.exercises[0])}
+{#snippet exerciseBlock(
+	block: Extract<(typeof lesson.blocks)[0], { type: 'exercise' }>,
+	index: number
+)}
+	{@const exercise = exercises.find((exercise) => exercise.id === block.exerciseId) || null}
 	<div class="flex flex-col gap-4">
 		<div class="grid grid-cols-2 gap-4">
 			<div class="flex h-full flex-col gap-4">
 				<div class="flex items-center justify-center p-8">
-					<p class="text-lg text-muted-foreground">🚧 Această secțiune este în lucru</p>
+					<Input bind:value={block.exerciseId} placeholder="ID-ul exercițiului" />
+					<Button
+						onclick={() => searchExercise(block.exerciseId)}
+						disabled={searching || Boolean(exercise)}
+					>
+						<Search class="h-4 w-4" />
+					</Button>
 				</div>
 			</div>
 
@@ -542,11 +594,11 @@
 				<Card class="space-y-4">
 					<div class="flex items-center gap-2 px-4 pt-4">
 						<BookOpen class="h-5 w-5 text-primary" />
-						<h3 class="text-lg font-semibold">Exercițiu: {exercise.title}</h3>
+						<h3 class="text-lg font-semibold">Exercițiu: {exercise?.title}</h3>
 					</div>
 					<Separator />
 					<div class="flex items-start gap-2 px-4">
-						<p class="text-sm text-muted-foreground">{exercise.summary}</p>
+						<p class="text-sm text-muted-foreground">{exercise?.summary}</p>
 					</div>
 					<div class="flex items-center justify-end gap-2 px-4 pb-4">
 						<div class="flex items-center gap-1.5">
