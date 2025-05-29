@@ -6,7 +6,7 @@
 	import { page } from '$app/stores';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { LogOut, LogIn, UserRound, Settings } from 'lucide-svelte';
+	import { LogOut, LogIn, UserRound, Settings, X } from 'lucide-svelte';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
@@ -85,7 +85,6 @@
 	});
 </script>
 
-{@render my_header()}
 <div class="flex min-h-screen w-full {isMobile.current ? 'flex-col-reverse' : 'flex-row'}">
 	<!-- w-full border-b bg-card lg:fixed lg:right-0 lg:h-screen lg:w-96 lg:border-b-0 lg:border-l -->
 
@@ -123,7 +122,9 @@
 						{#if exercise}
 							{@render exerciseBlock(exercise)}
 						{:else}
-							<div class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6">
+							<div
+								class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
+							>
 								<p class="text-muted-foreground">Exercițiu nu a fost găsit</p>
 							</div>
 						{/if}
@@ -146,116 +147,62 @@
 			</div>
 		</div>
 	</main>
-	{#if showSidebar}
-		<aside class="border-b bg-card md:max-w-96">
-			<div class="flex flex-col">
-				<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
-					<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
-					<p class="mb-6 text-sm text-muted-foreground">
-						Parcurge toate lecțiile pentru a finaliza acest capitol
-					</p>
-
-					<div class="space-y-3">
-						{#each data.lessonNamesInChapter as lesson, i}
-							<a
-								href="./{lesson.id}"
-								class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
-								onclick={() => (showSidebar = false)}
-							>
-								<span
-									class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20"
-								>
-									{i + 1}
-								</span>
-								<span class="flex-1 font-medium">{lesson.name}</span>
-								{#if lesson.id === data.lesson.id}
-									<div class="h-2 w-2 rounded-full bg-primary"></div>
-								{/if}
-							</a>
-						{/each}
+	<aside class="border-b bg-card md:max-w-96">
+		<div class="flex flex-col">
+			<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
+				<div class="flex items-center justify-between">
+					<div>
+						<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
+						<p class="mb-6 text-sm text-muted-foreground">
+							Parcurge toate lecțiile pentru a finaliza acest capitol
+						</p>
 					</div>
+					<Button variant="ghost" onclick={() => (showSidebar = !showSidebar)} class="md:hidden">
+						<MenuIcon class="h-4 w-4" />
+					</Button>
 				</div>
-				<Separator />
-				<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
-					<h3 class="mb-2 text-xl font-semibold">Progres</h3>
-					<p class="text-sm text-muted-foreground">
-						Ai completat {data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1} din
-						{data.lessonNamesInChapter.length} lecții
-					</p>
-					<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
-						<div
-							class="h-full bg-primary"
-							style="width: {((data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) +
-								1) /
-								data.lessonNamesInChapter.length) *
-								100}%"
-						></div>
-					</div>
+
+				<div class="space-y-3 {showSidebar ? '' : 'hidden'} md:block">
+					{#each data.lessonNamesInChapter as lesson, i}
+						<a
+							href="./{lesson.id}"
+							class="group flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-muted"
+							onclick={() => (showSidebar = false)}
+						>
+							<span
+								class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-medium text-primary group-hover:bg-primary/20"
+							>
+								{i + 1}
+							</span>
+							<span class="flex-1 font-medium">{lesson.name}</span>
+							{#if lesson.id === data.lesson.id}
+								<div class="h-2 w-2 rounded-full bg-primary"></div>
+							{/if}
+						</a>
+					{/each}
 				</div>
 			</div>
-		</aside>
-	{/if}
+			<Separator class="{showSidebar ? '' : 'hidden'} md:block" />
+			<div class="rounded-xl bg-muted/50 p-6 shadow-sm {showSidebar ? '' : 'hidden'} md:block">
+				<h3 class="mb-2 text-xl font-semibold">Progres</h3>
+				<p class="text-sm text-muted-foreground">
+					Ai completat {data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1} din
+					{data.lessonNamesInChapter.length} lecții
+				</p>
+				<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+					<div
+						class="h-full bg-primary"
+						style="width: {((data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) +
+							1) /
+							data.lessonNamesInChapter.length) *
+							100}%"
+					></div>
+				</div>
+			</div>
+		</div>
+	</aside>
 </div>
 
-{#snippet my_header()}
-	<header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-		<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
-		<div class="flex-1"></div>
-		{#if data.user}
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger>
-					<Avatar.Root>
-						<Avatar.Fallback
-							>{data
-								.user!.username.split(' ')
-								.map((name) => name[0])
-								.join('')}</Avatar.Fallback
-						>
-					</Avatar.Root>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content>
-					<DropdownMenu.Group>
-						<DropdownMenu.GroupHeading>
-							{data.user!.username}
-						</DropdownMenu.GroupHeading>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item>
-							<UserRound class="h-4 w-4" />
-							<a href={`/profile`}>Profil</a>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item
-							onclick={() => {
-								isDarkTheme = !isDarkTheme;
-							}}
-						>
-							<Sun
-								class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-							/>
-							<Moon
-								class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-							/>
-							<span class="dark:hidden">Tema luminoasa</span>
-							<span class="hidden dark:block">Tema întunecoasa</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item onclick={logout}>
-							<LogOut class="h-4 w-4 text-destructive" />
-							<span class="font-medium text-destructive">Deconectare</span>
-						</DropdownMenu.Item>
-					</DropdownMenu.Group>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
-			<Button variant="ghost" onclick={() => (showSidebar = !showSidebar)}>
-				<MenuIcon class="h-4 w-4" />
-			</Button>
-		{:else}
-			<a href="/login" class="flex items-center gap-2">
-				<LogIn class="h-4 w-4" />
-				<span class="font-medium">Conectare</span>
-			</a>
-		{/if}
-	</header>
-{/snippet}
 {#snippet textBlock(block: Extract<(typeof lesson.blocks)[0], { type: 'text' }>)}
 	<div class="markdown-content prose prose-slate max-w-none">
 		{@html marked(block.text)}
@@ -368,10 +315,7 @@
 {/snippet}
 
 {#snippet exerciseBlock(exercise: (typeof data.exercises)[0])}
-	<a
-		href="/exercises/{exercise.id}"
-		class="block transition-all duration-200 hover:scale-[1.02]"
-	>
+	<a href="/exercises/{exercise.id}" class="block transition-all duration-200 hover:scale-[1.02]">
 		<Card
 			class="space-y-4 transition-colors duration-200 hover:bg-muted/50 {exercise.hasSubmission
 				? 'bg-primary/10'
