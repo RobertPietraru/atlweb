@@ -52,7 +52,7 @@ export const actions = {
             return fail(400, { message: 'Nu ai permisiunea sa stergi exercitiul' });
         }
         await adminService.deleteExercise(params.exercise_id);
-        redirect(302, '/exercises/');
+        redirect(302, '/admin/exercises/');
     }
 
 }

@@ -79,32 +79,35 @@
 		{#each data.exercises as exercise}
 			<a href="/admin/exercises/{exercise.id}" class="block">
 				<Card
-					class="group cursor-pointer border-2 transition-all hover:scale-[1.01] hover:border-primary hover:shadow-md"
+					class="group flex cursor-pointer items-end justify-between overflow-hidden border-2 transition-all hover:scale-[1.01] hover:border-primary hover:shadow-lg"
 				>
-					<CardContent class="p-4">
-						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-3">
-								<div class="rounded-full bg-primary/10 p-2">
-									<BookOpenIcon class="h-5 w-5 text-primary" />
+					<CardContent class="relative p-6">
+						<div class="flex items-start justify-between gap-6">
+							<div class="flex items-start gap-4">
+								<div class="rounded-xl bg-primary/10 p-3">
+									<BookOpenIcon class="h-6 w-6 text-primary" />
 								</div>
-								<div>
-									<h2 class="text-xl font-semibold group-hover:text-primary">
+								<div class="space-y-1">
+									<h2
+										class="text-2xl font-semibold tracking-tight transition-colors group-hover:text-primary"
+									>
 										{exercise.title}
 									</h2>
-									<p class="text-sm text-muted-foreground">{exercise.summary}</p>
+									<p class="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+										{exercise.summary}
+									</p>
 								</div>
-							</div>
-							<div class="flex items-center gap-2">
-								<Button
-									variant="outline"
-									class="group-hover:bg-primary group-hover:text-primary-foreground"
-								>
-									Editeaza
-									<ArrowUpRightIcon class="ml-2 h-4 w-4" />
-								</Button>
 							</div>
 						</div>
 					</CardContent>
+					<Button
+						variant="outline"
+						class="shrink-0 transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
+					>
+						<ArrowUpRightIcon
+							class="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+						/>
+					</Button>
 				</Card>
 			</a>
 		{/each}

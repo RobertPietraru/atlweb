@@ -10,11 +10,12 @@
 	import * as Resizable from '$lib/components/ui/resizable/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Loader2, PlayIcon, SaveIcon } from '@lucide/svelte';
+	import { Loader2, PlayIcon, SaveIcon, TrashIcon } from '@lucide/svelte';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { deserialize } from '$app/forms';
+	import { goto } from '$app/navigation';
 	let { data } = $props();
 	const carta = new Carta({} as Options);
 
@@ -44,11 +45,6 @@
 		JSON.stringify($state.snapshot(lastSavedCode)) === JSON.stringify($state.snapshot(code)) &&
 			JSON.stringify($state.snapshot(lastSavedForm)) === JSON.stringify($state.snapshot(form))
 	);
-	let codeHasChanged = $derived(
-		JSON.stringify($state.snapshot(lastSavedCode)) !== JSON.stringify($state.snapshot(code))
-	);
-	$inspect(form);
-	$inspect(lastSavedForm);
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
 	let handleKeyDown = (e: KeyboardEvent) => {
@@ -115,6 +111,35 @@
 				lastSavedForm = structuredClone($state.snapshot(form));
 
 				console.log(result.data);
+			} else if (result.type === 'failure') {
+				toast.error(
+					(result.data?.message as string | undefined | null) ??
+						'A apărut o eroare la salvarea exercitiului',
+					{
+						position: 'bottom-left'
+					}
+				);
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error('A apărut o eroare la salvarea exercitiului');
+		} finally {
+			isSaving = false;
+		}
+	}
+	async function deleteExercise() {
+		try {
+			isSaving = true;
+			const formData = new FormData();
+			const response = await fetch('?/delete', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'redirect') {
+				toast.success('Exercitiul a fost sters cu succes');
+				goto(result.location);
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
@@ -273,6 +298,16 @@
 				>
 			</Tabs.List>
 			<div class="flex-1"></div>
+
+			<Button disabled={isSaving} onclick={deleteExercise} variant="destructive">
+				{#if isSaving}
+					<Loader2 class="size-4 animate-spin" />
+				{:else}
+					<TrashIcon class="size-4" />
+				{/if}
+				<span>Sterge</span>
+			</Button>
+
 			<Button disabled={isSaved || isSaving} onclick={save}>
 				{#if isSaving}
 					<Loader2 class="size-4 animate-spin" />
