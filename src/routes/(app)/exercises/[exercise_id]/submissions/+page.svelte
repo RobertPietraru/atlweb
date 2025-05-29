@@ -13,7 +13,7 @@
 	} from 'lucide-svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import * as Popover from '$lib/components/ui/popover/index.js';
+
 	let { data } = $props();
 
 	let code = $state({

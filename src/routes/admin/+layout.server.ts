@@ -54,7 +54,7 @@ export const load = async ({ locals, params, url }) => {
     if (exerciseId) {
         breadcrumbs.push({
             name: 'Exercitiu',
-            url: `/admin/exercise/${exerciseId}`
+            url: `/admin/exercises/${exerciseId}`
         });
     }
 

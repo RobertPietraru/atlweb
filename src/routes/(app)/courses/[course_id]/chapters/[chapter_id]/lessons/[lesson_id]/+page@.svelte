@@ -369,7 +369,7 @@
 
 {#snippet exerciseBlock(exercise: (typeof data.exercises)[0])}
 	<a
-		href="/exercise/{exercise.id}"
+		href="/exercises/{exercise.id}"
 		class="block transition-all duration-200 hover:scale-[1.02]"
 	>
 		<Card

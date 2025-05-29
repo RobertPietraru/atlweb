@@ -4,11 +4,11 @@ import { adminService } from '$lib/injection';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user) {
-        redirect(302, '/login?redirect=/exercise/' + params.id);
+        redirect(302, '/login?redirect=/exercises/' + params.exercise_id);
     }
 
-    const exercise = await adminService.getExercise(params.id);
-    const submissions = await adminService.getSubmissions(params.id);
+    const exercise = await adminService.getExercise(params.exercise_id);
+    const submissions = await adminService.getSubmissions(params.exercise_id);
     
     const isHelper = locals.user!.permissions.includes('submission.solve');
     if (!exercise) {
@@ -28,7 +28,7 @@ export const actions= {
         const html = formData.get('html') ?? '';
         const css = formData.get('css') ?? '';
         const javascript = formData.get('javascript') ?? '';
-        const exerciseId = params.id;
+        const exerciseId = params.exercise_id;
         const needHelp = formData.get('needHelp') ?? 'false';
         if (!html && !css && !javascript ) {
             return fail(400, { message: 'Nu ai trimis codul' });

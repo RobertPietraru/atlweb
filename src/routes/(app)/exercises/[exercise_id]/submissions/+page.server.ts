@@ -4,21 +4,19 @@ import { adminService } from '$lib/injection';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user) {
-        redirect(302, `/login?redirect=/exercise/${params.id}/submissions`);
+        redirect(302, `/login?redirect=/exercises/${params.exercise_id}/submissions`);
     }
 
     if (!locals.user!.permissions.includes('submission.solve')) {
         error(403, 'Nu ai permisiunea sa rezolvi exercitiile');
     }
 
-    const exercise = await adminService.getExercise(params.id);
+    const exercise = await adminService.getExercise(params.exercise_id);
     if (!exercise) {
         error(404, 'Exercise not found');
     }
 
-    const submissions = await adminService.getSubmissionsToCheck(params.id);
-
-
+    const submissions = await adminService.getSubmissionsToCheck(params.exercise_id);
 
     return {
         exercise,
@@ -41,7 +39,7 @@ export const actions = {
             return fail(400, { message: 'Nu ai permisiunea sa trimiti codul' });
         }
 
-        const submission = await adminService.createSubmission(params.id, locals.user.id, {
+        const submission = await adminService.createSubmission(params.exercise_id, locals.user.id, {
             html: html as string,
             css: css as string,
             needHelp: needHelp === 'true',
