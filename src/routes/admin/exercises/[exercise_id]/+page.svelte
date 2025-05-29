@@ -63,6 +63,7 @@
 					lastRunCode = structuredClone($state.snapshot(code));
 				}, 0);
 			}
+			save();
 		}
 	};
 
