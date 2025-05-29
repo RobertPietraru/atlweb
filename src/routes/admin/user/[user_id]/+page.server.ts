@@ -18,7 +18,7 @@ export const load = async ({ params, locals }) => {
     if (!locals.user!.permissions.includes('user.view')) {
         redirect(302, '/');
     }
-    const user = await adminService.getUser(params.id);
+    const user = await adminService.getUser(params.user_id);
     if (!user) {
         throw error(404, 'User not found');
     }
@@ -39,7 +39,7 @@ export const actions = {
         if (!locals.user!.permissions.includes('user.delete')) {
             error(403, 'Nu aveți permisiune să ștergeți utilizatori');
         }
-        await adminService.deleteUser(params.id);
+        await adminService.deleteUser(params.user_id);
         redirect(302, '/admin/users');
     },
 
@@ -53,7 +53,7 @@ export const actions = {
         }
 
         const { email, username } = form.data;
-        const result = await adminService.updateUser(event.params.id, { email, username });
+        const result = await adminService.updateUser(event.params.user_id, { email, username });
 
         if (result === 'emailAlreadyExists') {
             setError(form, 'email', 'Această adresă de email este deja folosită');
@@ -81,7 +81,7 @@ export const actions = {
         if (!form.valid) {
             return fail(400, { form });
         }
-        await adminService.updateUserPermissions(event.params.id, form.data.permissions.filter(permission => permissionsList.includes(permission as table.Permissions)) as table.Permissions[]);
+        await adminService.updateUserPermissions(event.params.user_id, form.data.permissions.filter(permission => permissionsList.includes(permission as table.Permissions)) as table.Permissions[]);
         return { form };
     }
 };

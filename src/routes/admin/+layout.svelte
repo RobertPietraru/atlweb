@@ -40,8 +40,8 @@
 			console.error('Failed to logout');
 		}
 	}
-	const removeContainer = $derived(page.url.pathname.includes('/exercises/create') || page.url.pathname.includes('/exercise/'));
 </script>
+
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
 	<div class="flex-1"></div>
@@ -148,7 +148,11 @@
 	</div>
 </header>
 
-<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl  {removeContainer ? 'pl-4' : 'container'} space-y-4 py-4">
+<div
+	class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl {data.isExercisePage
+		? 'pl-4'
+		: 'container'} space-y-4 py-4"
+>
 	<Breadcrumb.Root class="flex items-center">
 		<Breadcrumb.List>
 			<Breadcrumb.Separator />

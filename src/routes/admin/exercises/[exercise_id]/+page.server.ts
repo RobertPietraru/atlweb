@@ -6,11 +6,16 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user) {
         redirect(302, '/login?redirect=/exercises/');
     }
+    const exercise = await adminService.getExercise(params.exercise_id);
+    if (!exercise) {
+        redirect(302, '/exercises/');
+    }
     // if (!locals.user.permissions.includes('exercise.create')) {
     //     redirect(302, '/exercises/');
     // }
 
     return {
+        exercise
     };
 };
 

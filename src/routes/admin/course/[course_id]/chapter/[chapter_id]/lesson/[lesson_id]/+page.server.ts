@@ -18,7 +18,7 @@ export const load = async ({ locals, params }) => {
     return {
         lesson,
         exercises,
-        courseId: params.id,
+        courseId: params.course_id,
         chapterId: params.chapter_id,
     };
 };

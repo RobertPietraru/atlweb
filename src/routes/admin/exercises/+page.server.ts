@@ -11,7 +11,7 @@ export const load = async ({ locals, url }) => {
         redirect(302, '/');
     }
 
-    const {exercises, total} = await adminService.getExercises({
+    const { exercises, total } = await adminService.getExercises({
         page,
         pageSize,
         search: search,
@@ -25,3 +25,19 @@ export const load = async ({ locals, url }) => {
         search,
     };
 };
+
+export const actions = {
+    create: async ({ request }) => {
+        console.log('Creating exercise');
+        const id = await adminService.createExercise({
+            title: '',
+            summary: '',
+            instructions: '',
+            initialHtml: '',
+            initialCss: '',
+            initialJavascript: '',
+        });
+        console.log(id);
+        redirect(302, `/admin/exercises/${id}`);
+    }
+}

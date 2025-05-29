@@ -19,7 +19,7 @@ export const load = async ({ locals, params }) => {
         error(403, 'You do not have permission to view this course');
     }
 
-    const course = await adminService.getCourseWithChapters(params.id);
+    const course = await adminService.getCourseWithChapters(params.course_id);
     if (!course) {
         error(404, 'Course not found');
     }
@@ -44,12 +44,12 @@ export const actions = {
             error(403, 'Nu ai permisiunea să creezi un capitol');
         }
 
-        let id = await adminService.createChapter(params.id, {
+        let id = await adminService.createChapter(params.course_id, {
             name: 'Capitol nou',
             description: 'Descrierea capitolului'
         });
         cache.courses = null;
-        redirect(302, `/admin/course/${params.id}/chapter/${id}`);
+        redirect(302, `/admin/course/${params.course_id}/chapter/${id}`);
     },
     update: async ({ request, locals, params }) => {
         const hasPermission = locals.user!.permissions.includes('course.edit') 
@@ -62,7 +62,7 @@ export const actions = {
             error(403, 'Nu ai permisiunea să editezi acest curs');
         }
 
-        await adminService.updateCourse(params.id, {
+        await adminService.updateCourse(params.course_id, {
             name: name as string,
             description: description as string
         });
@@ -75,7 +75,7 @@ export const actions = {
         if (!hasPermission) {
             redirect(302, '/');
         }
-        const course = await adminService.getCourseWithChapters(params.id);
+        const course = await adminService.getCourseWithChapters(params.course_id);
 
         if (!course) {
             error(404, 'Course not found');

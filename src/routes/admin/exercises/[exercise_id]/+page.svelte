@@ -18,14 +18,14 @@
 	const carta = new Carta({} as Options);
 
 	let code = $state({
-		html: '',
-		css: '',
-		javascript: ''
+		html: data.exercise.initialHtml,
+		css: data.exercise.initialCss,
+		javascript: data.exercise.initialJavascript
 	});
 	let form = $state({
-		title: '',
-		summary: '',
-		instructions: ''
+		title: data.exercise.title,
+		summary: data.exercise.summary,
+		instructions: data.exercise.instructions
 	});
 
 	let lastRunCode: { html: string; css: string; javascript: string } | null = $state(null);
@@ -99,15 +99,6 @@
 		});
 	});
 
-	function setCode(params: { css: string; html: string; javascript: string }) {
-		code.css = params.css;
-		code.html = params.html;
-		code.javascript = params.javascript;
-		htmlEditor?.setValue(params.html);
-		cssEditor?.setValue(params.css);
-		jsEditor?.setValue(params.javascript);
-		toast.success('Codul a fost adus la cel de atunci');
-	}
 	function getCodePreview(params: { css: string; html: string; javascript: string }) {
 		const css = params.css ?? '';
 		const html = params.html ?? '';

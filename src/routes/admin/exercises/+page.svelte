@@ -2,15 +2,15 @@
 	import { withSearchParameters } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
 	import { page } from '$app/state';
-	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
-	import { ArrowUpRightIcon, BookOpenIcon, SearchIcon } from 'lucide-svelte';
+	import { Card, CardContent } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
-	import { Plus, Search } from '@lucide/svelte';
+	import { Plus, Search, Loader2, ArrowUpRightIcon, BookOpenIcon } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	const isMobile = new IsMobile();
 
 	let { data } = $props();
+	let loading = $state(false);
 </script>
 
 <main class="min-h-[100vh] w-full">
@@ -54,12 +54,24 @@
 					<Search />
 				</Button>
 			</div>
-			<Button type="submit" href="/admin/exercises/create" data-test="create-exercise-button">
-				<Plus />
-				{#if !isMobile.current}
-					Creeaza exercitiu nou
-				{/if}
-			</Button>
+			<form
+				action="?/create"
+				method="post"
+				onsubmit={() => {
+					loading = true;
+				}}
+			>
+				<Button type="submit" disabled={loading} data-test="create-exercise-button">
+					{#if loading}
+						<Loader2 class="size-4 animate-spin" />
+					{:else}
+						<Plus />
+					{/if}
+					{#if !isMobile.current}
+						Creeaza exercitiu nou
+					{/if}
+				</Button>
+			</form>
 		</div>
 	</div>
 

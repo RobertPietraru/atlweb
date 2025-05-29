@@ -1,6 +1,6 @@
 
 export const load = async ({ locals, params, url }) => {
-    const courseId = params.id;
+    const courseId = params.course_id;
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
     const exerciseId = params.exercise_id;
@@ -28,13 +28,6 @@ export const load = async ({ locals, params, url }) => {
             name: 'Exercitii',
             url: '/admin/exercises'
         });
-
-        if (url.pathname.includes('/create')) {
-            breadcrumbs.push({
-                name: 'Exercitiu nou',
-                url: '/admin/exercises/create'
-            });
-        }
     }
 
     if (courseId) {
@@ -68,6 +61,7 @@ export const load = async ({ locals, params, url }) => {
     return {
         user: locals.user,
         canViewAdminPage: locals.user?.permissions.includes('course.view'),
-        breadcrumbs: breadcrumbs
+        breadcrumbs: breadcrumbs,
+        isExercisePage: Boolean(exerciseId)
     };
 };
