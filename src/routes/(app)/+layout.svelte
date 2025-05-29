@@ -1,9 +1,6 @@
 <script lang="ts">
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { ShieldUser, LogOut, LogIn, UserRound, Settings, Loader2 } from 'lucide-svelte';
-	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
@@ -185,10 +182,6 @@
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">Contact</h3>
 			<nav class="flex flex-col gap-2">
-				<p class="text-muted-foreground">Prof. coordonator:</p>
-				<p class="hover:text-primary">Giocaș Afrodita</p>
-				<p class="hover:text-primary">Cardaș Cerasela</p>
-
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
 					<a href="https://github.com/RobertPietraru/atlweb" class="hover:text-primary">GitHub</a>

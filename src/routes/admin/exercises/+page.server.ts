@@ -4,6 +4,7 @@ import { redirect } from '@sveltejs/kit';
 export const load = async ({ locals, url }) => {
     const page = Number(url.searchParams.get('page') || '1') - 1;
     const pageSize = Number(url.searchParams.get('pageSize') || '10');
+    const search = url.searchParams.get('search') || '';
     const hasPermission = locals.user!.permissions.includes('course.view')
 
     if (!hasPermission) {
@@ -13,6 +14,7 @@ export const load = async ({ locals, url }) => {
     const {exercises, total} = await adminService.getExercises({
         page,
         pageSize,
+        search: search,
     });
     const pagesLeft = Math.ceil(total / pageSize);
 
@@ -20,5 +22,6 @@ export const load = async ({ locals, url }) => {
         exercises,
         total,
         pagesLeft,
+        search,
     };
 };

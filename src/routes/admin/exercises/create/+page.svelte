@@ -53,7 +53,7 @@
 
 	onMount(async () => {
 		window.addEventListener('keydown', handleKeyDown);
-		monaco = (await import('./monaco')).default;
+		monaco = (await import('./monaco.js')).default;
 
 		htmlEditor = monaco.editor.create(htmlEditorContainer!, {
 			theme: 'vs-dark',
@@ -135,115 +135,117 @@
 	});
 </script>
 
-<Resizable.PaneGroup direction="horizontal">
-	<Resizable.Pane defaultSize={25}>
-		<Resizable.PaneGroup direction="vertical" class="">
-			<Resizable.Pane defaultSize={50}>
-				<Tabs.Root class="h-full" bind:value={activeSidebarTab}>
-					<Tabs.List class="w-full border-b">
-						<Tabs.Trigger
-							value="description"
-							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-							>Descriere</Tabs.Trigger
-						>
-						<Tabs.Trigger
-							value="result"
-							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-							>Rezultat</Tabs.Trigger
-						>
-					</Tabs.List>
+<main class="min-h-[100vh] w-full mx-0">
+	<Resizable.PaneGroup direction="horizontal">
+		<Resizable.Pane defaultSize={25}>
+			<Resizable.PaneGroup direction="vertical" class="">
+				<Resizable.Pane defaultSize={50}>
+					<Tabs.Root class="h-full" bind:value={activeSidebarTab}>
+						<Tabs.List class="w-full border-b">
+							<Tabs.Trigger
+								value="description"
+								class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+								>Descriere</Tabs.Trigger
+							>
+							<Tabs.Trigger
+								value="result"
+								class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+								>Rezultat</Tabs.Trigger
+							>
+						</Tabs.List>
 
-					<Tabs.Content value="description" class="h-full w-full p-4">
-						{@render exerciseDescription()}
-					</Tabs.Content>
+						<Tabs.Content value="description" class="h-full w-full p-4">
+							{@render exerciseDescription()}
+						</Tabs.Content>
 
-					<Tabs.Content value="result" class="h-full w-full ">
-						<div class="flex h-full items-center justify-center">
-							{#if lastRunCode !== null}
-								<iframe
-									title="Code Preview"
-									class="h-full w-full"
-									srcdoc={getCodePreview(lastRunCode)}
-									sandbox="allow-scripts"
-								></iframe>
-							{/if}
-						</div>
-					</Tabs.Content>
-				</Tabs.Root>
-			</Resizable.Pane>
-		</Resizable.PaneGroup>
-	</Resizable.Pane>
-	<Resizable.Handle withHandle class="bg-muted" />
-	<Resizable.Pane class="p-0">
-		{@render editor()}
-	</Resizable.Pane>
-	<Resizable.Handle withHandle />
-</Resizable.PaneGroup>
-{#snippet editor()}
-	<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
-		<div class="flex items-center gap-4">
-			<Tabs.List class="m-0 p-0">
-				<Tabs.Trigger
-					value="html"
-					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
-					>HTML</Tabs.Trigger
+						<Tabs.Content value="result" class="h-full w-full ">
+							<div class="flex h-full items-center justify-center">
+								{#if lastRunCode !== null}
+									<iframe
+										title="Code Preview"
+										class="h-full w-full"
+										srcdoc={getCodePreview(lastRunCode)}
+										sandbox="allow-scripts"
+									></iframe>
+								{/if}
+							</div>
+						</Tabs.Content>
+					</Tabs.Root>
+				</Resizable.Pane>
+			</Resizable.PaneGroup>
+		</Resizable.Pane>
+		<Resizable.Handle withHandle class="bg-muted" />
+		<Resizable.Pane class="p-0">
+			{@render editor()}
+		</Resizable.Pane>
+		<Resizable.Handle withHandle />
+	</Resizable.PaneGroup>
+	{#snippet editor()}
+		<Tabs.Root class="h-[calc(100vh-4rem)]" bind:value={activeCodeTab}>
+			<div class="flex items-center gap-4">
+				<Tabs.List class="m-0 p-0">
+					<Tabs.Trigger
+						value="html"
+						class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
+						>HTML</Tabs.Trigger
+					>
+					<Tabs.Trigger
+						value="css"
+						class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
+						>CSS</Tabs.Trigger
+					>
+					<Tabs.Trigger
+						value="javascript"
+						class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
+						>JavaScript</Tabs.Trigger
+					>
+				</Tabs.List>
+				<div class="flex-1"></div>
+
+				<Button
+					class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+					onclick={async () => {
+						activeSidebarTab = 'result';
+						if (
+							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
+						) {
+							lastRunCode = structuredClone($state.snapshot(code));
+						} else {
+							lastRunCode = null;
+							await new Promise((resolve) => setTimeout(resolve, 0));
+							lastRunCode = structuredClone($state.snapshot(code));
+						}
+					}}
 				>
-				<Tabs.Trigger
-					value="css"
-					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
-					>CSS</Tabs.Trigger
-				>
-				<Tabs.Trigger
-					value="javascript"
-					class="m-0  h-full flex-1 rounded-t-md data-[state=active]:bg-[#1e1e1e] data-[state=active]:text-white"
-					>JavaScript</Tabs.Trigger
-				>
-			</Tabs.List>
-			<div class="flex-1"></div>
+					<PlayIcon class="size-4" />
+					<span>Ruleaza</span>
+				</Button>
+			</div>
+			<Tabs.Content value="html" class="mt-0 h-full w-full ">
+				<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
+			</Tabs.Content>
+			<Tabs.Content value="css" class="mt-0 h-full w-full ">
+				<div bind:this={cssEditorContainer} class="h-full w-full" id="css-editor"></div>
+			</Tabs.Content>
+			<Tabs.Content value="javascript" class="mt-0 h-full w-full ">
+				<div bind:this={jsEditorContainer} class="h-full w-full" id="javascript-editor"></div>
+			</Tabs.Content>
+		</Tabs.Root>
+	{/snippet}
 
-			<Button
-				class="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-				onclick={async () => {
-					activeSidebarTab = 'result';
-					if (
-						JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
-					) {
-						lastRunCode = structuredClone($state.snapshot(code));
-					} else {
-						lastRunCode = null;
-						await new Promise((resolve) => setTimeout(resolve, 0));
-						lastRunCode = structuredClone($state.snapshot(code));
-					}
-				}}
-			>
-				<PlayIcon class="size-4" />
-				<span>Ruleaza</span>
-			</Button>
-		</div>
-		<Tabs.Content value="html" class="mt-0 h-full w-full ">
-			<div bind:this={htmlEditorContainer} class="h-full w-full" id="html-editor"></div>
-		</Tabs.Content>
-		<Tabs.Content value="css" class="mt-0 h-full w-full ">
-			<div bind:this={cssEditorContainer} class="h-full w-full" id="css-editor"></div>
-		</Tabs.Content>
-		<Tabs.Content value="javascript" class="mt-0 h-full w-full ">
-			<div bind:this={jsEditorContainer} class="h-full w-full" id="javascript-editor"></div>
-		</Tabs.Content>
-	</Tabs.Root>
-{/snippet}
-
-{#snippet exerciseDescription()}
-	<ScrollArea class="h-full w-full">
-		<Textarea bind:value={form.title} class="h-full w-full" />
-		<Textarea bind:value={form.summary} class="h-full w-full" />
-		<Separator class="my-4" />
-		<Textarea bind:value={form.instructions} class="h-full w-full" />
-		<Separator class="my-4" />
-		<div class="markdown-content">
-			{@html marked(form.instructions)}
-		</div>
-	</ScrollArea>
-{/snippet}
+	{#snippet exerciseDescription()}
+		<ScrollArea class="h-full w-full">
+			<Textarea bind:value={form.title} class="h-full w-full" />
+			<Textarea bind:value={form.summary} class="h-full w-full" />
+			<Separator class="my-4" />
+			<Textarea bind:value={form.instructions} class="h-full w-full" />
+			<Separator class="my-4" />
+			<div class="markdown-content">
+				{@html marked(form.instructions)}
+			</div>
+		</ScrollArea>
+	{/snippet}
+</main>
 
 <style>
 	:global(.markdown-content h1) {

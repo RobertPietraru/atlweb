@@ -10,6 +10,6 @@ export const load = async ({ locals, params }) => {
 
     return {
         chapter,
-        courseId: params.id
+        courseId: params.course_id,
     };
 };

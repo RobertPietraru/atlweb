@@ -4,7 +4,7 @@ import { adminService } from '$lib/injection';
 export const load = async ({ locals, params }) => {
     const { lesson, exercises } = await adminService.getLessonWithBlocks(params.lesson_id, locals.user?.id ?? null);
     const lessonNamesInChapter = await adminService.getLessonNamesInChapter(params.chapter_id);
-    const courseId = params.id;
+    const courseId = params.course_id;
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
     const breadcrumbs = await adminService.getBreadcrumbs(courseId ?? null, chapterId ?? null, lessonId ?? null) ?? [];
@@ -22,7 +22,7 @@ export const load = async ({ locals, params }) => {
         exercises,
         user: locals.user,
         breadcrumbs: breadcrumbs,
-        courseId: params.id,
+        courseId: params.course_id,
         chapterId: params.chapter_id,
         lessonNamesInChapter
     };
