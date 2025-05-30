@@ -17,8 +17,8 @@ async function Auth(db: PostgresJsDatabase) {
   // Insert users
   await db.insert(tables.user).values([
     {
-      email: 'admin@pietrocka.com',
-      username: 'Robert Pietraru 3 ',
+      email: 'robert@pietrocka.com',
+      username: 'Robert Pietraru 4',
       passwordHash: passwordHash,
       permissions: [
         'exercise.create',

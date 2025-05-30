@@ -4,6 +4,7 @@
 	import { Sun, Moon } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 
@@ -40,6 +41,7 @@
 		}
 	}
 </script>
+
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
 	<div class="flex-1"></div>
@@ -97,14 +99,14 @@
 								{/if}
 							</div>
 							<div class="flex flex-col gap-1 px-2 py-1.5">
-								<p class="truncate text-sm font-medium">{data.user.username}</p>
-								<p class="text-xs capitalize text-muted-foreground">
+								<span class="truncate text-sm font-medium">{data.user.username}</span>
+								<span class="text-xs capitalize text-muted-foreground">
 									{#if data.canViewAdminPage}
 										Cont de administrator
 									{:else}
 										Utilizator
 									{/if}
-								</p>
+								</span>
 							</div>
 						</div>
 					</DropdownMenu.Label>
@@ -146,7 +148,11 @@
 	</div>
 </header>
 
-<div class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl container space-y-4 py-4">
+<div
+	class="min-h-[calc(100vh-4rem)] flex-1 rounded-xl {data.isExercisePage
+		? 'pl-4'
+		: 'container'} space-y-4 py-4"
+>
 	<Breadcrumb.Root class="flex items-center">
 		<Breadcrumb.List>
 			<Breadcrumb.Separator />
@@ -197,10 +203,6 @@
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">Contact</h3>
 			<nav class="flex flex-col gap-2">
-				<p class="text-muted-foreground">Prof. coordonator:</p>
-				<p class="hover:text-primary">Giocaș Afrodita</p>
-				<p class="hover:text-primary">Cardaș Cerasela</p>
-
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
 					<a href="https://github.com/RobertPietraru/atlweb" class="hover:text-primary">GitHub</a>
@@ -210,7 +212,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<p>©2025 ATLWEB - Toate drepturile rezervate</p>
-		<p>Făcut cu ❤️ în România</p>
+		<span>©2025 ATLWEB - Toate drepturile rezervate</span>
+		<span>Făcut cu ❤️ în România</span>
 	</div>
 </footer>

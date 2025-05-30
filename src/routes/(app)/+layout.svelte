@@ -1,9 +1,6 @@
 <script lang="ts">
-	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { ShieldUser, LogOut, LogIn, UserRound, Settings, Loader2 } from 'lucide-svelte';
-	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
@@ -100,14 +97,14 @@
 								{/if}
 							</div>
 							<div class="flex flex-col gap-1 px-2 py-1.5">
-								<p class="truncate text-sm font-medium">{data.user.username}</p>
-								<p class="text-xs capitalize text-muted-foreground">
+								<span class="truncate text-sm font-medium">{data.user.username}</span>
+								<span class="text-xs capitalize text-muted-foreground">
 									{#if data.canViewAdminPage}
 										Cont de administrator
 									{:else}
 										Utilizator
 									{/if}
-								</p>
+								</span>
 							</div>
 						</div>
 					</DropdownMenu.Label>
@@ -185,10 +182,6 @@
 		<div class="flex flex-col gap-4">
 			<h3 class="text-lg font-semibold">Contact</h3>
 			<nav class="flex flex-col gap-2">
-				<p class="text-muted-foreground">Prof. coordonator:</p>
-				<p class="hover:text-primary">Giocaș Afrodita</p>
-				<p class="hover:text-primary">Cardaș Cerasela</p>
-
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
 					<a href="https://github.com/RobertPietraru/atlweb" class="hover:text-primary">GitHub</a>
@@ -198,7 +191,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<p>© {2025} ATLWEB - Toate drepturile rezervate</p>
-		<p>Făcut cu ❤️ în România</p>
+		<span>© {2025} ATLWEB - Toate drepturile rezervate</span>
+		<span>Făcut cu ❤️ în România</span>
 	</div>
 </footer>

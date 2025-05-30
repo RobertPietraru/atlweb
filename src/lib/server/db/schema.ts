@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, uuid, integer, primaryKey, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, integer, primaryKey, boolean, jsonb } from 'drizzle-orm/pg-core';
 
 export const blockType = ['text', 'resources', 'code', 'exercise'] as const;
 export type BlockType = typeof blockType[number];
@@ -33,6 +33,8 @@ export const permissionsList = [
 
 	'submission.solve',
 ] as const;
+
+
 export const course = pgTable('course', {
 	id: uuid('id').primaryKey().defaultRandom(),
 	name: text('name').notNull(),
@@ -57,68 +59,45 @@ export const lesson = pgTable('lesson', {
 	name: text('name').notNull(),
 	teaser: text('teaser').notNull(),
 	/// markdown
-	description: text('description').notNull(),
 	chapterId: uuid('chapter_id')
 		.notNull()
 		.references(() => chapter.id),
+	blocks: jsonb('blocks').$type<LessonBlock[]>().notNull().default([]),
 	order: integer('order').notNull(),
 });
 
-export const lessonTextBlock = pgTable('lesson_text_block', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	lessonId: uuid('lesson_id')
-		.notNull()
-		.references(() => lesson.id),
-	/// markdown
-	text: text('text').notNull(),
-	order: integer('order').notNull(),
-});
-
-/// aditional resources such as tutorials, articles, etc
-export const lessonResourcesBlock = pgTable('lesson_resources_block', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	lessonId: uuid('lesson_id')
-		.notNull()
-		.references(() => lesson.id),
-	title: text('title').notNull(),
-	/// markdown
-	content: text('content').notNull(),
-	urls: text('urls').array().notNull(),
-	urlLabels: text('url_labels').array().notNull(),
-	order: integer('order').notNull(),
-});
-
-/// a little block that contains html, css and javascript code
-export const lessonCodeBlock = pgTable('lesson_code_block', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	text: text('text').notNull().default(''),
-	lessonId: uuid('lesson_id')
-		.notNull()
-		.references(() => lesson.id),
-	html: text('html').notNull(),
-
-	css: text('css').notNull(),
-	javascript: text('javascript').notNull(),
-	showOutput: boolean('show_output').notNull().default(false),
-	order: integer('order').notNull(),
-});
+export type LessonBlock = {
+	type: 'text'
+	text: string
+} | {
+	type: 'resources'
+	title: string
+	content: string
+	urls: string[]
+	urlLabels: string[]
+} | {
+	type: 'code'
+	html: string
+	css: string
+	javascript: string
+	text: string
+} | {
+	type: 'exercise'
+	exerciseId: string
+}
 
 
 export const exercise = pgTable('exercise', {
 	id: uuid('id').primaryKey().defaultRandom(),
-	name: text('name').notNull(),
+	title: text('name').notNull(),
 	creationDate: timestamp('creation_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	description: text('description').notNull(),
+	summary: text('summary').notNull(),
 	/// markdown
 	instructions: text('instructions').notNull(),
 	/// the starter code for the exercise
 	initialHtml: text('initial_html').notNull(),
 	initialCss: text('initial_css').notNull(),
 	initialJavascript: text('initial_javascript').notNull(),
-	lessonId: uuid('lesson_id')
-		.notNull()
-		.references(() => lesson.id),
-	order: integer('order').notNull(),
 });
 
 export const submission = pgTable('submission', {
@@ -134,8 +113,6 @@ export const submission = pgTable('submission', {
 	checked: boolean('checked').notNull().default(false),
 	/// if the student needs help
 	needHelp: boolean('need_help').notNull().default(false),
-	/// if the student wants to be anonymous
-	anonymous: boolean('anonymous').notNull().default(false),
 	/// the javascript code
 	javascriptCode: text('javascript_code').notNull(),
 	/// the html code
@@ -150,7 +127,7 @@ export const user = pgTable('user', {
 	email: text('email').notNull().unique(),
 	username: text('username').notNull().unique(),
 	passwordHash: text('password_hash').notNull(),
-	permissions: text('permissions').array().notNull().default([]),
+	permissions: text('permissions').$type<Permissions[]>().array().notNull().default([]),
 });
 
 // Session
@@ -168,7 +145,7 @@ export type Exercise = typeof exercise.$inferSelect;
 export type Submission = typeof submission.$inferSelect;
 export type Id = string;
 
-export type LessonBlock = Omit<typeof lessonTextBlock.$inferSelect, 'lessonId'> & { type: 'text' } | Omit<typeof lessonResourcesBlock.$inferSelect, 'lessonId'> & { type: 'resources' } | Omit<typeof lessonCodeBlock.$inferSelect, 'lessonId'> & { type: 'code' } | Omit<typeof exercise.$inferSelect, 'lessonId'> & { type: 'exercise', isSolved: boolean };
+
 
 export type Permissions = typeof permissionsList[number];
 
@@ -224,9 +201,6 @@ export function permissionToName(id: string) {
 export const tableSchema = [
 	submission,
 	exercise,
-	lessonCodeBlock,
-	lessonResourcesBlock,
-	lessonTextBlock,
 	lesson,
 	chapter,
 	course,

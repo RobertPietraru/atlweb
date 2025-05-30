@@ -20,3 +20,10 @@ export function tryParseInt(value: string): number | null {
         return null;
     }
 }
+
+export function withSearchParameters(url: URL, key: string, value: string): URL {
+    const urlString = url.toString();
+    const newUrl = new URL(urlString);
+    newUrl.searchParams.set(key, value);
+    return newUrl;
+}

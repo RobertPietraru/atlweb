@@ -72,7 +72,7 @@ describe('Admin', () => {
     cy.get('table tbody tr').should('contain', 'Test Course')
 
     cy.get('table tbody tr').find('.view-course-button').click()
-    cy.url().should('include', `${baseUrl}/admin/course/`)
+    cy.url().should('include', `${baseUrl}/admin/courses/`)
 
     cy.get('h1').should('contain', 'Test Course')
     cy.get('p').should('contain', 'Test Description')

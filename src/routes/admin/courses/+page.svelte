@@ -4,14 +4,11 @@
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon } from 'lucide-svelte';
 
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
-	const isMobile = new IsMobile();
 	let { data } = $props();
 
 </script>
 
 <main class="min-h-[100vh] w-full py-4">
-
 	<div class="mb-8 flex items-center justify-between">
 		<h1 class="text-2xl font-bold md:text-3xl">Cursuri</h1>
 		<Button href="/admin/courses/create" id="create-course-button">Creeaza curs nou</Button>
@@ -19,7 +16,7 @@
 
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 		{#each data.courses as course}
-			<a href="/admin/course/{course.id}" class="h-full">
+			<a href="/admin/courses/{course.id}" class="h-full">
 				<Card
 					class="group flex h-full cursor-pointer flex-col overflow-hidden border-2 transition-all hover:scale-[1.02] hover:border-primary hover:shadow-lg"
 				>
