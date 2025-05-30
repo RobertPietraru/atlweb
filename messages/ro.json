@@ -1,3 +1,28 @@
 {
-    "$schema": "https://inlang.com/schema/inlang-message-format"
+    "$schema": "https://inlang.com/schema/inlang-message-format",
+    "toggle_theme": "Schimba tema",
+    "profile": "Profil",
+    "courses": "Cursuri",
+    "exercises": "Exerciții",
+    "admin": "Admin",
+    "login": "Autentificare",
+    "register": "Înregistrare",
+    "logout": "Deconectare",
+
+    "footer_title": "ATLWEB",
+    "footer_description": "Platforma educațională pentru învățarea programării web într-un mod interactiv și practic.",
+    "footer_navigation": "Navigare",
+    "footer_legal": "Legal",
+    "footer_contact": "Contact",
+    "footer_email": "rob_piet@yahoo.com",
+    "footer_github": "GitHub",
+    "footer_copyright": "© 2025 ATLWEB - Toate drepturile rezervate",
+    "footer_made_with_love": "Făcut cu ❤️ în România",
+    "footer_home": "Acasă",
+    "footer_courses": "Cursuri", 
+    "footer_profile": "Profil",
+    "footer_terms": "Termeni și Condiții",
+    "footer_privacy": "Politica de Confidențialitate",
+    "footer_cookies": "Politica de Cookie-uri"
+    
 }

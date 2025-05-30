@@ -1,3 +1,28 @@
 {
-    "$schema": "https://inlang.com/schema/inlang-message-format"
+    "$schema": "https://inlang.com/schema/inlang-message-format",
+    "toggle_theme": "Toggle theme",
+    "profile": "Profile", 
+    "courses": "Courses",
+    "exercises": "Exercises",
+    "admin": "Admin",
+    "login": "Login",
+    "register": "Register", 
+    "logout": "Log out",
+
+    "footer_title": "ATLWEB",
+    "footer_description": "Educational platform for learning web programming in an interactive and practical way.",
+    "footer_navigation": "Navigation",
+    "footer_legal": "Legal",
+    "footer_contact": "Contact",
+    "footer_email": "rob_piet@yahoo.com",
+    "footer_github": "GitHub",
+    "footer_copyright": "© 2025 ATLWEB - All rights reserved",
+    "footer_made_with_love": "Made with ❤️ in Romania",
+    "footer_home": "Home",
+    "footer_courses": "Courses",
+    "footer_profile": "Profile",
+    "footer_terms": "Terms and Conditions",
+    "footer_privacy": "Privacy Policy", 
+    "footer_cookies": "Cookie Policy"
+    
 }
