@@ -58,7 +58,9 @@
 							<div class="flex items-center gap-2">
 								<div class="flex items-center gap-1 text-sm text-muted-foreground">
 									<PlayIcon class="h-4 w-4" />
-									<span>{m.chapter_lesson_number(lesson.order + 1)}</span>
+									<span>{m.chapter_lesson_number({
+										nr: lesson.order + 1
+									})}</span>
 								</div>
 							</div>
 							<div
