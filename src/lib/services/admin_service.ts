@@ -448,7 +448,7 @@ export class AdminService {
                     ilike(table.exercise.instructions, `%${params.search}%`),
                 )
             : undefined
-        );
+        ).orderBy(desc(table.exercise.creationDate));
 
         const totalQuery = await this.db.select({
             count: sql<number>`count(*)`

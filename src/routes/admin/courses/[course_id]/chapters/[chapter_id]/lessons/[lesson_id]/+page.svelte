@@ -2,6 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Toggle } from '$lib/components/ui/toggle';
 	import { Input } from '$lib/components/ui/input';
+	import { onMount } from 'svelte';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { Card } from '$lib/components/ui/card';
@@ -46,6 +47,15 @@
 	let saving = $state(false);
 	let searching = $state(false);
 
+	let handleKeyDown = (e: KeyboardEvent) => {
+		if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+			e.preventDefault();
+			saveLesson();
+		}
+	};
+	onMount(() => {
+		window.addEventListener('keydown', handleKeyDown);
+	});
 	async function saveLesson() {
 		saving = true;
 		try {
@@ -222,7 +232,7 @@
 			<div class="space-y-4">
 				<div class="space-y-2">
 					<Label for="name">Titlu</Label>
-					<Input id="name" bind:value={lesson.name} />
+					<Input id="name" bind:value={lesson.name} placeholder="Titlul lecției" />
 				</div>
 
 				<div class="space-y-2">
@@ -264,7 +274,6 @@
 
 				{#if block.type === 'exercise'}
 					{@render exerciseBlock(block, index)}
-
 				{/if}
 			</div>
 		</div>
