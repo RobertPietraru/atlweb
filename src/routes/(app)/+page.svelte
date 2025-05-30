@@ -91,6 +91,12 @@
 <img
 	src="/laurian.png"
 	alt={m.home_laurian_alt()}
-	class="fixed bottom-0 right-0 -z-10 object-cover opacity-20 md:opacity-50"
+	class="fixed bottom-0 right-0 -z-10 object-cover opacity-20 md:opacity-50 hidden dark:block"
+	style="height: calc(100vh - 4rem);"
+/>
+<img
+	src="/laurian_light.png"
+	alt={m.home_laurian_alt()}
+	class="fixed bottom-0 right-0 -z-10 object-cover opacity-20 md:opacity-80 dark:hidden"
 	style="height: calc(100vh - 4rem);"
 />
