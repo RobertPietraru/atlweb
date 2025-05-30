@@ -83,5 +83,8 @@
     "exercise_submission_username_tab": "Nume",
     "exercise_submission_solve": "Rezolvă",
     "exercise_submission_run": "Rulează",
+    "exercise_submission_checked": "Verificat",
+    "exercise_submission_need_help": "Ajutor solicitat",
+    "exercise_submission_submitted": "Trimis",
     "exercise_submission_selected": "Am selectat codul lui {}"
 }

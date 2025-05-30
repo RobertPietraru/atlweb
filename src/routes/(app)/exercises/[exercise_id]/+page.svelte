@@ -367,12 +367,12 @@
 						<td class="py-2">
 							{#if submission.needHelp}
 								{#if submission.checked}
-									<span class="text-green-500">Verificat</span>
+									<span class="text-green-500">{m.exercise_submission_checked()}</span>
 								{:else}
-									<span class="text-yellow-500">Ajutor solicitat</span>
+									<span class="text-yellow-500">{m.exercise_submission_need_help()}</span>
 								{/if}
 							{:else}
-								<span class="text-green-500">Trimis</span>
+								<span class="text-green-500">{m.exercise_submission_submitted()}</span>
 							{/if}
 						</td>
 						<td class="py-2">
