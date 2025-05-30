@@ -40,10 +40,11 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 const unprotectedPrefix = ['/login', '/register', '/course'];
 export const authentication: Handle = async ({ event, resolve }) => {
+	const canonicalPath = i18n.route(event.url.pathname);
 	// Protect any routes that don't start with the unprotectedPrefix or are not the root path
-	if (!unprotectedPrefix.some((path) => event.url.pathname.startsWith(path)) && event.url.pathname !== '/') {
+	if (!unprotectedPrefix.some((path) => canonicalPath.startsWith(path)) && canonicalPath !== '/') {
 		if (!event.locals.user) {
-			redirect(303, '/login?redirect=' + event.url.pathname);
+			redirect(303, i18n.resolveRoute('/login?redirect=' + canonicalPath));
 		}
 	}
 

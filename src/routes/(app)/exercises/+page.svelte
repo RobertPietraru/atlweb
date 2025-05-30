@@ -2,23 +2,17 @@
 	import { withSearchParameters, localizedGoto } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
 	import { page } from '$app/state';
-	import * as Pagination from '$lib/components/ui/pagination/index.js';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import {
-		Plus,
 		Search,
-		Loader2,
 		ArrowUpRightIcon,
 		BookOpenIcon,
 		ChevronLeftIcon,
 		ChevronRightIcon
 	} from '@lucide/svelte';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
-	const isMobile = new IsMobile();
 
 	let { data } = $props();
-	let loading = $state(false);
 </script>
 
 <main class="min-h-[100vh] w-full px-4 py-4 md:px-8">

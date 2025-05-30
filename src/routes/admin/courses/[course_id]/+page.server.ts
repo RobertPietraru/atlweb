@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { superValidate } from 'sveltekit-superforms';
 import { cache } from '$lib/cache.js';
-
+import { i18n } from '$lib/i18n';
 const schema = z.object({
     name: z.string().min(1),
     description: z.string().min(1),
@@ -35,7 +35,7 @@ export const load = async ({ locals, params }) => {
 export const actions = {
     createChapter: async ({ locals, params }) => {
         if (!locals.user) {
-            redirect(302, '/login');
+            redirect(302, i18n.resolveRoute('/login'));
         }
 
         const hasPermission = locals.user!.permissions.includes('course.edit') && locals.user!.permissions.includes('course.create')
@@ -49,7 +49,7 @@ export const actions = {
             description: 'Descrierea capitolului'
         });
         cache.courses = null;
-        redirect(302, `/admin/courses/${params.course_id}/chapters/${id}`);
+        redirect(302, i18n.resolveRoute(`/admin/courses/${params.course_id}/chapters/${id}`));
     },
     update: async ({ request, locals, params }) => {
         const hasPermission = locals.user!.permissions.includes('course.edit') 
@@ -73,7 +73,7 @@ export const actions = {
     manageChapters: async ({ request, locals, params }) => {
         const hasPermission = locals.user!.permissions.includes('course.edit')
         if (!hasPermission) {
-            redirect(302, '/');
+            redirect(302, i18n.resolveRoute('/'));
         }
         const course = await adminService.getCourseWithChapters(params.course_id);
 

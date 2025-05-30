@@ -1,10 +1,11 @@
-import { error, fail, redirect } from '@sveltejs/kit';
+    import { error, fail, redirect } from '@sveltejs/kit';
 import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { permissionsList } from '$lib/server/db/schema';
 import type * as table from '$lib/server/db/schema';
+import { i18n } from '$lib/i18n';
 const updateSchema = z.object({
     email: z.string().max(320, 'Email must be at most 320 characters'),
     username: z.string().max(100, 'Username must be at most 100 characters'),
@@ -16,7 +17,7 @@ const permissionsSchema = z.object({
 
 export const load = async ({ params, locals }) => {
     if (!locals.user!.permissions.includes('user.view')) {
-        redirect(302, '/');
+        redirect(302, i18n.resolveRoute('/'));
     }
     const user = await adminService.getUser(params.user_id);
     if (!user) {
@@ -40,7 +41,7 @@ export const actions = {
             error(403, 'Nu aveți permisiune să ștergeți utilizatori');
         }
         await adminService.deleteUser(params.user_id);
-        redirect(302, '/admin/users');
+        redirect(302, i18n.resolveRoute('/admin/users'));
     },
 
     updateUser: async (event) => {

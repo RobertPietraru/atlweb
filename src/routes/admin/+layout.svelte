@@ -22,6 +22,7 @@
 	let isDarkTheme = $state(false);
 	let logoutLoading = $state(false);
 		
+	let canonicalPath = $derived(i18n.route(page.url.pathname));
 	onMount(() => {
 		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
 	});
@@ -156,7 +157,7 @@
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item
 						onclick={() => localizedGoto(page.url.toString(), '/profile')}
-						class="flex items-center {page.url.pathname.startsWith('/profile')
+						class="flex items-center {canonicalPath.startsWith('/profile')
 							? 'bg-accent'
 							: ''}"
 					>
@@ -165,14 +166,14 @@
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
 						onclick={() => localizedGoto(page.url.toString(), '/courses')}
-						class="flex items-center {page.url.pathname.startsWith('/courses') ? 'bg-accent' : ''}"
+						class="flex items-center {canonicalPath.startsWith('/courses') ? 'bg-accent' : ''}"
 					>
 						<BookOpen class="mr-2.5 h-4 w-4" />
 						Cursuri
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
 						onclick={() => localizedGoto(page.url.toString(), '/exercises')}
-						class="flex items-center {page.url.pathname.startsWith('/exercises')
+						class="flex items-center {canonicalPath.startsWith('/exercises')
 							? 'bg-accent'
 							: ''}"
 					>
@@ -182,7 +183,7 @@
 					<DropdownMenu.Separator />
 					{#if data.canViewAdminPage}
 						<DropdownMenu.Item
-							class="flex items-center {page.url.pathname.startsWith('/admin') ? 'bg-accent' : ''}"
+							class="flex items-center {canonicalPath.startsWith('/admin') ? 'bg-accent' : ''}"
 							onclick={() => localizedGoto(page.url.toString(), '/admin')}
 							disabled={logoutLoading}
 						>

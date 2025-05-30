@@ -1,10 +1,10 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { adminService } from '$lib/injection';
-
+import { i18n } from '$lib/i18n';
 export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user) {
-        redirect(302, '/login?redirect=/exercises/' + params.exercise_id);
+        redirect(302, i18n.resolveRoute('/login?redirect=/exercises/' + params.exercise_id));
     }
 
     const exercise = await adminService.getExercise(params.exercise_id);

@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
+import { i18n } from '$lib/i18n';
 
 const schema = z.object({
 	email: z.string().max(320, 'Emailul trebuie sa aiba maxim 320 caractere'),
@@ -18,7 +19,8 @@ const limiter = new RateLimiter({
 
 export const load = async (event) => {
 	if (event.locals.user) {
-		return redirect(302, event.url.searchParams.get('redirect') || '/');
+		const canonicalPath = i18n.route(event.url.searchParams.get('redirect') || '/');
+		return redirect(302, i18n.resolveRoute(canonicalPath));
 	}
 	const form = await superValidate(zod(schema));
 	return { form };
@@ -55,6 +57,7 @@ export const actions = {
 
 		authService.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, event.url.searchParams.get('redirect') || '/');
+		const canonicalPath = i18n.route(event.url.searchParams.get('redirect') || '/');
+		return redirect(302, i18n.resolveRoute(canonicalPath));
 	},
 };

@@ -1,20 +1,12 @@
-import { error, fail, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { fail, redirect } from '@sveltejs/kit';
 import { adminService } from '$lib/injection';
-
-export const load: PageServerLoad = async ({ params, locals }) => {
-    if (!locals.user) {
-        redirect(302, '/login?redirect=/exercises/');
-    }
+import { i18n } from '$lib/i18n';
+export const load = async ({ params, locals }) => {
     const exercise = await adminService.getExercise(params.exercise_id);
     if (!exercise) {
-        redirect(302, '/exercises/');
+        redirect(302, i18n.resolveRoute('/exercises/'));
     }
-    // if (!locals.user.permissions.includes('exercise.create')) {
-    //     redirect(302, '/exercises/');
-    // }
 
-    console.log('exercise', exercise);
     return {
         exercise
     };
@@ -52,7 +44,7 @@ export const actions = {
             return fail(400, { message: 'Nu ai permisiunea sa stergi exercitiul' });
         }
         await adminService.deleteExercise(params.exercise_id);
-        redirect(302, '/admin/exercises/');
+        redirect(302, i18n.resolveRoute('/admin/exercises/'));
     }
 
 }

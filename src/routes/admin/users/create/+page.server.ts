@@ -3,7 +3,7 @@ import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
-
+import { i18n } from '$lib/i18n';
 const schema = z.object({
 	email: z.string().max(320, 'Email must be at most 320 characters'),
 	username: z.string().max(100, 'Username must be at most 100 characters'),
@@ -40,6 +40,6 @@ export const actions = {
 			return fail(400, { form });
 		}
 
-		return redirect(302, '/admin/users');
+		return redirect(302, i18n.resolveRoute('/admin/users'));
 	}
 };
