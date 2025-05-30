@@ -448,7 +448,7 @@ export class AdminService {
                     ilike(table.exercise.instructions, `%${params.search}%`),
                 )
             : undefined
-        ).orderBy(desc(table.exercise.creationDate));
+        ).orderBy(desc(table.exercise.creationDate)).limit(params.pageSize).offset(params.page * params.pageSize);
 
         const totalQuery = await this.db.select({
             count: sql<number>`count(*)`
@@ -463,7 +463,7 @@ export class AdminService {
         );
         const total = totalQuery[0].count;
         return {
-            exercises: await query.limit(params.pageSize).offset(params.page * params.pageSize),
+            exercises: await query,
             total,
         };
     }

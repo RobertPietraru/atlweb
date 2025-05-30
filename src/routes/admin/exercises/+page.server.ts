@@ -21,6 +21,8 @@ export const load = async ({ locals, url }) => {
     return {
         exercises,
         total,
+        page,
+        pageSize,
         pagesLeft,
         search,
     };
