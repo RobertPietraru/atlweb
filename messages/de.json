@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Fehler beim Speichern der Lektion",
     "admin_lesson_exercise_search_success": "Übung erfolgreich gefunden",
     "admin_lesson_exercise_search_error": "Fehler bei der Suche nach der Übung",
-    "admin_lesson_exercise_not_found": "Übung nicht gefunden"
+    "admin_lesson_exercise_not_found": "Übung nicht gefunden",
+    "breadcrumbs_admin": "Administratives Dashboard",
+    "breadcrumbs_courses": "Kurse",
+    "breadcrumbs_new_course": "Neuer Kurs",
+    "breadcrumbs_exercises": "Übungen",
+    "breadcrumbs_users": "Benutzer",
+    "breadcrumbs_course": "Kurs",
+    "breadcrumbs_chapter": "Kapitel",
+    "breadcrumbs_lesson": "Lektion",
+    "breadcrumbs_exercise": "Übung",
+    "breadcrumbs_user": "Benutzer"
 }

@@ -1,3 +1,4 @@
+import * as m from '$lib/paraglide/messages.js';
 
 export const load = async ({ locals, params, url }) => {
     const courseId = params.course_id;
@@ -8,64 +9,64 @@ export const load = async ({ locals, params, url }) => {
     let breadcrumbs: { name: string, url: string }[] = [];
 
     breadcrumbs.push({
-        name: 'Panou administrativ',
+        name: m.breadcrumbs_admin(),
         url: '/admin'
     });
 
     if (url.pathname.includes('/courses')) {
         breadcrumbs.push({
-            name: 'Cursuri',
+            name: m.breadcrumbs_courses(),
             url: '/admin/courses'
         });
 
         if (url.pathname.includes('/create')) {
             breadcrumbs.push({
-                name: 'Curs nou',
+                name: m.breadcrumbs_new_course(),
                 url: '/admin/courses/create'
             });
         }
     } else if (url.pathname.includes('/exercises')) {
         breadcrumbs.push({
-            name: 'Exercitii',
+            name: m.breadcrumbs_exercises(),
             url: '/admin/exercises'
         });
     } else if (url.pathname.includes('/users')) {
         breadcrumbs.push({
-            name: 'Utilizatori',
+            name: m.breadcrumbs_users(),
             url: '/admin/users'
         });
     }
 
     if (courseId) {
         breadcrumbs.push({
-            name: 'Curs',
+            name: m.breadcrumbs_course(),
             url: `/admin/courses/${courseId}`
         });
     }
 
     if (chapterId) {
         breadcrumbs.push({
-            name: 'Capitol',
+            name: m.breadcrumbs_chapter(),
             url: `/admin/courses/${courseId}/chapters/${chapterId}`
         });
 
     }
     if (lessonId) {
         breadcrumbs.push({
-            name: 'Lectie',
+            name: m.breadcrumbs_lesson(),
             url: `/admin/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`
         });
     }
 
     if (exerciseId) {
         breadcrumbs.push({
-            name: 'Exercitiu',
+            name: m.breadcrumbs_exercise(),
             url: `/admin/exercises/${exerciseId}`
         });
     }
     if (userId) {
         breadcrumbs.push({
-            name: 'Utilizator',
+            name: m.breadcrumbs_user(),
             url: `/admin/users/${userId}`
         });
     }

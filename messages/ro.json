@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "A apărut o eroare la salvarea lecției",
     "admin_lesson_exercise_search_success": "Exercițiul a fost găsit cu succes",
     "admin_lesson_exercise_search_error": "A apărut o eroare la căutarea exercițiului",
-    "admin_lesson_exercise_not_found": "Exercițiul nu există"
+    "admin_lesson_exercise_not_found": "Exercițiul nu există",
+    "breadcrumbs_admin": "Panou administrativ",
+    "breadcrumbs_courses": "Cursuri",
+    "breadcrumbs_new_course": "Curs nou",
+    "breadcrumbs_exercises": "Exercitii",
+    "breadcrumbs_users": "Utilizatori",
+    "breadcrumbs_course": "Curs",
+    "breadcrumbs_chapter": "Capitol",
+    "breadcrumbs_lesson": "Lectie",
+    "breadcrumbs_exercise": "Exercitiu",
+    "breadcrumbs_user": "Utilizator"
 }

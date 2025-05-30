@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Произошла ошибка при сохранении урока",
     "admin_lesson_exercise_search_success": "Упражнение успешно найдено",
     "admin_lesson_exercise_search_error": "Произошла ошибка при поиске упражнения",
-    "admin_lesson_exercise_not_found": "Упражнение не найдено"
+    "admin_lesson_exercise_not_found": "Упражнение не найдено",
+    "breadcrumbs_admin": "Административна табла",
+    "breadcrumbs_courses": "Курсы",
+    "breadcrumbs_new_course": "Новый курс",
+    "breadcrumbs_exercises": "Упражнения",
+    "breadcrumbs_users": "Utilizatori",
+    "breadcrumbs_course": "Курс",
+    "breadcrumbs_chapter": "Глава",
+    "breadcrumbs_lesson": "Урок",
+    "breadcrumbs_exercise": "Упражнение",
+    "breadcrumbs_user": "Пользователь"
 }

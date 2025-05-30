@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Дошло је до грешке при чувању лекције",
     "admin_lesson_exercise_search_success": "Вежба је успешно пронађена",
     "admin_lesson_exercise_search_error": "Дошло је до грешке при претрази вежбе",
-    "admin_lesson_exercise_not_found": "Вежба није пронађена"
+    "admin_lesson_exercise_not_found": "Вежба није пронађена",
+    "breadcrumbs_admin": "Административна табла",
+    "breadcrumbs_courses": "Курсеви",
+    "breadcrumbs_new_course": "Нови курс",
+    "breadcrumbs_exercises": "Вежбе",
+    "breadcrumbs_users": "Корисници",
+    "breadcrumbs_course": "Курс",
+    "breadcrumbs_chapter": "Поглавље",
+    "breadcrumbs_lesson": "Лекција",
+    "breadcrumbs_exercise": "Вежба",
+    "breadcrumbs_user": "Корисник"
 }
