@@ -2,6 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import * as m from '$lib/paraglide/messages.js';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
@@ -13,7 +14,7 @@
 	<div class="flex min-h-screen items-center justify-center bg-background">
 		<Card class="w-[350px]">
 			<CardHeader>
-				<CardTitle class="text-center text-2xl font-bold">Creează utilizator</CardTitle>
+				<CardTitle class="text-center text-2xl font-bold">{m.admin_user_create_title()}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{#if $message}
@@ -23,7 +24,7 @@
 				{/if}
 				<form method="POST" class="space-y-4">
 					<div class="space-y-2">
-						<Label for="username">Nume de utilizator</Label>
+						<Label for="username">{m.admin_user_username()}</Label>
 						<Input
 							id="username"
 							name="username"
@@ -36,7 +37,7 @@
 						<p class="text-destructive">{$errors.username}</p>
 					</div>
 					<div class="space-y-2">
-						<Label for="email">Adresa de email</Label>
+						<Label for="email">{m.admin_user_email()}</Label>
 						<Input
 							id="email"
 							name="email"
@@ -49,7 +50,7 @@
 						<p class="text-destructive">{$errors.email}</p>
 					</div>
 					<div class="space-y-2">
-						<Label for="password">Parola</Label>
+						<Label for="password">{m.auth_password_label()}</Label>
 						<Input
 							id="password"
 							name="password"
@@ -61,11 +62,11 @@
 						/>
 						<p class="text-destructive">{$errors.password}</p>
 					</div>
-					<Button type="submit" class="w-full">Creează utilizator</Button>
+					<Button type="submit" class="w-full">{m.admin_user_create_button()}</Button>
 				</form>
 			</CardContent>
 			<CardFooter class="flex justify-center">
-				<a href="/admin/users" class="text-primary hover:underline">Inapoi la lista de utilizatori</a>
+				<a href="/admin/users" class="text-primary hover:underline">{m.admin_user_back_to_list()}</a>
 			</CardFooter>
 		</Card>
 	</div>

@@ -1,3 +1,4 @@
+import { i18n } from '$lib/i18n'
 import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle, } from '@sveltejs/kit';
 import type { ServerInit } from '@sveltejs/kit';
@@ -39,10 +40,11 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 const unprotectedPrefix = ['/login', '/register', '/course'];
 export const authentication: Handle = async ({ event, resolve }) => {
+	const canonicalPath = i18n.route(event.url.pathname);
 	// Protect any routes that don't start with the unprotectedPrefix or are not the root path
-	if (!unprotectedPrefix.some((path) => event.url.pathname.startsWith(path)) && event.url.pathname !== '/') {
+	if (!unprotectedPrefix.some((path) => canonicalPath.startsWith(path)) && canonicalPath !== '/') {
 		if (!event.locals.user) {
-			redirect(303, '/login?redirect=' + event.url.pathname);
+			redirect(303, i18n.resolveRoute('/login?redirect=' + canonicalPath));
 		}
 	}
 
@@ -52,7 +54,7 @@ export const authentication: Handle = async ({ event, resolve }) => {
 };
 
 
-export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, authentication));
+export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, authentication, i18n.handle()));
 export const init: ServerInit = async () => {
 	log.info('=== Starting app ===');
 };

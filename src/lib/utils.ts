@@ -1,4 +1,6 @@
+import { goto } from "$app/navigation";
 import { type ClassValue, clsx } from "clsx";
+import { i18n } from "./i18n";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -26,4 +28,10 @@ export function withSearchParameters(url: URL, key: string, value: string): URL 
     const newUrl = new URL(urlString);
     newUrl.searchParams.set(key, value);
     return newUrl;
+}
+
+export function localizedGoto(currentUrl: string, path: string, options?: { invalidateAll?: boolean }) {
+    const language = i18n.getLanguageFromUrl(new URL(currentUrl));
+    const localisedPath = i18n.resolveRoute(path, language);
+    goto(localisedPath, options);
 }

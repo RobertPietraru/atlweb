@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
+	import * as m from '$lib/paraglide/messages.js';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
@@ -37,7 +38,7 @@
 </script>
 
 <div class="py-8">
-	<h1 class="mb-8 text-3xl font-bold">Editează utilizator: {$updateForm.username}</h1>
+	<h1 class="mb-8 text-3xl font-bold">{m.admin_user_edit_title({ username: $updateForm.username })}</h1>
 
 	{#if $updateMessage}
 		<Alert variant="destructive" class="mb-4">
@@ -47,7 +48,7 @@
 
 	<div class="grid gap-8 md:grid-cols-2">
 		<div>
-			<h2 class="mb-4 text-xl font-semibold">Informații de bază</h2>
+			<h2 class="mb-4 text-xl font-semibold">{m.admin_user_basic_info()}</h2>
 			<form
 				method="POST"
 				action="?/updateUser"
@@ -61,7 +62,7 @@
 				}}
 			>
 				<div class="space-y-2">
-					<Label for="username">Nume de utilizator</Label>
+					<Label for="username">{m.admin_user_username()}</Label>
 					<Input
 						id="username"
 						name="username"
@@ -74,7 +75,7 @@
 				</div>
 
 				<div class="space-y-2">
-					<Label for="email">Adresa de email</Label>
+					<Label for="email">{m.admin_user_email()}</Label>
 					<Input
 						id="email"
 						name="email"
@@ -88,9 +89,9 @@
 
 				<Button type="submit" disabled={isLoading}>
 					{#if updatingUser}
-						Actualizare în curs...
+						{m.admin_user_update_info_loading()}
 					{:else}
-						Actualizează informațiile
+						{m.admin_user_update_info()}
 					{/if}
 				</Button>
 			</form>
@@ -109,16 +110,16 @@
 			>
 				<Button type="submit" variant="destructive" disabled={isLoading}>
 					{#if deleting}
-						Ștergere în curs...
+						{m.admin_user_delete_loading()}
 					{:else}
-						Șterge utilizatorul
+						{m.admin_user_delete()}
 					{/if}
 				</Button>
 			</form>
 		</div>
 
 		<div>
-			<h2 class="mb-4 text-xl font-semibold">Permisiuni</h2>
+			<h2 class="mb-4 text-xl font-semibold">{m.admin_user_permissions()}</h2>
 			<form
 				method="POST"
 				action="?/updatePermissions"
@@ -154,9 +155,9 @@
 
 				<Button type="submit" disabled={isLoading}>
 					{#if updatingPermissions}
-						Actualizare în curs...
+						{m.admin_user_update_permissions_loading()}
 					{:else}
-						Actualizează permisiunile
+						{m.admin_user_update_permissions()}
 					{/if}
 				</Button>
 			</form>

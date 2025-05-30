@@ -3,7 +3,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { LogOut, LogIn, UserRound, Settings, X } from 'lucide-svelte';
@@ -16,6 +16,7 @@
 	import { onMount } from 'svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import { Card } from '$lib/components/ui/card/index.js';
+	import * as m from '$lib/paraglide/messages.js';
 	const isMobile = new IsMobile();
 
 	async function logout() {
@@ -125,7 +126,7 @@
 							<div
 								class="rounded-lg border-2 bg-muted/50 p-4 shadow-sm transition-all hover:border-primary/20 hover:shadow-md md:p-6"
 							>
-								<p class="text-muted-foreground">Exercițiu nu a fost găsit</p>
+								<p class="text-muted-foreground">{m.exercise_was_not_found()}</p>
 							</div>
 						{/if}
 					{:else}
@@ -152,9 +153,11 @@
 			<div class="rounded-xl bg-muted/50 p-6 shadow-sm">
 				<div class="flex items-center justify-between">
 					<div>
-						<h3 class="mb-2 text-xl font-semibold">Lecții în acest capitol</h3>
+						<h3 class="mb-2 text-xl font-semibold">
+							{m.chapter_lessons_in_this_chapter()}
+						</h3>
 						<p class="mb-6 text-sm text-muted-foreground">
-							Parcurge toate lecțiile pentru a finaliza acest capitol
+							{m.chapter_lessons_in_this_chapter_description()}
 						</p>
 					</div>
 					<Button variant="ghost" onclick={() => (showSidebar = !showSidebar)} class="md:hidden">
@@ -186,8 +189,10 @@
 			<div class="rounded-xl bg-muted/50 p-6 shadow-sm {showSidebar ? '' : 'hidden'} md:block">
 				<h3 class="mb-2 text-xl font-semibold">Progres</h3>
 				<p class="text-sm text-muted-foreground">
-					Ai completat {data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1} din
-					{data.lessonNamesInChapter.length} lecții
+					{m.chapter_lesson_count({
+						nr1: data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1,
+						nr2: data.lessonNamesInChapter.length
+					})}
 				</p>
 				<div class="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
 					<div
@@ -281,7 +286,7 @@
 				}}
 			>
 				<PlayIcon class="mr-2 h-4 w-4" />
-				Rulează codul
+				{m.code_block_run()}
 			</Button>
 		</div>
 
@@ -325,7 +330,7 @@
 				<BookOpen
 					class="h-5 w-5 text-primary transition-transform duration-200 group-hover:scale-110"
 				/>
-				<h3 class="text-lg font-semibold">Exercițiu: {exercise.title}</h3>
+				<h3 class="text-lg font-semibold">{m.exercise_title({title: exercise.title})}</h3>
 			</div>
 			<Separator />
 			<div class="flex items-start gap-2 px-4">
@@ -335,10 +340,10 @@
 				<div class="flex items-center gap-1.5">
 					{#if exercise.hasSubmission}
 						<FileCheck class="h-4 w-4 text-primary" />
-						<span class="animate-pulse text-sm font-medium text-primary"> Soluție trimisă </span>
+						<span class="animate-pulse text-sm font-medium text-primary"> {m.exercise_submission_submitted()} </span>
 					{:else}
 						<FileCheck class="h-4 w-4 text-muted-foreground" />
-						<span class="text-sm font-medium text-muted-foreground"> Soluție netrimisă </span>
+						<span class="text-sm font-medium text-muted-foreground"> {m.exercise_submission_not_submitted()} </span>
 					{/if}
 				</div>
 				<div class="flex-1"></div>
@@ -348,7 +353,7 @@
 					class="gap-2 transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
 				>
 					<PlayCircle class="h-4 w-4" />
-					<span>Încearcă exercițiul</span>
+					<span>{m.exercise_try()}</span>
 				</Button>
 			</div>
 		</Card>
@@ -356,24 +361,24 @@
 {/snippet}
 
 <svelte:head>
-	<title>{lesson.name} | atl.vercel.app</title>
+	<title>{lesson.name} | atlweb.vercel.app</title>
 	<meta name="description" content={lesson.teaser} />
-	<meta property="og_site_name" content="“atl.vercel.app”" />
-	<meta property="og:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta property="og_site_name" content="“atlweb.vercel.app”" />
+	<meta property="og:url" content="https://atlweb.vercel.app{page.url.pathname.toString()}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content={lesson.name} />
 	<meta property="og:description" content={lesson.teaser} />
 
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta property="twitter:domain" content="“atl.vercel.app" />
-	<meta property="twitter:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta property="twitter:domain" content="“atlweb.vercel.app" />
+	<meta property="twitter:url" content="https://atlweb.vercel.app{page.url.pathname.toString()}" />
 	<meta name="twitter:title" content={lesson.name} />
 	<meta name="twitter:description" content={lesson.teaser} />
 	{@html `  <script type="application/ld+json">{
    "@context": "https://schema.org",
    "@type": "Website",
-   "name": "${lesson.name} | atl.vercel.app",
-   "url": "https//www.atl.vercel.app${$page.url.pathname}",
+   "name": "${lesson.name} | atlweb.vercel.app",
+   "url": "https//www.atlweb.vercel.app${page.url.pathname}",
    }</script>`}
 </svelte:head>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+		import * as m from '$lib/paraglide/messages.js';
 	import { Button } from '$lib/components/ui/button';
 
 	let { data } = $props();
@@ -6,18 +7,18 @@
 
 <main class="min-h-[100vh] w-full py-4">
 	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-3xl font-bold">Users</h1>
-		<Button href="/admin/users/create">Create New User</Button>
+		<h1 class="text-3xl font-bold">{m.admin_users_title()}</h1>
+		<Button href="/admin/users/create">{m.admin_users_create()}</Button>
 	</div>
 
 	<div class="relative w-full overflow-auto">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b">
-					<th class="h-12 px-4 text-left align-middle font-medium">Username</th>
-					<th class="h-12 px-4 text-left align-middle font-medium">Email</th>
-					<th class="h-12 px-4 text-left align-middle font-medium">Permissions</th>
-					<th class="h-12 px-4 text-right align-middle font-medium">Actions</th>
+					<th class="h-12 px-4 text-left align-middle font-medium">{m.admin_users_username()}</th>
+					<th class="h-12 px-4 text-left align-middle font-medium">{m.admin_users_email()}</th>
+					<th class="h-12 px-4 text-left align-middle font-medium">{m.admin_users_permissions()}</th>
+					<th class="h-12 px-4 text-right align-middle font-medium">{m.admin_users_actions()}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -40,13 +41,13 @@
 										>...</span
 									>
 								{:else if user.permissions.length === 0}
-									<span class="text-muted-foreground">No permissions</span>
+									<span class="text-muted-foreground">{m.admin_users_no_permissions()}</span>
 								{/if}
 							</div>
 						</td>
 						<td class="p-4 align-middle">
 							<div class="flex justify-end gap-2">
-								<Button href="/admin/users/{user.id}" variant="outline" size="sm">View</Button>
+								<Button href="/admin/users/{user.id}" variant="outline" size="sm">{m.admin_users_view()}</Button>
 							</div>
 						</td>
 					</tr>

@@ -5,6 +5,7 @@
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 	const { form, message, errors } = superForm(data.form);
@@ -12,13 +13,13 @@
 
 <main class="min-h-[100vh] w-full px-8 py-4">
 	<nav class="flex items-center justify-between">
-		<a class="text-3xl font-bold" href="/">ATLWEB</a>
+		<a class="text-3xl font-bold" href="/">{m.brand_name()}</a>
 	</nav>
 
 	<div class="flex min-h-screen items-center justify-center bg-background">
 		<Card class="w-[350px]">
 			<CardHeader>
-				<CardTitle class="text-center text-2xl font-bold">Înregistrează-te</CardTitle>
+				<CardTitle class="text-center text-2xl font-bold">{m.auth_register_title()}</CardTitle>
 			</CardHeader>
 			<CardContent>
 				{#if $message}
@@ -28,7 +29,7 @@
 				{/if}
 				<form method="POST" class="space-y-4">
 					<div class="space-y-2">
-						<Label for="username">Nume de utilizator</Label>
+						<Label for="username">{m.auth_username_label()}</Label>
 						<Input
 							id="username"
 							name="username"
@@ -41,7 +42,7 @@
 						<p class="text-destructive">{$errors.username}</p>
 					</div>
 					<div class="space-y-2">
-						<Label for="email">Adresa de email</Label>
+						<Label for="email">{m.auth_email_label()}</Label>
 						<Input
 							id="email"
 							name="email"
@@ -54,7 +55,7 @@
 						<p class="text-destructive">{$errors.email}</p>
 					</div>
 					<div class="space-y-2">
-						<Label for="password">Parola</Label>
+						<Label for="password">{m.auth_password_label()}</Label>
 						<Input
 							id="password"
 							name="password"
@@ -66,11 +67,11 @@
 						/>
 						<p class="text-destructive">{$errors.password}</p>
 					</div>
-					<Button type="submit" class="w-full">Înregistrează-te</Button>
+					<Button type="submit" class="w-full">{m.auth_register_button()}</Button>
 				</form>
 			</CardContent>
 			<CardFooter class="flex justify-center">
-				<p class="text-center">Ai deja cont? <a href="/login" class="text-primary hover:underline">Autentifică-te</a></p>
+				<p class="text-center">{m.auth_has_account()} <a href="/login" class="text-primary hover:underline">{m.auth_login_link()}</a></p>
 			</CardFooter>
 		</Card>
 	</div>

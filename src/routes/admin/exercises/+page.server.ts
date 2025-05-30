@@ -1,6 +1,6 @@
 import { adminService } from '$lib/injection';
 import { redirect } from '@sveltejs/kit';
-
+import { i18n } from '$lib/i18n';
 export const load = async ({ locals, url }) => {
     const page = Number(url.searchParams.get('page') || '1') - 1;
     const pageSize = Number(url.searchParams.get('pageSize') || '10');
@@ -8,7 +8,7 @@ export const load = async ({ locals, url }) => {
     const hasPermission = locals.user!.permissions.includes('course.view')
 
     if (!hasPermission) {
-        redirect(302, '/');
+        redirect(302, i18n.resolveRoute('/'));
     }
 
     const { exercises, total } = await adminService.getExercises({
@@ -40,6 +40,6 @@ export const actions = {
             initialJavascript: '',
         });
         console.log(id);
-        redirect(302, `/admin/exercises/${id}`);
+        redirect(302, i18n.resolveRoute(`/admin/exercises/${id}`));
     }
 }

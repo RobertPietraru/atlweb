@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
+import { i18n } from '$lib/i18n.js';
 
 const schema = z.object({
 	email: z.string().max(320, 'Emailul trebuie sa aiba maxim 320 caractere'),
@@ -15,20 +16,22 @@ const limiter = new RateLimiter({
 	IPUA: [5, 'm'], // IP + User Agent limiter
 });
 
-export const load= async (event) => {
+export const load = async (event) => {
 	if (event.locals.user) {
-		return redirect(302, '/');
+		return redirect(302, i18n.resolveRoute('/'));
 	}
 	const redirectUrl = event.url.searchParams.get('redirect') || '/';
 	const form = await superValidate(zod(schema));
 	return { form, redirectUrl };
 };
 
-export const actions= {
+export const actions = {
 	default: async (event) => {
 		// if (await limiter.isLimited(event)) error(429, 'Prea multe incercari de logare. Te rugam sa astepti o perioada de timp.');
 		const redirectUrl = event.url.searchParams.get('redirect') || '/';
+		const canonicalPath = i18n.route(redirectUrl);
 		const form = await superValidate(event.request, zod(schema));
+
 		if (!form.valid) {
 			return fail(400, { form });
 		}
@@ -45,6 +48,6 @@ export const actions= {
 
 		authService.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, redirectUrl);
+		return redirect(302, i18n.resolveRoute(canonicalPath));
 	},
 };

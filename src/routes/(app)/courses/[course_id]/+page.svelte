@@ -3,6 +3,7 @@
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import * as m from '$lib/paraglide/messages.js';
 	const isMobile = new IsMobile();
 	let { data } = $props();
 </script>
@@ -66,14 +67,14 @@
 									<BookOpenIcon class="h-4 w-4" />
 									<span>
 										{chapter.lessonCount}
-										{chapter.lessonCount === 1 ? 'lecție' : 'lecții'}
+										{chapter.lessonCount === 1 ? m.chapter_lesson_singular() : m.chapter_lesson_plural()}
 									</span>
 								</div>
 							</div>
 							<div
 								class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-hover:bg-primary group-hover:text-primary-foreground"
 							>
-								Începe capitolul
+								{m.chapter_begin()}
 							</div>
 						</div>
 					</CardFooter>

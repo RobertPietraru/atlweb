@@ -1,11 +1,23 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen, BrainCircuit } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
+	import {
+		ShieldUser,
+		LogOut,
+		UserRound,
+		Loader2,
+		BookOpen,
+		BrainCircuit,
+		Languages
+	} from '@lucide/svelte';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { languageTag, type AvailableLanguageTag } from '$lib/paraglide/runtime.js';
+	import { i18n } from '$lib/i18n.js';
+	import { localizedGoto } from '$lib/utils.js';
 
 	let { children, data } = $props();
 	let isDarkTheme = $state(false);
@@ -13,6 +25,14 @@
 	onMount(() => {
 		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
 	});
+	let canonicalPath = $derived(i18n.route(page.url.pathname));
+	function switchToLanguage(newLanguage: AvailableLanguageTag) {
+		const canonicalPath = i18n.route(page.url.pathname);
+		const localisedPath = i18n.resolveRoute(canonicalPath, newLanguage);
+		goto(localisedPath);
+	}
+
+
 	$effect(() => {
 		const htmlEl = document.documentElement;
 		if (isDarkTheme) {
@@ -36,16 +56,48 @@
 		if (res.ok) {
 			location.reload();
 		} else {
-			console.error('Failed to logout');
+			console.error(m.failed_to_logout());
 		}
 	}
 </script>
 
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
+	<a href="/" class="mr-4 text-2xl font-bold">{m.brand_name()}</a>
 	<div class="flex-1"></div>
 
 	<div class="flex items-center gap-1 md:gap-3">
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'icon' })}>
+				<Languages class="h-[1.2rem] w-[1.2rem]" />
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content align="end">
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('ro')}
+					class={languageTag() === 'ro' ? 'bg-accent' : ''}>{m.language_ro()}</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('en')}
+					class={languageTag() === 'en' ? 'bg-accent' : ''}>{m.language_en()}</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('hu')}
+					class={languageTag() === 'hu' ? 'bg-accent' : ''}>{m.language_hu()}</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('uk')}
+					class={languageTag() === 'uk' ? 'bg-accent' : ''}>{m.language_uk()}</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('de')}
+					class={languageTag() === 'de' ? 'bg-accent' : ''}>{m.language_de()}</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('ru')}
+					class={languageTag() === 'ru' ? 'bg-accent' : ''}>{m.language_ru()}</DropdownMenu.Item
+				>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+
 		<Button
 			onclick={() => {
 				isDarkTheme = !isDarkTheme;
@@ -59,10 +111,10 @@
 			<Moon
 				class="h-[1.2rem] w-[1.2rem] translate-y-8 rotate-180 scale-75 opacity-0 transition-all duration-500 ease-in-out dark:translate-y-0 dark:rotate-0 dark:scale-100 dark:opacity-100"
 			/>
-			<span class="sr-only">Toggle theme</span>
+			<span class="sr-only">{m.toggle_theme()}</span>
 		</Button>
 		{#if !data.user}
-			<Button href="/login" variant="outline">Autentifica-te</Button>
+			<Button href="/login" variant="outline">{m.login()}</Button>
 		{:else}
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger
@@ -101,9 +153,9 @@
 								<span class="truncate text-sm font-medium">{data.user.username}</span>
 								<span class="text-xs capitalize text-muted-foreground">
 									{#if data.canViewAdminPage}
-										Cont de administrator
+										{m.admin_account()}
 									{:else}
-										Utilizator
+										{m.user_account()}
 									{/if}
 								</span>
 							</div>
@@ -111,39 +163,39 @@
 					</DropdownMenu.Label>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item
-						onclick={() => goto('/profile')}
-						class="flex items-center {page.url.pathname.startsWith('/profile') ? 'bg-accent' : ''}"
+						onclick={() => localizedGoto(page.url.toString(), '/profile')}
+						class="flex items-center {canonicalPath.startsWith('/profile') ? 'bg-accent' : ''}"
 					>
 						<UserRound class="mr-2.5 h-4 w-4" />
-						Profil
+						{m.profile()}
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
-						onclick={() => goto('/courses')}
-						class="flex items-center {page.url.pathname.startsWith('/courses') ? 'bg-accent' : ''}"
+						onclick={() => localizedGoto(page.url.toString(), '/courses')}
+						class="flex items-center {canonicalPath.startsWith('/courses') ? 'bg-accent' : ''}"
 					>
 						<BookOpen class="mr-2.5 h-4 w-4" />
-						Cursuri
+						{m.courses()}
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
-						onclick={() => goto('/exercises')}
-						class="flex items-center {page.url.pathname.startsWith('/exercises')
+						onclick={() => localizedGoto(page.url.toString(), '/exercises')}
+						class="flex items-center {canonicalPath.startsWith('/exercises')
 							? 'bg-accent'
 							: ''}"
 					>
 						<BrainCircuit class="mr-2.5 h-4 w-4" />
-						Exerciții
+						{m.exercises()}
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					{#if data.canViewAdminPage}
 						<DropdownMenu.Item
-							class="flex items-center {window.location.pathname.startsWith('/admin')
+							class="flex items-center {canonicalPath.startsWith('/admin')
 								? 'bg-accent'
 								: ''}"
-							onclick={() => goto('/admin')}
+							onclick={() => localizedGoto(page.url.toString(), '/admin')}
 							disabled={logoutLoading}
 						>
 							<ShieldUser class="mr-2.5 h-4 w-4" />
-							<span>Administrator</span>
+							{m.admin()}
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator />
 					{/if}
@@ -158,7 +210,7 @@
 						{:else}
 							<LogOut class="mr-2.5 h-4 w-4" />
 						{/if}
-						<span>Log out</span>
+						{m.logout()}
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
@@ -175,32 +227,32 @@
 >
 	<div class="container grid grid-cols-1 gap-8 md:grid-cols-4">
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">ATLWEB</h3>
+			<h3 class="text-lg font-semibold">{m.footer_title()}</h3>
 			<p class="max-w-xs">
-				Platforma educațională pentru învățarea programării web într-un mod interactiv și practic.
+				{m.footer_description()}
 			</p>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Navigare</h3>
+			<h3 class="text-lg font-semibold">{m.footer_navigation()}</h3>
 			<nav class="flex flex-col gap-2">
-				<a href="/" class="hover:text-primary">Acasă</a>
-				<a href="/courses" class="hover:text-primary">Cursuri</a>
-				<a href="/profile" class="hover:text-primary">Profil</a>
+				<a href="/" class="hover:text-primary">{m.footer_home()}</a>
+				<a href="/courses" class="hover:text-primary">{m.footer_courses()}</a>
+				<a href="/profile" class="hover:text-primary">{m.footer_profile()}</a>
 			</nav>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Legal</h3>
+			<h3 class="text-lg font-semibold">{m.footer_legal()}</h3>
 			<nav class="flex flex-col gap-2">
-				<a href="/terms" class="hover:text-primary">Termeni și Condiții</a>
-				<a href="/privacy" class="hover:text-primary">Politica de Confidențialitate</a>
-				<a href="/cookies" class="hover:text-primary">Politica de Cookie-uri</a>
+				<a href="/terms" class="hover:text-primary">{m.footer_terms()}</a>
+				<a href="/privacy" class="hover:text-primary">{m.footer_privacy()}</a>
+				<a href="/cookies" class="hover:text-primary">{m.footer_cookies()}</a>
 			</nav>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Contact</h3>
+			<h3 class="text-lg font-semibold">{m.footer_contact()}</h3>
 			<nav class="flex flex-col gap-2">
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">
@@ -211,7 +263,7 @@
 	</div>
 
 	<div class="container flex items-center justify-between border-t pt-8">
-		<span>© {2025} ATLWEB - Toate drepturile rezervate</span>
-		<span>Făcut cu ❤️ în România</span>
+		<span>{m.footer_copyright()}</span>
+		<span>{m.footer_made_with_love()}</span>
 	</div>
 </footer>

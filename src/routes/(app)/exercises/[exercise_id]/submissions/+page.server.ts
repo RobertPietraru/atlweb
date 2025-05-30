@@ -1,10 +1,11 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { i18n } from '$lib/i18n';
 import { adminService } from '$lib/injection';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user) {
-        redirect(302, `/login?redirect=/exercises/${params.exercise_id}/submissions`);
+        redirect(302, i18n.resolveRoute(`/login?redirect=/exercises/${params.exercise_id}/submissions`));
     }
 
     if (!locals.user!.permissions.includes('submission.solve')) {

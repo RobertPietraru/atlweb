@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
+	import * as m from '$lib/paraglide/messages.js';
 	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	let { data } = $props();
 </script>
@@ -59,13 +58,15 @@
 							<div class="flex items-center gap-2">
 								<div class="flex items-center gap-1 text-sm text-muted-foreground">
 									<PlayIcon class="h-4 w-4" />
-									<span>Lecția {lesson.order + 1}</span>
+									<span>{m.chapter_lesson_number({
+										nr: lesson.order + 1
+									})}</span>
 								</div>
 							</div>
 							<div
 								class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-hover:bg-primary group-hover:text-primary-foreground"
 							>
-								Începe lecția
+								{m.chapter_lesson_start()}
 							</div>
 						</div>
 					</CardFooter>

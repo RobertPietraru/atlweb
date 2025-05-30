@@ -6,6 +6,7 @@
 	import { deserialize } from '$app/forms';
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 	let lessons = $state(data.chapter.lessons.map((l) => ({ ...l })));
@@ -52,7 +53,7 @@
 				console.error('Error saving lesson order:', result.data?.message);
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la salvarea ordinii lecțiilor',
+						m.admin_chapter_save_lesson_order_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -60,7 +61,7 @@
 			}
 		} catch (error) {
 			console.error('Error saving lesson order:', error);
-			toast.error('A apărut o eroare la salvarea ordinii lecțiilor', {
+			toast.error(m.admin_chapter_save_lesson_order_error(), {
 				position: 'bottom-left'
 			});
 		} finally {
@@ -84,13 +85,13 @@
 				data.chapter.name = editForm.name;
 				data.chapter.description = editForm.description;
 				isEditing = false;
-				toast.success('Informațiile au fost actualizate cu succes', {
+				toast.success(m.admin_chapter_save_info_success(), {
 					position: 'bottom-left'
 				});
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ?? 
-						'A apărut o eroare la actualizarea informațiilor',
+						m.admin_chapter_save_info_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -98,7 +99,7 @@
 			}
 		} catch (error) {
 			console.error('Error updating chapter:', error);
-			toast.error('A apărut o eroare la actualizarea informațiilor', {
+			toast.error(m.admin_chapter_save_info_error(), {
 				position: 'bottom-left'
 			});
 		} finally {
@@ -114,41 +115,41 @@
 
 <div class="container mx-auto max-w-4xl py-12" class:pointer-events-none={loading}>
 	<header class="mb-12">
-		<h1 class="text-4xl font-bold tracking-tight">Capitol: {data.chapter.name}</h1>
+		<h1 class="text-4xl font-bold tracking-tight">{m.admin_chapter_title({ name: data.chapter.name })}</h1>
 	</header>
 
 	<div class="grid gap-12">
 		<section>
 			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">Informații de bază</h2>
+				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_chapter_basic_info()}</h2>
 				{#if !isEditing}
-					<Button variant="outline" onclick={() => (isEditing = true)}>Editează</Button>
+					<Button variant="outline" onclick={() => (isEditing = true)}>{m.admin_chapter_edit()}</Button>
 				{/if}
 			</div>
 			<Card>
 				<CardContent class="space-y-6 pt-6">
 					{#if isEditing}
 						<div>
-							<Label for="name">Nume capitol</Label>
+							<Label for="name">{m.admin_chapter_name()}</Label>
 							<Input id="name" bind:value={editForm.name} />
 						</div>
 						<div>
-							<Label for="description">Descriere</Label>
+							<Label for="description">{m.admin_chapter_description()}</Label>
 							<Textarea id="description" bind:value={editForm.description} />
 						</div>
 						<div class="flex gap-2">
-							<Button variant="default" onclick={saveChapterInfo} disabled={loading}>Salvează</Button>
+							<Button variant="default" onclick={saveChapterInfo} disabled={loading}>{m.admin_chapter_save()}</Button>
 							<Button variant="outline" onclick={() => (isEditing = false)} disabled={loading}>
-								Anulează
+								{m.admin_chapter_cancel()}
 							</Button>
 						</div>
 					{:else}
 						<div>
-							<Label class="text-sm text-muted-foreground">Nume capitol</Label>
+							<Label class="text-sm text-muted-foreground">{m.admin_chapter_name()}</Label>
 							<p class="mt-1 text-lg font-medium">{data.chapter.name}</p>
 						</div>
 						<div>
-							<Label class="text-sm text-muted-foreground">Descriere</Label>
+							<Label class="text-sm text-muted-foreground">{m.admin_chapter_description()}</Label>
 							<p class="mt-1 text-lg leading-relaxed">{data.chapter.description}</p>
 						</div>
 					{/if}
@@ -158,24 +159,24 @@
 
 		<section>
 			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">Lecții</h2>
+				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_chapter_lessons()}</h2>
 				<div class="flex gap-2">
 					<form action="?/create" method="post">
-						<Button type="submit">Adaugă lecție nouă</Button>
+						<Button type="submit">{m.admin_chapter_add_lesson()}</Button>
 					</form>
 				</div>
 			</div>
 
 			{#if hasChanges}
 				<Button variant="default" onclick={saveLessonOrder} disabled={loading} class="w-full">
-					Salvează
+					{m.admin_chapter_save()}
 				</Button>
 			{/if}
 
 			{#if lessons.length === 0}
 				<Card>
 					<CardContent class="pt-6">
-						<p class="text-center text-muted-foreground">Nu există lecții pentru acest capitol.</p>
+						<p class="text-center text-muted-foreground">{m.admin_chapter_no_lessons()}</p>
 					</CardContent>
 				</Card>
 			{:else}
@@ -214,9 +215,9 @@
 										href="/admin/courses/{data.courseId}/chapters/{data.chapter
 											.id}/lessons/{lesson.id}"
 									>
-										Editează
+										{m.admin_chapter_edit_lesson()}
 									</Button>
-									<Button variant="destructive" onclick={() => deleteLesson(index)}>Șterge</Button>
+									<Button variant="destructive" onclick={() => deleteLesson(index)}>{m.admin_chapter_delete_lesson()}</Button>
 								</div>
 							</CardContent>
 						</Card>
