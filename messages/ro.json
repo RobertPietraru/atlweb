@@ -47,7 +47,36 @@
     "courses_start": "Începe cursul",
     "courses_chapter_singular": "capitol",
     "courses_chapter_plural": "capitole",
+    "courses_create": "Creează curs nou",
 
-    "courses_create": "Creează curs nou"
+    "exercises_title": "Exerciții",
+    "exercises_create": "Creează exercițiu nou",
+    "exercises_filter_placeholder": "Filtrează",
+    "exercises_no_results": "Nu s-au gasit exercitii care sa corespunda cautarii",
+    "exercises_previous_page": "Pagina anterioară", 
+    "exercises_next_page": "Pagina următoare",
 
+
+    "exercise_description_tab": "Descriere",
+    "exercise_result_tab": "Rezultat",
+    "exercise_copy_id": "ID-ul exercitiului a fost copiat in clipboard",
+    "exercise_delete": "Sterge",
+    "exercise_save": "Salveaza",
+    "exercise_run": "Ruleaza",
+    "exercise_title_placeholder": "Titlu",
+    "exercise_summary_placeholder": "Rezumat",
+    "exercise_submissions_tab": "Solutii",
+    "exercise_submission_date_tab": "Data",
+    "exercise_submission_status_tab": "Status",
+    "exercise_instructions_placeholder": "Instructiuni",
+    "exercise_code_brought_to_current": "Codul a fost adus la cel de atunci",
+    "exercise_submission_error": "A apărut o eroare la trimiterea codului",
+    "exercise_submission_success": "Solutia a fost trimisa cu succes",
+    "exercise_submission_delete_success": "Solutia a fost stearsa cu succes",
+    "exercise_submission_delete_error": "A apărut o eroare la stergerea solutiei",
+    "exercise_submission_delete_confirm": "Sunteți sigur că doriți să ștergeți această soluție?",
+    "exercise_save_success": "Exercitiul a fost salvat cu succes",
+    "exercise_save_error": "A apărut o eroare la salvarea exercitiului",
+    "exercise_delete_success": "Exercitiul a fost sters cu succes",
+    "exercise_delete_error": "A apărut o eroare la stergerea exercitiului"
 }

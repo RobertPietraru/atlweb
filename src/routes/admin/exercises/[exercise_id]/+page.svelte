@@ -17,6 +17,7 @@
 	import { deserialize } from '$app/forms';
 	import { page } from '$app/state';
 	import { localizedGoto } from '$lib/utils.js';
+	import * as m from '$lib/paraglide/messages.js';
 	let { data } = $props();
 	const carta = new Carta({} as Options);
 
@@ -106,7 +107,7 @@
 
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
-				toast.success('Exercitiul a fost salvat cu succes');
+				toast.success(m.exercise_save_success());
 
 				lastSavedCode = structuredClone($state.snapshot(code));
 				lastSavedForm = structuredClone($state.snapshot(form));
@@ -114,8 +115,7 @@
 				console.log(result.data);
 			} else if (result.type === 'failure') {
 				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la salvarea exercitiului',
+					(result.data?.message as string | undefined | null) ?? m.exercise_save_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -123,7 +123,7 @@
 			}
 		} catch (error) {
 			console.error(error);
-			toast.error('A apărut o eroare la salvarea exercitiului');
+			toast.error(m.exercise_save_error());
 		} finally {
 			isSaving = false;
 		}
@@ -139,12 +139,11 @@
 
 			const result = deserialize(await response.text());
 			if (result.type === 'redirect') {
-				toast.success('Exercitiul a fost sters cu succes');
+				toast.success(m.exercise_delete_success());
 				localizedGoto(page.url.toString(), result.location);
 			} else if (result.type === 'failure') {
 				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la salvarea exercitiului',
+					(result.data?.message as string | undefined | null) ?? m.exercise_delete_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -152,7 +151,7 @@
 			}
 		} catch (error) {
 			console.error(error);
-			toast.error('A apărut o eroare la salvarea exercitiului');
+			toast.error(m.exercise_delete_error());
 		} finally {
 			isSaving = false;
 		}
@@ -242,12 +241,12 @@
 							<Tabs.Trigger
 								value="description"
 								class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-								>Descriere</Tabs.Trigger
+								>{m.exercise_description_tab()}</Tabs.Trigger
 							>
 							<Tabs.Trigger
 								value="result"
 								class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-								>Rezultat</Tabs.Trigger
+								>{m.exercise_result_tab()}</Tabs.Trigger
 							>
 						</Tabs.List>
 
@@ -304,7 +303,7 @@
 				disabled={isSaving}
 				onclick={() => {
 					navigator.clipboard.writeText(data.exercise.id);
-					toast.success('ID-ul exercitiului a fost copiat in clipboard');
+					toast.success(m.exercise_copy_id());
 				}}
 			>
 				<Clipboard class="size-4" />
@@ -316,7 +315,7 @@
 				{:else}
 					<TrashIcon class="size-4" />
 				{/if}
-				<span>Sterge</span>
+				<span>{m.exercise_delete()}</span>
 			</Button>
 
 			<Button disabled={isSaved || isSaving} onclick={save}>
@@ -325,7 +324,7 @@
 				{:else}
 					<SaveIcon class="size-4" />
 				{/if}
-				<span>Salveaza</span>
+				<span>{m.exercise_save()}</span>
 			</Button>
 
 			<Button
@@ -344,7 +343,7 @@
 				}}
 			>
 				<PlayIcon class="size-4" />
-				<span>Ruleaza</span>
+				<span>{m.exercise_run()}</span>
 			</Button>
 		</div>
 		<Tabs.Content value="html" class="mt-0 h-full w-full ">
@@ -361,8 +360,8 @@
 
 {#snippet exerciseDescription()}
 	<ScrollArea class="h-full w-full ">
-		<Input bind:value={form.title} class="mb-4 w-full" placeholder="Titlu" />
-		<Textarea bind:value={form.summary} class=" mb-4 w-full" placeholder="Rezumat" />
+		<Input bind:value={form.title} class="mb-4 w-full" placeholder={m.exercise_title_placeholder()} />
+		<Textarea bind:value={form.summary} class=" mb-4 w-full" placeholder={m.exercise_summary_placeholder()} />
 		<div class="bg-white" style="border-radius: 4px; color: black">
 			<MarkdownEditor bind:value={form.instructions} {carta} />
 		</div>
@@ -398,12 +397,5 @@
 		--hover-color: var(--hover-color-dark);
 		--caret-color: var(--caret-color-dark);
 		--text-color: var(--text-color-dark);
-	}
-
-	/* Code dark mode */
-	/* Only if you didn't specify a custom code theme */
-	html.dark .shiki,
-	html.dark .shiki span {
-		/* color: var(--shiki-dark) !important; */
 	}
 </style>

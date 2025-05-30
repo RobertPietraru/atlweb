@@ -29,16 +29,26 @@
     "home_subtitle": "Educational platform for learning web programming in an interactive and practical way",
     "home_start_learning": "Start learning",
     "home_github_repository": "GitHub Repository",
-
     "home_interactive_courses_title": "Interactive Courses",
     "home_interactive_courses_description": "Learn through structured courses with practical examples and interactive exercises",
-
     "home_practical_exercises_title": "Practical Exercises",
     "home_practical_exercises_description": "Solve exercises and get instant feedback to improve your skills",
-
     "home_community_title": "Community",
     "home_community_description": "Connect with other learners and share your learning experience",
+    "home_laurian_alt": "National College \"A. T. Laurian\" Botosani",
 
-    "home_laurian_alt": "National College \"A. T. Laurian\" Botosani"
+    "courses_title": "Courses",
+    "courses_start": "Start course",
+    "courses_chapter_singular": "chapter",
+    "courses_chapter_plural": "chapters", 
+    "courses_create": "Create new course",
+    "courses_edit": "Edit",
+
+    "exercises_title": "Exercises",
+    "exercises_create": "Create new exercise",
+    "exercises_filter_placeholder": "Filter",
+    "exercises_no_results": "No exercises found matching your search",
+    "exercises_previous_page": "Previous page",
+    "exercises_next_page": "Next page"
     
 }

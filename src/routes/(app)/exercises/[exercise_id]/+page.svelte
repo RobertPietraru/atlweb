@@ -8,20 +8,16 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { page } from '$app/state';
 	import {
-		CheckIcon,
-		ChevronDown,
 		EyeIcon,
-		HelpCircleIcon,
 		Loader2,
 		PlayIcon,
 		Send,
 		TrashIcon,
-		UserIcon
-	} from 'lucide-svelte';
+	} from '@lucide/svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
+	import * as m from '$lib/paraglide/messages.js';
 	let { data } = $props();
 
 	let code = $state({
@@ -120,7 +116,7 @@
 		htmlEditor?.setValue(params.html);
 		cssEditor?.setValue(params.css);
 		jsEditor?.setValue(params.javascript);
-		toast.success('Codul a fost adus la cel de atunci');
+		toast.success(m.exercise_code_brought_to_current());
 	}
 	function getCodePreview(params: { css: string; html: string; javascript: string }) {
 		const css = params.css ?? '';
@@ -163,7 +159,7 @@
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
 				submittedCode = structuredClone($state.snapshot(code));
-				toast.success('Codul a fost trimis cu succes');
+				toast.success(m.exercise_submission_success());
 
 				console.log(result.data);
 				submissions = [result.data?.submission as (typeof submissions)[0], ...submissions];
@@ -171,7 +167,7 @@
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la trimiterea codului',
+						m.exercise_submission_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -179,7 +175,7 @@
 			}
 		} catch (error) {
 			console.error(error);
-			toast.error('A apărut o eroare la trimiterea codului');
+			toast.error(m.exercise_submission_error());
 		} finally {
 			submitting = false;
 		}
@@ -197,7 +193,7 @@
 
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
-				toast.success('Raspunsul a fost sters cu succes');
+				toast.success(m.exercise_submission_delete_success());
 				submissions.splice(
 					submissions.findIndex((submission) => submission.id === submissionId),
 					1
@@ -205,14 +201,14 @@
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la stergerea raspunsului',
+						m.exercise_submission_delete_error(),
 					{
 						position: 'bottom-left'
 					}
 				);
 			}
 		} catch (error) {
-			toast.error('A apărut o eroare la stergerea raspunsului');
+			toast.error(m.exercise_submission_delete_error());
 		} finally {
 			deleting.splice(
 				deleting.findIndex((id) => id === submissionId),
@@ -238,17 +234,17 @@
 						<Tabs.Trigger
 							value="description"
 							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-							>Descriere</Tabs.Trigger
+							>{m.exercise_description_tab()}</Tabs.Trigger
 						>
 						<Tabs.Trigger
 							value="result"
 							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-							>Rezultat</Tabs.Trigger
+							>{m.exercise_result_tab()}</Tabs.Trigger
 						>
 						<Tabs.Trigger
 							value="submissions"
 							class="flex-1 px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-							>Solutii</Tabs.Trigger
+							>{m.exercise_submissions_tab()}</Tabs.Trigger
 						>
 					</Tabs.List>
 					<Tabs.Content value="submissions" class="h-full w-full p-4">
@@ -321,7 +317,7 @@
 				}}
 			>
 				<PlayIcon class="size-4" />
-				<span>Ruleaza</span>
+				<span>{m.exercise_run()}</span>
 			</Button>
 		</div>
 		<Tabs.Content value="html" class="mt-0 h-full w-full ">
@@ -341,8 +337,8 @@
 			<thead>
 				<tr class="border-b">
 					<th class="py-2 text-left"></th>
-					<th class="py-2 text-left">Data</th>
-					<th class="py-2 text-left">Status</th>
+					<th class="py-2 text-left">{m.exercise_submission_date_tab()}</th>
+					<th class="py-2 text-left">{m.exercise_submission_status_tab()}</th>
 					<th class="py-2 text-left"></th>
 				</tr>
 			</thead>
@@ -420,7 +416,7 @@
 		{:else}
 			<Send class="size-4" />
 		{/if}
-		Salveaza
+		{m.exercise_save()}
 	</Button>
 {/snippet}
 <svelte:head>
