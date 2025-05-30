@@ -4,6 +4,7 @@ export const load = async ({ locals, params, url }) => {
     const chapterId = params.chapter_id;
     const lessonId = params.lesson_id;
     const exerciseId = params.exercise_id;
+    const userId = params.user_id;
     let breadcrumbs: { name: string, url: string }[] = [];
 
     breadcrumbs.push({
@@ -11,7 +12,7 @@ export const load = async ({ locals, params, url }) => {
         url: '/admin'
     });
 
-    if (url.pathname.includes('/course')) {
+    if (url.pathname.includes('/courses')) {
         breadcrumbs.push({
             name: 'Cursuri',
             url: '/admin/courses'
@@ -23,10 +24,15 @@ export const load = async ({ locals, params, url }) => {
                 url: '/admin/courses/create'
             });
         }
-    } else if (url.pathname.includes('/exercise')) {
+    } else if (url.pathname.includes('/exercises')) {
         breadcrumbs.push({
             name: 'Exercitii',
             url: '/admin/exercises'
+        });
+    } else if (url.pathname.includes('/users')) {
+        breadcrumbs.push({
+            name: 'Utilizatori',
+            url: '/admin/users'
         });
     }
 
@@ -55,6 +61,12 @@ export const load = async ({ locals, params, url }) => {
         breadcrumbs.push({
             name: 'Exercitiu',
             url: `/admin/exercises/${exerciseId}`
+        });
+    }
+    if (userId) {
+        breadcrumbs.push({
+            name: 'Utilizator',
+            url: `/admin/users/${userId}`
         });
     }
 
