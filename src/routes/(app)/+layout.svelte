@@ -153,9 +153,9 @@
 								<span class="truncate text-sm font-medium">{data.user.username}</span>
 								<span class="text-xs capitalize text-muted-foreground">
 									{#if data.canViewAdminPage}
-										Cont de administrator
+										{m.admin_account()}
 									{:else}
-										Utilizator
+										{m.user_account()}
 									{/if}
 								</span>
 							</div>

@@ -2,6 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { ArrowRightIcon, BookOpenIcon, UsersIcon, Github } from 'lucide-svelte';
+	import * as m from '$lib/paraglide/messages.js';
 </script>
 
 <section class="container grid gap-10 py-20 md:py-32">
@@ -9,16 +10,16 @@
 		<main class="text-center text-5xl font-bold md:text-6xl">
 			<h1 class="font-bold">
 				ATLWEB - <span class="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] dark:from-[#a22604] dark:via-[#e34211] dark:to-[#fb5b27] bg-clip-text text-transparent"
-					>Învață programare web</span
+					>{m.home_title()}</span
 				>
 			</h1>
 		</main>
 		<h2 class="mx-auto text-center text-2xl text-muted-foreground md:w-10/12">
-			Platformă educațională pentru învățarea programării web într-un mod interactiv și practic
+			{m.home_subtitle()}
 		</h2>
 		<div class="flex justify-center gap-4">
 			<Button href="/courses" size="lg" class="px-8" id="main-button">
-				Începe să înveți
+				{m.home_start_learning()}
 				<ArrowRightIcon class="ml-2 h-4 w-4" />
 			</Button>
 
@@ -29,7 +30,7 @@
 				size="lg"
 				class="px-8"
 			>
-				Repository Github
+				{m.home_github_repository()}
 				<svg
 					width="15"
 					height="15"
@@ -54,12 +55,10 @@
 				<div class="mx-auto rounded-full bg-primary/10 p-4">
 					<BookOpenIcon class="h-8 w-8 text-primary" />
 				</div>
-				<Card.Title>Cursuri Interactive</Card.Title>
+				<Card.Title>{m.home_interactive_courses_title()}</Card.Title>
 			</Card.Header>
 			<Card.Content>
-				<Card.Description
-					>Învață prin cursuri structurate cu exemple practice și exerciții interactive</Card.Description
-				>
+				<Card.Description>{m.home_interactive_courses_description()}</Card.Description>
 			</Card.Content>
 		</Card.Root>
 
@@ -68,12 +67,10 @@
 				<div class="mx-auto rounded-full bg-primary/10 p-4">
 					<BookOpenIcon class="h-8 w-8 text-primary" />
 				</div>
-				<Card.Title>Exerciții Practice</Card.Title>
+				<Card.Title>{m.home_practical_exercises_title()}</Card.Title>
 			</Card.Header>
 			<Card.Content>
-				<Card.Description
-					>Rezolvă exerciții și primește feedback instant pentru a-ți îmbunătăți abilitățile</Card.Description
-				>
+				<Card.Description>{m.home_practical_exercises_description()}</Card.Description>
 			</Card.Content>
 		</Card.Root>
 
@@ -82,12 +79,10 @@
 				<div class="mx-auto rounded-full bg-primary/10 p-4">
 					<UsersIcon class="h-8 w-8 text-primary" />
 				</div>
-				<Card.Title>Comunitate</Card.Title>
+				<Card.Title>{m.home_community_title()}</Card.Title>
 			</Card.Header>
 			<Card.Content>
-				<Card.Description
-					>Conectează-te cu alți cursanți și împărtășește experiența ta de învățare</Card.Description
-				>
+				<Card.Description>{m.home_community_description()}</Card.Description>
 			</Card.Content>
 		</Card.Root>
 	</div>
@@ -95,7 +90,7 @@
 
 <img
 	src="/laurian.png"
-	alt="Colegiul Naţional „A. T. Laurian” Botoşani"
+	alt={m.home_laurian_alt()}
 	class="fixed bottom-0 right-0 -z-10 object-cover opacity-20 md:opacity-50"
 	style="height: calc(100vh - 4rem);"
 />

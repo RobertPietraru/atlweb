@@ -8,6 +8,8 @@
     "login": "Autentificare",
     "register": "Înregistrare",
     "logout": "Deconectare",
+    "admin_account": "Cont de administrator",
+    "user_account": "Cont de utilizator",
 
     "footer_title": "ATLWEB",
     "footer_description": "Platforma educațională pentru învățarea programării web într-un mod interactiv și practic.",
@@ -23,6 +25,29 @@
     "footer_profile": "Profil",
     "footer_terms": "Termeni și Condiții",
     "footer_privacy": "Politica de Confidențialitate",
-    "footer_cookies": "Politica de Cookie-uri"
-    
+    "footer_cookies": "Politica de Cookie-uri",
+
+    "home_title": "Învață programare web",
+    "home_subtitle": "Platformă educațională pentru învățarea programării web într-un mod interactiv și practic",
+    "home_start_learning": "Începe să înveți",
+    "home_github_repository": "Repository Github",
+
+    "home_interactive_courses_title": "Cursuri Interactive",
+    "home_interactive_courses_description": "Învață prin cursuri structurate cu exemple practice și exerciții interactive",
+
+    "home_practical_exercises_title": "Exerciții Practice", 
+    "home_practical_exercises_description": "Rezolvă exerciții și primește feedback instant pentru a-ți îmbunătăți abilitățile",
+
+    "home_community_title": "Comunitate",
+    "home_community_description": "Conectează-te cu alți cursanți și împărtășește experiența ta de învățare",
+
+    "home_laurian_alt": "Colegiul Naţional „A. T. Laurian” Botoşani",
+
+    "courses_title": "Cursuri",
+    "courses_start": "Începe cursul",
+    "courses_chapter_singular": "capitol",
+    "courses_chapter_plural": "capitole",
+
+    "courses_create": "Creează curs nou"
+
 }

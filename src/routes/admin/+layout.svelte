@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
+
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen } from '@lucide/svelte';
 	import { Sun, Moon } from 'lucide-svelte';
@@ -239,32 +241,32 @@
 >
 	<div class="container grid grid-cols-1 gap-8 md:grid-cols-4">
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">ATLWEB</h3>
+			<h3 class="text-lg font-semibold">{m.footer_title()}</h3>
 			<p class="max-w-xs">
-				Platforma educațională pentru învățarea programării web într-un mod interactiv și practic.
+				{m.footer_description()}
 			</p>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Navigare</h3>
+			<h3 class="text-lg font-semibold">{m.footer_navigation()}</h3>
 			<nav class="flex flex-col gap-2">
-				<a href="/" class="hover:text-primary">Acasă</a>
-				<a href="/courses" class="hover:text-primary">Cursuri</a>
-				<a href="/profile" class="hover:text-primary">Profil</a>
+				<a href="/" class="hover:text-primary">{m.footer_home()}</a>
+				<a href="/courses" class="hover:text-primary">{m.footer_courses()}</a>
+				<a href="/profile" class="hover:text-primary">{m.footer_profile()}</a>
 			</nav>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Legal</h3>
+			<h3 class="text-lg font-semibold">{m.footer_legal()}</h3>
 			<nav class="flex flex-col gap-2">
-				<a href="/terms" class="hover:text-primary">Termeni și Condiții</a>
-				<a href="/privacy" class="hover:text-primary">Politica de Confidențialitate</a>
-				<a href="/cookies" class="hover:text-primary">Politica de Cookie-uri</a>
+				<a href="/terms" class="hover:text-primary">{m.footer_terms()}</a>
+				<a href="/privacy" class="hover:text-primary">{m.footer_privacy()}</a>
+				<a href="/cookies" class="hover:text-primary">{m.footer_cookies()}</a>
 			</nav>
 		</div>
 
 		<div class="flex flex-col gap-4">
-			<h3 class="text-lg font-semibold">Contact</h3>
+			<h3 class="text-lg font-semibold">{m.footer_contact()}</h3>
 			<nav class="flex flex-col gap-2">
 				<a href="mailto:rob_piet@yahoo.com" class="hover:text-primary">rob_piet@yahoo.com</a>
 				<div class="flex gap-4">

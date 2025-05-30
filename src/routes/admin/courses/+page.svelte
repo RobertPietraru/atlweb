@@ -3,15 +3,15 @@
 
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { ArrowUpRightIcon, BookOpenIcon } from 'lucide-svelte';
-
+	import * as m from '$lib/paraglide/messages.js';
 	let { data } = $props();
 
 </script>
 
 <main class="min-h-[100vh] w-full py-4">
 	<div class="mb-8 flex items-center justify-between">
-		<h1 class="text-2xl font-bold md:text-3xl">Cursuri</h1>
-		<Button href="/admin/courses/create" id="create-course-button">Creeaza curs nou</Button>
+		<h1 class="text-2xl font-bold md:text-3xl">{m.courses_title()}</h1>
+		<Button href="/admin/courses/create" id="create-course-button">{m.courses_create()}</Button>
 	</div>
 
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -45,14 +45,14 @@
 									<BookOpenIcon class="h-4 w-4" />
 									<span>
 										{course.chapterCount}
-										{course.chapterCount === 1 ? 'capitol' : 'capitole'}
+										{course.chapterCount === 1 ? m.courses_chapter_singular() : m.courses_chapter_plural()}
 									</span>
 								</div>
 							</div>
 							<div
 								class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-hover:bg-primary group-hover:text-primary-foreground"
 							>
-								Editeaza
+								{m.courses_edit()}
 							</div>
 						</div>
 					</CardFooter>

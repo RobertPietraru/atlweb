@@ -23,6 +23,22 @@
     "footer_profile": "Profile",
     "footer_terms": "Terms and Conditions",
     "footer_privacy": "Privacy Policy", 
-    "footer_cookies": "Cookie Policy"
+    "footer_cookies": "Cookie Policy",
+
+    "home_title": "Learn web programming",
+    "home_subtitle": "Educational platform for learning web programming in an interactive and practical way",
+    "home_start_learning": "Start learning",
+    "home_github_repository": "GitHub Repository",
+
+    "home_interactive_courses_title": "Interactive Courses",
+    "home_interactive_courses_description": "Learn through structured courses with practical examples and interactive exercises",
+
+    "home_practical_exercises_title": "Practical Exercises",
+    "home_practical_exercises_description": "Solve exercises and get instant feedback to improve your skills",
+
+    "home_community_title": "Community",
+    "home_community_description": "Connect with other learners and share your learning experience",
+
+    "home_laurian_alt": "National College \"A. T. Laurian\" Botosani"
     
 }
