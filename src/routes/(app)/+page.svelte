@@ -9,7 +9,7 @@
 	<div class="space-y-6 text-center">
 		<main class="text-center text-5xl font-bold md:text-6xl">
 			<h1 class="font-bold">
-				ATLWEB - <span class="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] dark:from-[#a22604] dark:via-[#e34211] dark:to-[#fb5b27] bg-clip-text text-transparent"
+				{m.brand_name()} - <span class="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#60a5fa] dark:from-[#a22604] dark:via-[#e34211] dark:to-[#fb5b27] bg-clip-text text-transparent"
 					>{m.home_title()}</span
 				>
 			</h1>

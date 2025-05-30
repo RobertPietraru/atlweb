@@ -56,13 +56,13 @@
 		if (res.ok) {
 			location.reload();
 		} else {
-			console.error('Failed to logout');
+			console.error(m.failed_to_logout());
 		}
 	}
 </script>
 
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-	<a href="/" class="mr-4 text-2xl font-bold">ATLWEB</a>
+	<a href="/" class="mr-4 text-2xl font-bold">{m.brand_name()}</a>
 	<div class="flex-1"></div>
 
 	<div class="flex items-center gap-1 md:gap-3">
@@ -73,27 +73,27 @@
 			<DropdownMenu.Content align="end">
 				<DropdownMenu.Item
 					onclick={() => switchToLanguage('ro')}
-					class={languageTag() === 'ro' ? 'bg-accent' : ''}>Română</DropdownMenu.Item
+					class={languageTag() === 'ro' ? 'bg-accent' : ''}>{m.language_ro()}</DropdownMenu.Item
 				>
 				<DropdownMenu.Item
 					onclick={() => switchToLanguage('en')}
-					class={languageTag() === 'en' ? 'bg-accent' : ''}>English</DropdownMenu.Item
+					class={languageTag() === 'en' ? 'bg-accent' : ''}>{m.language_en()}</DropdownMenu.Item
 				>
 				<DropdownMenu.Item
 					onclick={() => switchToLanguage('hu')}
-					class={languageTag() === 'hu' ? 'bg-accent' : ''}>Magyar</DropdownMenu.Item
+					class={languageTag() === 'hu' ? 'bg-accent' : ''}>{m.language_hu()}</DropdownMenu.Item
 				>
 				<DropdownMenu.Item
 					onclick={() => switchToLanguage('uk')}
-					class={languageTag() === 'uk' ? 'bg-accent' : ''}>Українська</DropdownMenu.Item
+					class={languageTag() === 'uk' ? 'bg-accent' : ''}>{m.language_uk()}</DropdownMenu.Item
 				>
 				<DropdownMenu.Item
 					onclick={() => switchToLanguage('de')}
-					class={languageTag() === 'de' ? 'bg-accent' : ''}>Deutsch</DropdownMenu.Item
+					class={languageTag() === 'de' ? 'bg-accent' : ''}>{m.language_de()}</DropdownMenu.Item
 				>
 				<DropdownMenu.Item
 					onclick={() => switchToLanguage('ru')}
-					class={languageTag() === 'ru' ? 'bg-accent' : ''}>Русский</DropdownMenu.Item
+					class={languageTag() === 'ru' ? 'bg-accent' : ''}>{m.language_ru()}</DropdownMenu.Item
 				>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>

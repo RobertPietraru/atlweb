@@ -27,6 +27,7 @@
 	import { slide } from 'svelte/transition';
 	import { ArrowUp, ArrowDown } from 'lucide-svelte';
 	import { Search } from '@lucide/svelte';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 	let lesson = $state(data.lesson);
@@ -80,18 +81,18 @@
 
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
-				toast.success('Lecția a fost salvată cu succes', {
+				toast.success(m.admin_lesson_save_success(), {
 					position: 'bottom-left'
 				});
 				oldLesson = structuredClone($state.snapshot(lesson));
 			} else {
-				toast.error('A apărut o eroare la salvarea lecției', {
+				toast.error(m.admin_lesson_save_error(), {
 					position: 'bottom-left'
 				});
 			}
 		} catch (error) {
 			console.error('Error saving lesson:', error);
-			toast.error('A apărut o eroare la salvarea lecției', {
+			toast.error(m.admin_lesson_save_error(), {
 				position: 'bottom-left'
 			});
 		} finally {
@@ -114,22 +115,22 @@
 
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
-				toast.success('Exercițiul a fost găsit cu succes', {
+				toast.success(m.admin_lesson_exercise_search_success(), {
 					position: 'bottom-left'
 				});
 				exercises.push(result.data?.exercise as unknown as (typeof exercises)[0]);
 			} else if (result.type === 'error') {
-				toast.error('A apărut o eroare la căutarea exercițiului', {
+				toast.error(m.admin_lesson_exercise_search_error(), {
 					position: 'bottom-left'
 				});
 			} else if (result.type === 'failure') {
-				toast.error('Exercițiul nu există', {
+				toast.error(m.admin_lesson_exercise_not_found(), {
 					position: 'bottom-left'
 				});
 			}
 		} catch (error) {
 			console.error('Error saving lesson:', error);
-			toast.error('A apărut o eroare la căutarea exercițiului', {
+			toast.error(m.admin_lesson_exercise_search_error(), {
 				position: 'bottom-left'
 			});
 		} finally {
@@ -206,7 +207,7 @@
 <main class="py-8">
 	<div class="mb-6 flex items-center justify-between">
 		<div class="flex items-center gap-6">
-			<h1 class="text-3xl font-bold tracking-tight">Editare lecție</h1>
+			<h1 class="text-3xl font-bold tracking-tight">{m.admin_lesson_title()}</h1>
 		</div>
 		<Button
 			onclick={saveLesson}
@@ -216,12 +217,12 @@
 			{#if saving}
 				<span class="inline-flex items-center">
 					<span class="mr-2 animate-spin">⟳</span>
-					Se salvează...
+					{m.admin_lesson_saving()}
 				</span>
 			{:else if isSaved}
-				<span>✓ Salvat</span>
+				<span>{m.admin_lesson_saved()}</span>
 			{:else}
-				Salvează
+				{m.admin_lesson_save()}
 			{/if}
 		</Button>
 	</div>
@@ -231,16 +232,16 @@
 		<Card class="p-4">
 			<div class="space-y-4">
 				<div class="space-y-2">
-					<Label for="name">Titlu</Label>
-					<Input id="name" bind:value={lesson.name} placeholder="Titlul lecției" />
+					<Label for="name">{m.admin_lesson_name()}</Label>
+					<Input id="name" bind:value={lesson.name} placeholder={m.admin_lesson_name_placeholder()} />
 				</div>
 
 				<div class="space-y-2">
-					<Label for="teaser">Teaser</Label>
+					<Label for="teaser">{m.admin_lesson_teaser()}</Label>
 					<Textarea
 						id="teaser"
 						bind:value={lesson.teaser}
-						placeholder="Scrie un scurt rezumat al lecției (markdown)"
+						placeholder={m.admin_lesson_teaser_placeholder()}
 						class="min-h-[100px]"
 					/>
 				</div>

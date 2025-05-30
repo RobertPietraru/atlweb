@@ -7,6 +7,7 @@
 	import { toast } from 'svelte-sonner';
 	import { deserialize } from '$app/forms';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 	let chapters = $state(data.course.chapters.map((ch) => ({ ...ch })));
@@ -54,7 +55,7 @@
 				console.error('Error saving chapter order:', result.data?.message);
 				toast.error(
 					(result.data?.message as string | undefined | null) ?? 
-					'A apărut o eroare la salvarea ordinii capitolelor',
+					m.admin_course_save_chapter_order_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -62,7 +63,7 @@
 			}
 		} catch (error) {
 			console.error('Error saving chapter order:', error);
-			toast.error('A apărut o eroare la salvarea ordinii capitolelor', {
+			toast.error(m.admin_course_save_chapter_order_error(), {
 				position: 'bottom-left'
 			});
 		} finally {
@@ -86,14 +87,14 @@
 				data.course.name = editForm.name;
 				data.course.description = editForm.description;
 				isEditing = false;
-				toast.success('Informațiile cursului au fost salvate cu succes', {
+				toast.success(m.admin_course_save_info_success(), {
 					position: 'bottom-left'
 				});
 			} else if (result.type === 'failure') {
 				console.error('Error saving course info:', result.data?.message);
 				toast.error(
 					(result.data?.message as string | undefined | null) ?? 
-					'A apărut o eroare la salvarea informațiilor cursului',
+					m.admin_course_save_info_error(),
 					{
 						position: 'bottom-left'
 					}
@@ -101,7 +102,7 @@
 			}
 		} catch (error) {
 			console.error('Error saving course info:', error);
-			toast.error('A apărut o eroare la salvarea informațiilor cursului', {
+			toast.error(m.admin_course_save_info_error(), {
 				position: 'bottom-left'
 			});
 		} finally {
@@ -117,41 +118,41 @@
 
 <div class="container mx-auto max-w-4xl py-12">
 	<header class="mb-12">
-		<h1 class="text-4xl font-bold tracking-tight">Curs: {data.course.name}</h1>
+		<h1 class="text-4xl font-bold tracking-tight">{m.admin_course_title({ name: data.course.name })}</h1>
 	</header>
 
 	<div class="grid gap-12">
 		<section>
 			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">Informații de bază</h2>
+				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_course_basic_info()}</h2>
 				{#if !isEditing}
-					<Button variant="outline" onclick={() => (isEditing = true)} id="edit-course-button">Editează</Button>
+					<Button variant="outline" onclick={() => (isEditing = true)} id="edit-course-button">{m.admin_course_edit()}</Button>
 				{/if}
 			</div>
 			<Card>
 				<CardContent class="space-y-6 pt-6">
 					{#if isEditing}
 						<div>
-							<Label for="name">Nume curs</Label>
+							<Label for="name">{m.admin_course_name()}</Label>
 							<Input id="name" bind:value={editForm.name} />
 						</div>
 						<div>
-							<Label for="description">Descriere</Label>
+							<Label for="description">{m.admin_course_description()}</Label>
 							<Textarea id="description" bind:value={editForm.description} />
 						</div>
 						<div class="flex gap-2">
-							<Button variant="default" onclick={saveCourseInfo} disabled={saving}>Salvează</Button>
+							<Button variant="default" onclick={saveCourseInfo} disabled={saving}>{m.admin_course_save()}</Button>
 							<Button variant="outline" onclick={() => (isEditing = false)} disabled={saving}>
-								Anulează
+								{m.admin_course_cancel()}
 							</Button>
 						</div>
 					{:else}
 						<div>
-							<Label class="text-sm text-muted-foreground">Nume curs</Label>
+							<Label class="text-sm text-muted-foreground">{m.admin_course_name()}</Label>
 							<p class="mt-1 text-lg font-medium">{data.course.name}</p>
 						</div>
 						<div>
-							<Label class="text-sm text-muted-foreground">Descriere</Label>
+							<Label class="text-sm text-muted-foreground">{m.admin_course_description()}</Label>
 							<p class="mt-1 text-lg leading-relaxed">{data.course.description}</p>
 						</div>
 					{/if}
@@ -161,24 +162,24 @@
 
 		<section>
 			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">Capitole</h2>
+				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_course_chapters()}</h2>
 				<div class="flex gap-2">
 					<form action="?/createChapter" method="POST">
-						<Button id="add-chapter-button" type="submit">Adaugă capitol nou</Button>
+						<Button id="add-chapter-button" type="submit">{m.admin_course_add_chapter()}</Button>
 					</form>
 				</div>
 			</div>
 
 			{#if hasChanges}
 				<Button variant="default" onclick={saveChapterOrder} disabled={loading} class="w-full">
-					Salvează
+					{m.admin_course_save()}
 				</Button>
 			{/if}
 
 			{#if chapters.length === 0}
 				<Card>
 					<CardContent class="pt-6">
-						<p class="text-center text-muted-foreground">Nu există capitole pentru acest curs.</p>
+						<p class="text-center text-muted-foreground">{m.admin_course_no_chapters()}</p>
 					</CardContent>
 				</Card>
 			{:else}
@@ -216,13 +217,13 @@
 										variant="outline"
 										href="/admin/courses/{data.course.id}/chapters/{chapter.id}"
 									>
-										Editează
+										{m.admin_course_edit_chapter()}
 									</Button>
 									<Button 
 										variant="destructive"
 										onclick={() => deleteChapter(index)}
 									>
-										Șterge
+										{m.admin_course_delete_chapter()}
 									</Button>
 								</div>
 							</CardContent>

@@ -106,10 +106,10 @@
 			<Moon
 				class="h-[1.2rem] w-[1.2rem] translate-y-8 rotate-180 scale-75 opacity-0 transition-all duration-500 ease-in-out dark:translate-y-0 dark:rotate-0 dark:scale-100 dark:opacity-100"
 			/>
-			<span class="sr-only">Toggle theme</span>
+			<span class="sr-only">{m.admin_toggle_theme()}</span>
 		</Button>
 		{#if !data.user}
-			<Button href="/login" variant="outline">Autentifica-te</Button>
+			<Button href="/login" variant="outline">{m.login()}</Button>
 		{:else}
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger
@@ -148,9 +148,9 @@
 								<span class="truncate text-sm font-medium">{data.user.username}</span>
 								<span class="text-xs capitalize text-muted-foreground">
 									{#if data.canViewAdminPage}
-										Cont de administrator
+										{m.admin_account()}
 									{:else}
-										Utilizator
+										{m.admin_user()}
 									{/if}
 								</span>
 							</div>
@@ -164,14 +164,14 @@
 							: ''}"
 					>
 						<UserRound class="mr-2.5 h-4 w-4" />
-						Profil
+						{m.profile()}
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
 						onclick={() => localizedGoto(page.url.toString(), '/courses')}
 						class="flex items-center {canonicalPath.startsWith('/courses') ? 'bg-accent' : ''}"
 					>
 						<BookOpen class="mr-2.5 h-4 w-4" />
-						Cursuri
+						{m.courses()}
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
 						onclick={() => localizedGoto(page.url.toString(), '/exercises')}
@@ -180,7 +180,7 @@
 							: ''}"
 					>
 						<BrainCircuit class="mr-2.5 h-4 w-4" />
-						Exerciții
+						{m.exercises()}
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					{#if data.canViewAdminPage}
@@ -190,7 +190,7 @@
 							disabled={logoutLoading}
 						>
 							<ShieldUser class="mr-2.5 h-4 w-4" />
-							<span>Administrator</span>
+							{m.admin_administrator()}
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator />
 					{/if}
@@ -205,7 +205,7 @@
 						{:else}
 							<LogOut class="mr-2.5 h-4 w-4" />
 						{/if}
-						<span>Log out</span>
+						{m.logout()}
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>

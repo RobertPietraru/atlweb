@@ -81,7 +81,7 @@
 						<Plus />
 					{/if}
 					{#if !isMobile.current}
-						Creeaza exercitiu nou
+						{m.exercises_create()}
 					{/if}
 				</Button>
 			</form>
