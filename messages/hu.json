@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Hiba történt a lecke mentése során",
     "admin_lesson_exercise_search_success": "A feladat sikeresen megtalálva",
     "admin_lesson_exercise_search_error": "Hiba történt a feladat keresése során",
-    "admin_lesson_exercise_not_found": "A feladat nem található"
+    "admin_lesson_exercise_not_found": "A feladat nem található",
+    "breadcrumbs_admin": "Admin vezérlőpult",
+    "breadcrumbs_courses": "Kurzusok",
+    "breadcrumbs_new_course": "Új kurzus",
+    "breadcrumbs_exercises": "Feladatok",
+    "breadcrumbs_users": "Utilizatori",
+    "breadcrumbs_course": "Kurzus",
+    "breadcrumbs_chapter": "Fejezet",
+    "breadcrumbs_lesson": "Lecke",
+    "breadcrumbs_exercise": "Feladat",
+    "breadcrumbs_user": "Felhasználó"
 }

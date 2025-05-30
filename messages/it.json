@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Si è verificato un errore durante il salvataggio della lezione",
     "admin_lesson_exercise_search_success": "Esercizio trovato con successo",
     "admin_lesson_exercise_search_error": "Si è verificato un errore durante la ricerca dell'esercizio",
-    "admin_lesson_exercise_not_found": "Esercizio non trovato"
+    "admin_lesson_exercise_not_found": "Esercizio non trovato",
+    "breadcrumbs_admin": "Pannello amministrativo",
+    "breadcrumbs_courses": "Corsi",
+    "breadcrumbs_new_course": "Nuovo corso",
+    "breadcrumbs_exercises": "Esercizi",
+    "breadcrumbs_users": "Utenti",
+    "breadcrumbs_course": "Corso",
+    "breadcrumbs_chapter": "Capitolo",
+    "breadcrumbs_lesson": "Lezione",
+    "breadcrumbs_exercise": "Esercizio",
+    "breadcrumbs_user": "Utente"
 }

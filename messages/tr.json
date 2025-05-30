@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Ders kaydedilirken bir hata oluştu",
     "admin_lesson_exercise_search_success": "Alıştırma başarıyla bulundu",
     "admin_lesson_exercise_search_error": "Alıştırma aranırken bir hata oluştu",
-    "admin_lesson_exercise_not_found": "Alıştırma bulunamadı"
+    "admin_lesson_exercise_not_found": "Alıştırma bulunamadı",
+    "breadcrumbs_admin": "Yönetici panosu",
+    "breadcrumbs_courses": "Kurslar",
+    "breadcrumbs_new_course": "Yeni kurs",
+    "breadcrumbs_exercises": "Alıştırmalar",
+    "breadcrumbs_users": "Kullanıcılar",
+    "breadcrumbs_course": "Kurs",
+    "breadcrumbs_chapter": "Bölüm",
+    "breadcrumbs_lesson": "Ders",
+    "breadcrumbs_exercise": "Alıştırma",
+    "breadcrumbs_user": "Kullanıcı"
 }

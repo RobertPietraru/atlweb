@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "Помилка при збереженні уроку",
     "admin_lesson_exercise_search_success": "Вправу успішно знайдено",
     "admin_lesson_exercise_search_error": "Помилка при пошуку вправи",
-    "admin_lesson_exercise_not_found": "Вправу не знайдено"
+    "admin_lesson_exercise_not_found": "Вправу не знайдено",
+    "breadcrumbs_admin": "Панель адміністратора",
+    "breadcrumbs_courses": "Курси",
+    "breadcrumbs_new_course": "Новий курс",
+    "breadcrumbs_exercises": "Вправи",
+    "breadcrumbs_users": "Користувачі",
+    "breadcrumbs_course": "Курс",
+    "breadcrumbs_chapter": "Розділ",
+    "breadcrumbs_lesson": "Урок",
+    "breadcrumbs_exercise": "Вправа",
+    "breadcrumbs_user": "Користувач"
 }

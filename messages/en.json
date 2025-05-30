@@ -187,5 +187,15 @@
     "admin_lesson_save_error": "An error occurred while saving the lesson",
     "admin_lesson_exercise_search_success": "Exercise found successfully",
     "admin_lesson_exercise_search_error": "An error occurred while searching for the exercise",
-    "admin_lesson_exercise_not_found": "Exercise not found"
+    "admin_lesson_exercise_not_found": "Exercise not found",
+    "breadcrumbs_admin": "Administrative Dashboard",
+    "breadcrumbs_courses": "Courses",
+    "breadcrumbs_new_course": "New course",
+    "breadcrumbs_exercises": "Exercises",
+    "breadcrumbs_users": "Users",
+    "breadcrumbs_course": "Course",
+    "breadcrumbs_chapter": "Chapter",
+    "breadcrumbs_lesson": "Lesson",
+    "breadcrumbs_exercise": "Exercise",
+    "breadcrumbs_user": "User"
 }
