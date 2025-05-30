@@ -121,7 +121,7 @@ export class AdminService {
     }
 
     async updateUserPermissions(userId: table.Id, permissions: table.Permissions[]) {
-        this.db.update(table.user).set({
+        await this.db.update(table.user).set({
             permissions: permissions
         }).where(eq(table.user.id, userId));
     }
