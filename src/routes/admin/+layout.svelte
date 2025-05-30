@@ -54,6 +54,20 @@
 			console.error('Failed to logout');
 		}
 	}
+	let lang = {
+		bg: 'Български',
+		de: 'Deutsch',
+		en: 'Englis',
+		fr: 'Français',
+		hu: 'Magyar',
+		it: 'Italiano',
+		ro: 'Română',
+		ru: 'Русский',
+		sr: 'Српски',
+		tr: 'Türkçe',
+		uk: 'Українська'
+	};
+	let languages = ['ro', 'de', 'en', 'fr', 'hu', 'it', 'ru', 'sr', 'tr', 'uk', 'bg'];
 </script>
 
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -66,33 +80,14 @@
 				<Languages class="h-[1.2rem] w-[1.2rem]" />
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content align="end">
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('ro')}
-					class={languageTag() === 'ro' ? 'bg-accent' : ''}>Română</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('en')}
-					class={languageTag() === 'en' ? 'bg-accent' : ''}>English</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('hu')}
-					class={languageTag() === 'hu' ? 'bg-accent' : ''}>Magyar</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('uk')}
-					class={languageTag() === 'uk' ? 'bg-accent' : ''}>Українська</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('de')}
-					class={languageTag() === 'de' ? 'bg-accent' : ''}>Deutsch</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('ru')}
-					class={languageTag() === 'ru' ? 'bg-accent' : ''}>Русский</DropdownMenu.Item
-				>
+				{#each languages as language}
+					<DropdownMenu.Item
+						onclick={() => switchToLanguage(language)}
+						class={languageTag() === language ? 'bg-accent' : ''}>{lang[language]}</DropdownMenu.Item
+					>
+				{/each}
 			</DropdownMenu.Content>
-		</DropdownMenu.Root>
-
+		</DropdownMenu.Root>	
 		<Button
 			onclick={() => {
 				isDarkTheme = !isDarkTheme;

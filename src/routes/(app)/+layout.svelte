@@ -32,7 +32,6 @@
 		goto(localisedPath);
 	}
 
-
 	$effect(() => {
 		const htmlEl = document.documentElement;
 		if (isDarkTheme) {
@@ -59,6 +58,20 @@
 			console.error(m.failed_to_logout());
 		}
 	}
+	let lang = {
+		bg: 'Български',
+		de: 'Deutsch',
+		en: 'Englis',
+		fr: 'Français',
+		hu: 'Magyar',
+		it: 'Italiano',
+		ro: 'Română',
+		ru: 'Русский',
+		sr: 'Српски',
+		tr: 'Türkçe',
+		uk: 'Українська'
+	};
+	let languages = ['ro', 'de', 'en', 'fr', 'hu', 'it', 'ru', 'sr', 'tr', 'uk', 'bg'];
 </script>
 
 <header class="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -71,30 +84,12 @@
 				<Languages class="h-[1.2rem] w-[1.2rem]" />
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content align="end">
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('ro')}
-					class={languageTag() === 'ro' ? 'bg-accent' : ''}>{m.language_ro()}</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('en')}
-					class={languageTag() === 'en' ? 'bg-accent' : ''}>{m.language_en()}</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('hu')}
-					class={languageTag() === 'hu' ? 'bg-accent' : ''}>{m.language_hu()}</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('uk')}
-					class={languageTag() === 'uk' ? 'bg-accent' : ''}>{m.language_uk()}</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('de')}
-					class={languageTag() === 'de' ? 'bg-accent' : ''}>{m.language_de()}</DropdownMenu.Item
-				>
-				<DropdownMenu.Item
-					onclick={() => switchToLanguage('ru')}
-					class={languageTag() === 'ru' ? 'bg-accent' : ''}>{m.language_ru()}</DropdownMenu.Item
-				>
+				{#each languages as language}
+					<DropdownMenu.Item
+						onclick={() => switchToLanguage(language)}
+						class={languageTag() === language ? 'bg-accent' : ''}>{lang[language]}</DropdownMenu.Item
+					>
+				{/each}
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 
@@ -178,9 +173,7 @@
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
 						onclick={() => localizedGoto(page.url.toString(), '/exercises')}
-						class="flex items-center {canonicalPath.startsWith('/exercises')
-							? 'bg-accent'
-							: ''}"
+						class="flex items-center {canonicalPath.startsWith('/exercises') ? 'bg-accent' : ''}"
 					>
 						<BrainCircuit class="mr-2.5 h-4 w-4" />
 						{m.exercises()}
@@ -188,9 +181,7 @@
 					<DropdownMenu.Separator />
 					{#if data.canViewAdminPage}
 						<DropdownMenu.Item
-							class="flex items-center {canonicalPath.startsWith('/admin')
-								? 'bg-accent'
-								: ''}"
+							class="flex items-center {canonicalPath.startsWith('/admin') ? 'bg-accent' : ''}"
 							onclick={() => localizedGoto(page.url.toString(), '/admin')}
 							disabled={logoutLoading}
 						>
