@@ -167,6 +167,7 @@
 
 				console.log(result.data);
 				submissions = [result.data?.submission as (typeof submissions)[0], ...submissions];
+				activeSidebarTab = 'submissions';
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
@@ -419,45 +420,17 @@
 	</ScrollArea>
 {/snippet}
 {#snippet submitButton()}
-	<Popover.Root bind:open={submitPopupOpen}>
-		<Popover.Trigger
-			bind:ref={submitPopupRef}
-			disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-		>
-			{#snippet child({ props })}
-				<Button {...props} aria-expanded={submitPopupOpen} class="h-10">
-					{#if submitting}
-						<Loader2 class="size-4 animate-spin" />
-					{:else}
-						<Send class="size-4" />
-					{/if}
-				</Button>
-			{/snippet}
-		</Popover.Trigger>
-		<Popover.Content class=" w-[250px] space-y-0 rounded-md p-0">
-			<Button
-				variant="ghost"
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				class="w-full justify-start rounded-t-md"
-				onclick={() => submitCode({ needHelp: false})}
-			>
-				<CheckIcon class="size-4" />
-				Trimite
-			</Button>
-
-			<Separator class="my-2" />
-
-			<Button
-				variant="ghost"
-				disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
-				class="w-full justify-start rounded-b-none"
-				onclick={() => submitCode({ needHelp: true })}
-			>
-				<HelpCircleIcon class="size-4" />
-				Cere ajutor
-			</Button>
-		</Popover.Content>
-	</Popover.Root>
+	<Button
+		disabled={submitting || currentCodeAndSubmittedCodeAreTheSame}
+		onclick={() => submitCode({ needHelp: false })}
+	>
+		{#if submitting}
+			<Loader2 class="size-4 animate-spin" />
+		{:else}
+			<Send class="size-4" />
+		{/if}
+		Salveaza
+	</Button>
 {/snippet}
 <svelte:head>
 	<title>{data.exercise.title} | atl.vercel.app</title>
