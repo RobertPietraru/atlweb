@@ -15,7 +15,8 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { deserialize } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { localizedGoto } from '$lib/utils.js';
 	let { data } = $props();
 	const carta = new Carta({} as Options);
 
@@ -139,7 +140,7 @@
 			const result = deserialize(await response.text());
 			if (result.type === 'redirect') {
 				toast.success('Exercitiul a fost sters cu succes');
-				goto(result.location);
+				localizedGoto(page.url.toString(), result.location);
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??

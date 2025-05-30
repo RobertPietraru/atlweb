@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { withSearchParameters } from '$lib/utils';
+	import { withSearchParameters, localizedGoto } from '$lib/utils';
 	import { Button } from '$lib/components/ui/button';
 	import { page } from '$app/state';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
@@ -14,7 +14,6 @@
 		ChevronLeftIcon,
 		ChevronRightIcon
 	} from '@lucide/svelte';
-	import { goto } from '$app/navigation';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
 	const isMobile = new IsMobile();
 
@@ -37,7 +36,8 @@
 					autocomplete="off"
 					onkeydown={(e) => {
 						if (e.key === 'Enter') {
-							goto(
+							localizedGoto(
+								page.url.toString(),
 								withSearchParameters(
 									withSearchParameters(
 									new URL(page.url.toString()),
@@ -46,7 +46,7 @@
 								),
 									'page',
 									'1'
-								),
+								).toString(),
 								{ invalidateAll: true }
 							);
 						}

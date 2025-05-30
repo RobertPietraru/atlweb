@@ -3,7 +3,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import { marked } from 'marked';
 	import { Separator } from '$lib/components/ui/separator/index.js';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { LogOut, LogIn, UserRound, Settings, X } from 'lucide-svelte';
@@ -356,24 +356,24 @@
 {/snippet}
 
 <svelte:head>
-	<title>{lesson.name} | atl.vercel.app</title>
+	<title>{lesson.name} | atlweb.vercel.app</title>
 	<meta name="description" content={lesson.teaser} />
-	<meta property="og_site_name" content="“atl.vercel.app”" />
-	<meta property="og:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta property="og_site_name" content="“atlweb.vercel.app”" />
+	<meta property="og:url" content="https://atlweb.vercel.app{page.url.pathname.toString()}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:title" content={lesson.name} />
 	<meta property="og:description" content={lesson.teaser} />
 
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta property="twitter:domain" content="“atl.vercel.app" />
-	<meta property="twitter:url" content="https://atl.vercel.app{$page.url.pathname.toString()}" />
+	<meta property="twitter:domain" content="“atlweb.vercel.app" />
+	<meta property="twitter:url" content="https://atlweb.vercel.app{page.url.pathname.toString()}" />
 	<meta name="twitter:title" content={lesson.name} />
 	<meta name="twitter:description" content={lesson.teaser} />
 	{@html `  <script type="application/ld+json">{
    "@context": "https://schema.org",
    "@type": "Website",
-   "name": "${lesson.name} | atl.vercel.app",
-   "url": "https//www.atl.vercel.app${$page.url.pathname}",
+   "name": "${lesson.name} | atlweb.vercel.app",
+   "url": "https//www.atlweb.vercel.app${page.url.pathname}",
    }</script>`}
 </svelte:head>
 

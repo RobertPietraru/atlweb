@@ -1,3 +1,4 @@
+import { i18n } from '$lib/i18n'
 import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle, } from '@sveltejs/kit';
 import type { ServerInit } from '@sveltejs/kit';
@@ -52,7 +53,7 @@ export const authentication: Handle = async ({ event, resolve }) => {
 };
 
 
-export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, authentication));
+export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, authentication, i18n.handle()));
 export const init: ServerInit = async () => {
 	log.info('=== Starting app ===');
 };

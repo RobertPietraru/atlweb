@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen } from 'lucide-svelte';
+	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen } from '@lucide/svelte';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
@@ -8,10 +8,20 @@
 	import { goto } from '$app/navigation';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import { BrainCircuit } from '@lucide/svelte';
+	import { Languages } from '@lucide/svelte';
+	import { languageTag, type AvailableLanguageTag } from '$lib/paraglide/runtime.js';
+	import { i18n } from '$lib/i18n.js';
+	import { localizedGoto } from '$lib/utils.js';
+	function switchToLanguage(newLanguage: AvailableLanguageTag) {
+		const canonicalPath = i18n.route(page.url.pathname);
+		const localisedPath = i18n.resolveRoute(canonicalPath, newLanguage);
+		goto(localisedPath);
+	}
 
 	let { children, data } = $props();
 	let isDarkTheme = $state(false);
 	let logoutLoading = $state(false);
+		
 	onMount(() => {
 		isDarkTheme = localStorage.getItem('isDarkTheme') === 'true';
 	});
@@ -48,6 +58,38 @@
 	<div class="flex-1"></div>
 
 	<div class="flex items-center gap-1 md:gap-3">
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'icon' })}>
+				<Languages class="h-[1.2rem] w-[1.2rem]" />
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content align="end">
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('ro')}
+					class={languageTag() === 'ro' ? 'bg-accent' : ''}>Română</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('en')}
+					class={languageTag() === 'en' ? 'bg-accent' : ''}>English</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('hu')}
+					class={languageTag() === 'hu' ? 'bg-accent' : ''}>Magyar</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('uk')}
+					class={languageTag() === 'uk' ? 'bg-accent' : ''}>Українська</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('de')}
+					class={languageTag() === 'de' ? 'bg-accent' : ''}>Deutsch</DropdownMenu.Item
+				>
+				<DropdownMenu.Item
+					onclick={() => switchToLanguage('ru')}
+					class={languageTag() === 'ru' ? 'bg-accent' : ''}>Русский</DropdownMenu.Item
+				>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+
 		<Button
 			onclick={() => {
 				isDarkTheme = !isDarkTheme;
@@ -113,7 +155,7 @@
 					</DropdownMenu.Label>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item
-						onclick={() => goto('/profile')}
+						onclick={() => localizedGoto(page.url.toString(), '/profile')}
 						class="flex items-center {page.url.pathname.startsWith('/profile')
 							? 'bg-accent'
 							: ''}"
@@ -122,14 +164,14 @@
 						Profil
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
-						onclick={() => goto('/courses')}
+						onclick={() => localizedGoto(page.url.toString(), '/courses')}
 						class="flex items-center {page.url.pathname.startsWith('/courses') ? 'bg-accent' : ''}"
 					>
 						<BookOpen class="mr-2.5 h-4 w-4" />
 						Cursuri
 					</DropdownMenu.Item>
 					<DropdownMenu.Item
-						onclick={() => goto('/exercises')}
+						onclick={() => localizedGoto(page.url.toString(), '/exercises')}
 						class="flex items-center {page.url.pathname.startsWith('/exercises')
 							? 'bg-accent'
 							: ''}"
@@ -141,7 +183,7 @@
 					{#if data.canViewAdminPage}
 						<DropdownMenu.Item
 							class="flex items-center {page.url.pathname.startsWith('/admin') ? 'bg-accent' : ''}"
-							onclick={() => goto('/admin')}
+							onclick={() => localizedGoto(page.url.toString(), '/admin')}
 							disabled={logoutLoading}
 						>
 							<ShieldUser class="mr-2.5 h-4 w-4" />
