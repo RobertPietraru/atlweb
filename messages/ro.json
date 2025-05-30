@@ -86,5 +86,20 @@
     "exercise_submission_checked": "Verificat",
     "exercise_submission_need_help": "Ajutor solicitat",
     "exercise_submission_submitted": "Trimis",
-    "exercise_submission_selected": "Am selectat codul lui {}"
+    "exercise_submission_selected": "Am selectat codul lui {value}",
+    "exercise_submission_not_submitted": "Netrimis",
+    "exercise_was_not_found": "Exercițiul nu a fost găsit",
+
+    "courses_edit": "Editează",
+    "chapter_begin": "Începe capitolul",
+    "chapter_lesson_plural": "lecții",
+    "chapter_lesson_start": "Începe lecția",
+    "chapter_lesson_singular": "lecție",
+    "chapter_lesson_number": "Lecția {}",
+    "chapter_lessons_in_this_chapter": "Lecții în acest capitol",
+    "chapter_lessons_in_this_chapter_description": "Parcurge toate lecțiile pentru a finaliza acest capitol",
+    "chapter_lesson_count": "Ai completat {nr1} din {nr2} lecții",
+    "exercise_try": "Încearcă exercițiul",
+    "exercise_title": "Exercițiu: {title}",
+    "code_block_run": "Rulează codul"   
 }

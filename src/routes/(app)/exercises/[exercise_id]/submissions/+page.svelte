@@ -90,7 +90,9 @@
 		htmlEditor?.setValue(submission.htmlCode);
 		cssEditor?.setValue(submission.cssCode);
 		jsEditor?.setValue(submission.javascriptCode);
-		toast.success(m.exercise_submission_selected(submission.username ?? m.exercise_submission_anonymous()));
+		toast.success(m.exercise_submission_selected({
+			value: submission.username ?? m.exercise_submission_anonymous()
+		}));
 	}
 
 	function clearCode() {
@@ -246,7 +248,9 @@
 					<h1
 						class="rounded-lg bg-fuchsia-500/20 px-4 text-3xl font-bold text-fuchsia-600 shadow-lg shadow-fuchsia-200/50"
 					>
-						{m.exercise_submission_selected(submissions[selectedSubmissionIndex].username ?? m.exercise_submission_anonymous())}
+						{m.exercise_submission_selected({
+							value: submissions[selectedSubmissionIndex].username ?? m.exercise_submission_anonymous()
+						})}
 					</h1>
 				{/if}
 				<div class="flex-1"></div>
@@ -270,7 +274,6 @@
 						if (
 							JSON.stringify($state.snapshot(lastRunCode)) !== JSON.stringify($state.snapshot(code))
 						) {
-							alert('asdf')
 							lastRunCode = structuredClone($state.snapshot(code));
 						} else {
 							lastRunCode = null;
