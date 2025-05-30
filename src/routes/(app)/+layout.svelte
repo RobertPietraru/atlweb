@@ -1,7 +1,8 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { ShieldUser, LogOut, LogIn, UserRound, Settings, Loader2 } from 'lucide-svelte';
+	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen, BrainCircuit } from 'lucide-svelte';
 	import { Sun, Moon } from 'lucide-svelte';
+	import { page } from '$app/state';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -109,9 +110,28 @@
 						</div>
 					</DropdownMenu.Label>
 					<DropdownMenu.Separator />
-					<DropdownMenu.Item>
+					<DropdownMenu.Item
+						onclick={() => goto('/profile')}
+						class="flex items-center {page.url.pathname.startsWith('/profile') ? 'bg-accent' : ''}"
+					>
 						<UserRound class="mr-2.5 h-4 w-4" />
-						<a href="/profile" id="profile-button">Profil</a>
+						Profil
+					</DropdownMenu.Item>
+					<DropdownMenu.Item
+						onclick={() => goto('/courses')}
+						class="flex items-center {page.url.pathname.startsWith('/courses') ? 'bg-accent' : ''}"
+					>
+						<BookOpen class="mr-2.5 h-4 w-4" />
+						Cursuri
+					</DropdownMenu.Item>
+					<DropdownMenu.Item
+						onclick={() => goto('/exercises')}
+						class="flex items-center {page.url.pathname.startsWith('/exercises')
+							? 'bg-accent'
+							: ''}"
+					>
+						<BrainCircuit class="mr-2.5 h-4 w-4" />
+						Exerciții
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					{#if data.canViewAdminPage}

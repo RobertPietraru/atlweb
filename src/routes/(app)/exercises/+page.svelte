@@ -22,10 +22,10 @@
 	let loading = $state(false);
 </script>
 
-<main class="min-h-[100vh] w-full">
+<main class="min-h-[100vh] w-full px-4 py-4 md:px-8">
 	<h1 class="mb-8 text-2xl font-bold md:text-3xl">Exercitii</h1>
 
-	<div class="mb-4 mr-4 flex items-center gap-2">
+	<div class="mb-4 flex items-center gap-2">
 		<div class="flex w-full flex-wrap items-center gap-4">
 			<div class="relative flex-1">
 				<Input
@@ -67,24 +67,6 @@
 					<Search />
 				</Button>
 			</div>
-			<form
-				action="?/create"
-				method="post"
-				onsubmit={() => {
-					loading = true;
-				}}
-			>
-				<Button type="submit" disabled={loading} data-test="create-exercise-button">
-					{#if loading}
-						<Loader2 class="size-4 animate-spin" />
-					{:else}
-						<Plus />
-					{/if}
-					{#if !isMobile.current}
-						Creeaza exercitiu nou
-					{/if}
-				</Button>
-			</form>
 		</div>
 	</div>
 
@@ -95,7 +77,7 @@
 			</div>
 		{:else}
 			{#each data.exercises as exercise}
-				<a href="/admin/exercises/{exercise.id}" class="block">
+				<a href="/exercises/{exercise.id}" class="block">
 					<Card
 						class="group flex cursor-pointer items-end justify-between overflow-hidden border-2 transition-all hover:scale-[1.01] hover:border-primary hover:shadow-lg"
 					>

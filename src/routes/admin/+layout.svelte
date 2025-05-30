@@ -1,12 +1,13 @@
 <script lang="ts">
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { ShieldUser, LogOut, UserRound, Loader2 } from 'lucide-svelte';
+	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen } from 'lucide-svelte';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
+	import { BrainCircuit } from '@lucide/svelte';
 
 	let { children, data } = $props();
 	let isDarkTheme = $state(false);
@@ -111,16 +112,35 @@
 						</div>
 					</DropdownMenu.Label>
 					<DropdownMenu.Separator />
-					<DropdownMenu.Item>
+					<DropdownMenu.Item
+						onclick={() => goto('/profile')}
+						class="flex items-center {page.url.pathname.startsWith('/profile')
+							? 'bg-accent'
+							: ''}"
+					>
 						<UserRound class="mr-2.5 h-4 w-4" />
-						<a href="/profile" id="profile-button">Profil</a>
+						Profil
+					</DropdownMenu.Item>
+					<DropdownMenu.Item
+						onclick={() => goto('/courses')}
+						class="flex items-center {page.url.pathname.startsWith('/courses') ? 'bg-accent' : ''}"
+					>
+						<BookOpen class="mr-2.5 h-4 w-4" />
+						Cursuri
+					</DropdownMenu.Item>
+					<DropdownMenu.Item
+						onclick={() => goto('/exercises')}
+						class="flex items-center {page.url.pathname.startsWith('/exercises')
+							? 'bg-accent'
+							: ''}"
+					>
+						<BrainCircuit class="mr-2.5 h-4 w-4" />
+						Exerciții
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					{#if data.canViewAdminPage}
 						<DropdownMenu.Item
-							class="flex items-center {window.location.pathname.startsWith('/admin')
-								? 'bg-accent'
-								: ''}"
+							class="flex items-center {page.url.pathname.startsWith('/admin') ? 'bg-accent' : ''}"
 							onclick={() => goto('/admin')}
 							disabled={logoutLoading}
 						>
