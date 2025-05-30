@@ -2,7 +2,7 @@
     "$schema": "https://inlang.com/schema/inlang-message-format",
     "toggle_theme": "Toggle theme",
     "profile": "Profile",
-    "courses": "Courses", 
+    "courses": "Courses",
     "exercises": "Exercises",
     "admin": "Admin",
     "login": "Login",
@@ -14,11 +14,10 @@
     "language_ro": "Română",
     "language_en": "English",
     "language_hu": "Magyar",
-    "language_uk": "Українська", 
+    "language_uk": "Українська",
     "language_de": "Deutsch",
     "language_ru": "Русский",
     "brand_name": "ATLWEB",
-
     "footer_title": "ATLWEB",
     "footer_description": "Educational platform for learning web programming in an interactive and practical way.",
     "footer_navigation": "Navigation",
@@ -34,36 +33,28 @@
     "footer_terms": "Terms and Conditions",
     "footer_privacy": "Privacy Policy",
     "footer_cookies": "Cookie Policy",
-
     "home_title": "Learn web programming",
     "home_subtitle": "Educational platform for learning web programming in an interactive and practical way",
     "home_start_learning": "Start learning",
     "home_github_repository": "Github Repository",
-
     "home_interactive_courses_title": "Interactive Courses",
     "home_interactive_courses_description": "Learn through structured courses with practical examples and interactive exercises",
-
     "home_practical_exercises_title": "Practical Exercises",
     "home_practical_exercises_description": "Solve exercises and receive instant feedback to improve your skills",
-
     "home_community_title": "Community",
     "home_community_description": "Connect with other learners and share your learning experience",
-
     "home_laurian_alt": "National College „A. T. Laurian” Botoşani",
-
     "courses_title": "Courses",
     "courses_start": "Start course",
     "courses_chapter_singular": "chapter",
     "courses_chapter_plural": "chapters",
     "courses_create": "Create new course",
-
     "exercises_title": "Exercises",
     "exercises_create": "Create new exercise",
     "exercises_filter_placeholder": "Filter",
     "exercises_no_results": "No exercises found matching your search",
     "exercises_previous_page": "Previous page",
     "exercises_next_page": "Next page",
-
     "exercise_description_tab": "Description",
     "exercise_result_tab": "Result",
     "exercise_copy_id": "Exercise ID has been copied to clipboard",
@@ -96,7 +87,6 @@
     "exercise_submission_selected": "Selected {value}'s code",
     "exercise_submission_not_submitted": "Not submitted",
     "exercise_was_not_found": "Exercise not found",
-
     "courses_edit": "Edit",
     "chapter_begin": "Start chapter",
     "chapter_lesson_plural": "lessons",
@@ -109,7 +99,6 @@
     "exercise_try": "Try exercise",
     "exercise_title": "Exercise: {title}",
     "code_block_run": "Run code",
-
     "auth_login_title": "Login",
     "auth_register_title": "Register",
     "auth_email_label": "Email address",
@@ -121,7 +110,6 @@
     "auth_has_account": "Already have an account?",
     "auth_register_link": "Register",
     "auth_login_link": "Login",
-
     "admin_toggle_theme": "Toggle theme",
     "admin_user": "User",
     "admin_administrator": "Administrator",

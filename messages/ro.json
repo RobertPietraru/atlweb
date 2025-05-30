@@ -18,7 +18,6 @@
     "language_de": "Deutsch",
     "language_ru": "Русский",
     "brand_name": "ATLWEB",
-
     "footer_title": "ATLWEB",
     "footer_description": "Platforma educațională pentru învățarea programării web într-un mod interactiv și practic.",
     "footer_navigation": "Navigare",
@@ -29,42 +28,33 @@
     "footer_copyright": "© 2025 ATLWEB - Toate drepturile rezervate",
     "footer_made_with_love": "Făcut cu ❤️ în România",
     "footer_home": "Acasă",
-    "footer_courses": "Cursuri", 
+    "footer_courses": "Cursuri",
     "footer_profile": "Profil",
     "footer_terms": "Termeni și Condiții",
     "footer_privacy": "Politica de Confidențialitate",
     "footer_cookies": "Politica de Cookie-uri",
-
     "home_title": "Învață programare web",
     "home_subtitle": "Platformă educațională pentru învățarea programării web într-un mod interactiv și practic",
     "home_start_learning": "Începe să înveți",
     "home_github_repository": "Repository Github",
-
     "home_interactive_courses_title": "Cursuri Interactive",
     "home_interactive_courses_description": "Învață prin cursuri structurate cu exemple practice și exerciții interactive",
-
-    "home_practical_exercises_title": "Exerciții Practice", 
+    "home_practical_exercises_title": "Exerciții Practice",
     "home_practical_exercises_description": "Rezolvă exerciții și primește feedback instant pentru a-ți îmbunătăți abilitățile",
-
     "home_community_title": "Comunitate",
     "home_community_description": "Conectează-te cu alți cursanți și împărtășește experiența ta de învățare",
-
     "home_laurian_alt": "Colegiul Naţional „A. T. Laurian” Botoşani",
-
     "courses_title": "Cursuri",
     "courses_start": "Începe cursul",
     "courses_chapter_singular": "capitol",
     "courses_chapter_plural": "capitole",
     "courses_create": "Creează curs nou",
-
     "exercises_title": "Exerciții",
     "exercises_create": "Creează exercițiu nou",
     "exercises_filter_placeholder": "Filtrează",
     "exercises_no_results": "Nu s-au gasit exercitii care sa corespunda cautarii",
-    "exercises_previous_page": "Pagina anterioară", 
+    "exercises_previous_page": "Pagina anterioară",
     "exercises_next_page": "Pagina următoare",
-
-
     "exercise_description_tab": "Descriere",
     "exercise_result_tab": "Rezultat",
     "exercise_copy_id": "ID-ul exercitiului a fost copiat in clipboard",
@@ -97,7 +87,6 @@
     "exercise_submission_selected": "Am selectat codul lui {value}",
     "exercise_submission_not_submitted": "Netrimis",
     "exercise_was_not_found": "Exercițiul nu a fost găsit",
-
     "courses_edit": "Editează",
     "chapter_begin": "Începe capitolul",
     "chapter_lesson_plural": "lecții",
@@ -110,7 +99,6 @@
     "exercise_try": "Încearcă exercițiul",
     "exercise_title": "Exercițiu: {title}",
     "code_block_run": "Rulează codul",
-
     "auth_login_title": "Autentifică-te",
     "auth_register_title": "Înregistrează-te",
     "auth_email_label": "Adresa de email",
@@ -122,7 +110,6 @@
     "auth_has_account": "Ai deja cont?",
     "auth_register_link": "Înregistrează-te",
     "auth_login_link": "Autentifică-te",
-
     "admin_toggle_theme": "Schimbă tema",
     "admin_user": "Utilizator",
     "admin_administrator": "Administrator",
