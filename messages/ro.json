@@ -78,5 +78,10 @@
     "exercise_save_success": "Exercitiul a fost salvat cu succes",
     "exercise_save_error": "A apărut o eroare la salvarea exercitiului",
     "exercise_delete_success": "Exercitiul a fost sters cu succes",
-    "exercise_delete_error": "A apărut o eroare la stergerea exercitiului"
+    "exercise_delete_error": "A apărut o eroare la stergerea exercitiului",
+    "exercise_submission_anonymous": "Anonim",
+    "exercise_submission_username_tab": "Nume",
+    "exercise_submission_solve": "Rezolvă",
+    "exercise_submission_run": "Rulează",
+    "exercise_submission_selected": "Am selectat codul lui {}"
 }

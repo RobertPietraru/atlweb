@@ -13,7 +13,7 @@
 	} from 'lucide-svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-
+	import * as m from '$lib/paraglide/messages.js';
 	let { data } = $props();
 
 	let code = $state({
@@ -90,7 +90,7 @@
 		htmlEditor?.setValue(submission.htmlCode);
 		cssEditor?.setValue(submission.cssCode);
 		jsEditor?.setValue(submission.javascriptCode);
-		toast.success('Am selectat codul lui ' + (submission.username ?? 'Anonim'));
+		toast.success(m.exercise_submission_selected(submission.username ?? m.exercise_submission_anonymous()));
 	}
 
 	function clearCode() {
@@ -195,8 +195,8 @@
 						<thead>
 							<tr class="border-b">
 								<th class="py-2 text-left"></th>
-								<th class="py-2 text-left">Data</th>
-								<th class="py-2 text-left">Nume</th>
+								<th class="py-2 text-left">{m.exercise_submission_date_tab()}</th>
+								<th class="py-2 text-left">{m.exercise_submission_username_tab()}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -221,7 +221,7 @@
 										{#if submission.username}
 											{submission.username}
 										{:else}
-											<span class="text-gray-500">Anonim</span>
+											<span class="text-gray-500">{m.exercise_submission_anonymous()}</span>
 										{/if}
 									</td>
 								</tr>
@@ -246,7 +246,7 @@
 					<h1
 						class="rounded-lg bg-fuchsia-500/20 px-4 text-3xl font-bold text-fuchsia-600 shadow-lg shadow-fuchsia-200/50"
 					>
-						Codul lui {submissions[selectedSubmissionIndex].username ?? 'Anonim'}
+						{m.exercise_submission_selected(submissions[selectedSubmissionIndex].username ?? m.exercise_submission_anonymous())}
 					</h1>
 				{/if}
 				<div class="flex-1"></div>
@@ -260,7 +260,7 @@
 					}}
 				>
 					<CheckIcon class="h-4 w-4" />
-					<span>Rezolvă</span>
+					<span>{m.exercise_submission_solve()}</span>
 				</Button>
 
 				<Button
@@ -280,7 +280,7 @@
 					}}
 				>
 					<PlayIcon class="h-4 w-4" />
-					<span>Rulează</span>
+					<span>{m.exercise_submission_run()}</span>
 				</Button>
 			</div>
 			<Tabs.Content value="html" class="h-full w-full">
