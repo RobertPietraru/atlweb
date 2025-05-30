@@ -303,15 +303,6 @@
 			</Tabs.List>
 			<div class="flex-1"></div>
 
-			{#if data.isHelper}
-				<Button
-					class="flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm hover:bg-secondary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
-					href="./{data.exercise.id}/submissions"
-				>
-					<UserIcon class="size-4" />
-					<span>Solutii</span>
-				</Button>
-			{/if}
 			{@render submitButton()}
 
 			<Button
