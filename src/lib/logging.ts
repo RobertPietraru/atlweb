@@ -1,6 +1,6 @@
 import { pino } from "pino";
 
-const log = process.env.NODE_ENV === 'development' ? pino(
+const log = process.env.DEVELOPMENT === 'true' ? pino(
     { level: 'info' },
     pino.transport({
         target: 'pino-pretty',

@@ -55,7 +55,4 @@ export const authentication: Handle = async ({ event, resolve }) => {
 
 
 export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, authentication, i18n.handle()));
-export const init: ServerInit = async () => {
-	log.info('=== Starting app ===');
-};
 export const handleError = Sentry.handleErrorWithSentry();

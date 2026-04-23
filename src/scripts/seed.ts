@@ -2,8 +2,8 @@ import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { hash } from '@node-rs/argon2';
 import postgres from 'postgres';
 import * as tables from '$lib/server/db/schema';
-if (!process.env.POSTGRES_URL) throw new Error('POSTGRES_URL is not set');
-const client = postgres(process.env.POSTGRES_URL, { prepare: false });
+if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+const client = postgres(process.env.DATABASE_URL, { prepare: false });
 export const db = drizzle(client);
 
 async function Auth(db: PostgresJsDatabase) {

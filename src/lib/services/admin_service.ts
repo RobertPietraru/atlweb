@@ -21,7 +21,6 @@ export class AdminService {
     }
 
     async createUser(email: string, username: string, password: string): Promise<table.Id | 'unknown' | 'emailAlreadyExists' | 'usernameAlreadyExists'> {
-        /// if the password is too long, throw an error
         assert(password.length < 400, 'Password too long');
         assert(username.length < 100, 'Username too long');
         assert(email.length < 100, 'Email too long');
