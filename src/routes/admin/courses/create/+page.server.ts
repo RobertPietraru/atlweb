@@ -3,7 +3,7 @@ import { adminService } from '$lib/injection';
 import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { setError, superValidate } from 'sveltekit-superforms';
-import { cache } from '$lib/cache';
+// import { cache } from '$lib/cache';
 import { i18n } from '$lib/i18n';
 
 const schema = z.object({
@@ -33,7 +33,7 @@ export const actions = {
 
 		const { name, description } = form.data;
 		const result = await adminService.createCourse(name, description);
-        cache.courses = null;
+        // cache.courses = null;
 		
 		if (result === 'nameAlreadyExists') {
 			setError(form, 'name', 'A course with this name already exists');

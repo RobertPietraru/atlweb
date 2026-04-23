@@ -1,8 +1,8 @@
-import { adminService } from "$lib/injection";
+// import { adminService } from "$lib/injection";
 
 
-export let cache: {
-    courses: Awaited<ReturnType<typeof adminService.getCourses>> | null,
-} = {
-    courses: null,
-}
+// export let cache: {
+//     courses: Awaited<ReturnType<typeof adminService.getCourses>> | null,
+// } = {
+//     courses: null,
+// }
