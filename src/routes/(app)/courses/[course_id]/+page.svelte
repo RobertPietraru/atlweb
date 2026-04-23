@@ -1,85 +1,99 @@
 <script lang="ts">
-	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
-	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from '@lucide/svelte';
-	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';
+	import { ArrowUpRightIcon, BookOpenIcon } from '@lucide/svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import * as m from '$lib/paraglide/messages.js';
-	const isMobile = new IsMobile();
+
 	let { data } = $props();
 </script>
 
-<main class="min-h-[100vh] w-full py-4">
-	<div class="mb-8 space-y-4 px-4 md:px-8">
-		<Breadcrumb.Root class="flex items-center">
-			<Breadcrumb.List>
-				<Breadcrumb.Separator />
-				{#each data.breadcrumbs as crumb, i}
-					<Breadcrumb.Item>
-						<Breadcrumb.Link href={crumb.url}>
-							{crumb.name}
-						</Breadcrumb.Link>
-					</Breadcrumb.Item>
-					{#if i < data.breadcrumbs.length - 1}
-						<Breadcrumb.Separator />
-					{/if}
-				{/each}
-			</Breadcrumb.List>
-		</Breadcrumb.Root>
-		<div class="flex items-center gap-2">
-			<a
-				class="flex items-center gap-2 text-2xl font-bold transition-colors hover:text-primary md:text-3xl"
-				href="../courses"
-			>
-				{data.course.name}
-			</a>
+<div class="mx-auto max-w-[1280px] px-6 py-10">
+	<!-- Breadcrumb -->
+	<Breadcrumb.Root class="mb-6">
+		<Breadcrumb.List>
+			<Breadcrumb.Separator />
+			{#each data.breadcrumbs as crumb, i}
+				<Breadcrumb.Item>
+					<Breadcrumb.Link href={crumb.url}>{crumb.name}</Breadcrumb.Link>
+				</Breadcrumb.Item>
+				{#if i < data.breadcrumbs.length - 1}
+					<Breadcrumb.Separator />
+				{/if}
+			{/each}
+		</Breadcrumb.List>
+	</Breadcrumb.Root>
+
+	<!-- Course hero -->
+	<div class="mb-10 rounded-xl border bg-card p-8 shadow-sm">
+		<div class="flex items-start gap-4">
+			<div class="shrink-0 rounded-xl bg-primary/10 p-4">
+				<BookOpenIcon class="h-7 w-7 text-primary" />
+			</div>
+			<div>
+				<h1 class="font-display text-3xl font-bold text-foreground md:text-4xl">
+					{data.course.name}
+				</h1>
+				<p class="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">
+					{data.course.description}
+				</p>
+				<div class="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+					<BookOpenIcon class="h-4 w-4" />
+					<span>
+						{data.course.chapters.length}
+						{data.course.chapters.length === 1 ? m.courses_chapter_singular() : m.courses_chapter_plural()}
+					</span>
+				</div>
+			</div>
 		</div>
-		<p class="text-lg text-muted-foreground">{data.course.description}</p>
 	</div>
 
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:px-8 lg:grid-cols-3">
-		{#each data.course.chapters as chapter}
-			<a href="/courses/{data.course.id}/chapters/{chapter.id}" class="h-full">
-				<Card
-					class="group flex h-full cursor-pointer flex-col overflow-hidden border-2 transition-all hover:scale-[1.02] hover:border-primary hover:shadow-lg"
+	<!-- Chapters grid -->
+	<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+		{#each data.course.chapters as chapter, index}
+			<a href="/courses/{data.course.id}/chapters/{chapter.id}" class="group block h-full">
+				<article
+					class="flex h-full flex-col rounded-xl border bg-card shadow-sm transition-all duration-200 hover:border-primary hover:shadow-md"
 				>
-					<CardContent class="flex-grow p-6">
-						<div class="mb-4 flex items-center justify-between">
-							<div class="flex items-center gap-2">
-								<div class="rounded-full bg-primary/10 p-2">
-									<BookOpenIcon class="h-5 w-5 text-primary" />
-								</div>
-								<h2 class="text-2xl font-bold tracking-tight group-hover:text-primary">
+					<div class="flex flex-1 flex-col p-6">
+						<!-- Chapter number badge + title -->
+						<div class="mb-3 flex items-start justify-between gap-3">
+							<div class="flex items-center gap-3">
+								<span
+									class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground"
+								>
+									{index + 1}
+								</span>
+								<h2
+									class="font-display text-base font-semibold leading-snug text-foreground transition-colors group-hover:text-primary"
+								>
 									{chapter.name}
 								</h2>
 							</div>
 							<div
-								class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100"
+								class="mt-0.5 shrink-0 rounded-full bg-primary/10 p-1.5 opacity-0 transition-opacity group-hover:opacity-100"
 							>
-								<ArrowUpRightIcon class="h-4 w-4 text-primary" />
+								<ArrowUpRightIcon class="h-3.5 w-3.5 text-primary" />
 							</div>
 						</div>
-						<p class="text-sm text-muted-foreground">{chapter.description}</p>
-					</CardContent>
-					<CardFooter class="border-t bg-muted/50 p-4">
-						<div class="flex w-full items-center justify-between">
-							<div class="flex items-center gap-2">
-								<div class="flex items-center gap-1 text-sm text-muted-foreground">
-									<BookOpenIcon class="h-4 w-4" />
-									<span>
-										{chapter.lessonCount}
-										{chapter.lessonCount === 1 ? m.chapter_lesson_singular() : m.chapter_lesson_plural()}
-									</span>
-								</div>
-							</div>
-							<div
-								class="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-hover:bg-primary group-hover:text-primary-foreground"
+
+						<p class="mb-6 flex-1 text-sm leading-relaxed text-muted-foreground">
+							{chapter.description}
+						</p>
+
+						<div class="flex items-center justify-between border-t pt-4">
+							<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+								<BookOpenIcon class="h-3.5 w-3.5" />
+								{chapter.lessonCount}
+								{chapter.lessonCount === 1 ? m.chapter_lesson_singular() : m.chapter_lesson_plural()}
+							</span>
+							<span
+								class="rounded-md bg-primary/10 px-3 py-1 font-display text-xs font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
 							>
 								{m.chapter_begin()}
-							</div>
+							</span>
 						</div>
-					</CardFooter>
-				</Card>
+					</div>
+				</article>
 			</a>
 		{/each}
 	</div>
-</main>
+</div>

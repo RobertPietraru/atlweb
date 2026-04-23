@@ -111,7 +111,7 @@
 					<div class="rounded-full bg-primary/10 p-2">
 						<BookOpenIcon class="h-5 w-5 text-primary" />
 					</div>
-					<h1 class="text-2xl font-bold">{lesson.name || 'Lectie'}</h1>
+					<h1 class="text-2xl font-bold">{lesson.name || m.lesson_unnamed()}</h1>
 				</div>
 			</div>
 
@@ -187,7 +187,7 @@
 			</div>
 			<Separator class="{showSidebar ? '' : 'hidden'} md:block" />
 			<div class="rounded-xl bg-muted/50 p-6 shadow-sm {showSidebar ? '' : 'hidden'} md:block">
-				<h3 class="mb-2 text-xl font-semibold">Progres</h3>
+				<h3 class="mb-2 text-xl font-semibold">{m.lesson_progress()}</h3>
 				<p class="text-sm text-muted-foreground">
 					{m.chapter_lesson_count({
 						nr1: data.lessonNamesInChapter.findIndex((l) => l.id === data.lesson.id) + 1,
@@ -303,7 +303,7 @@
 		</div>
 		{#if stateOfLastRanBlocks[index]}
 			<div class="mt-4 overflow-hidden rounded-lg border-2 bg-white">
-				<div class="border-b bg-muted/50 px-4 py-2 text-sm font-medium">Output</div>
+				<div class="border-b bg-muted/50 px-4 py-2 text-sm font-medium">{m.lesson_code_output()}</div>
 				<div class="h-[300px] w-full">
 					<iframe
 						title="Code Preview"

@@ -132,7 +132,7 @@
 
 	async function closeDownIssueWithFix() {
 		if (selectedSubmissionIndex === null) {
-			toast.error('Nu ai selectat un raspuns');
+			toast.error(m.submission_solve_no_selection());
 			return;
 		}
 		try {
@@ -149,20 +149,20 @@
 
 			const result = deserialize(await response.text());
 			if (result.type === 'success') {
-				toast.success('Codul a fost rezolvat cu succes');
+				toast.success(m.submission_solve_success());
 				submissions = submissions.filter((_, index) => index !== selectedSubmissionIndex);
 				clearCode();
 			} else if (result.type === 'failure') {
 				toast.error(
 					(result.data?.message as string | undefined | null) ??
-						'A apărut o eroare la rezolvarea raspunsului',
+						m.submission_solve_error(),
 					{
 						position: 'bottom-left'
 					}
 				);
 			}
 		} catch (error) {
-			toast.error('A apărut o eroare la rezolvarea raspunsului');
+			toast.error(m.submission_solve_error());
 		} finally {
 			submitting = false;
 		}

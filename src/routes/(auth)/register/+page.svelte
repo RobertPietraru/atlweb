@@ -2,68 +2,115 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { register } from './register.remote';
 	import * as m from '$lib/paraglide/messages.js';
+	import { BookOpenIcon } from '@lucide/svelte';
 
 	let { data } = $props();
 </script>
 
-<main class="min-h-[100vh] w-full px-8 py-4">
-	<nav class="flex items-center justify-between">
-		<a class="text-3xl font-bold" href="/">{m.brand_name()}</a>
-	</nav>
+<div class="flex min-h-screen">
+	<!-- Left brand panel -->
+	<div
+		class="hidden flex-col justify-between bg-primary p-12 text-primary-foreground lg:flex lg:w-5/12"
+	>
+		<a href="/" class="font-display text-2xl font-bold">{m.brand_name()}</a>
 
-	<div class="flex min-h-screen items-center justify-center bg-background">
-		<Card class="w-[350px]">
-			<CardHeader>
-				<CardTitle class="text-center text-2xl font-bold">{m.auth_register_title()}</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<form {...register} class="space-y-4">
+		<div>
+			<div class="mb-6 inline-flex rounded-2xl bg-white/10 p-4">
+				<BookOpenIcon class="h-8 w-8" />
+			</div>
+			<blockquote class="space-y-3">
+				<p class="font-display text-3xl font-semibold leading-snug">
+					{m.home_title()}
+				</p>
+				<p class="text-base leading-relaxed text-primary-foreground/75">
+					{m.home_subtitle()}
+				</p>
+			</blockquote>
+		</div>
+
+		<p class="text-sm text-primary-foreground/60">{m.footer_copyright()}</p>
+	</div>
+
+	<!-- Right form panel -->
+	<div class="flex flex-1 flex-col">
+		<!-- Mobile brand header -->
+		<div class="flex items-center justify-between border-b px-8 py-5 lg:hidden">
+			<a href="/" class="font-display text-xl font-bold text-primary">{m.brand_name()}</a>
+		</div>
+
+		<div class="flex flex-1 items-center justify-center px-8 py-12">
+			<div class="w-full max-w-sm">
+				<div class="mb-8">
+					<h1 class="font-display text-3xl font-bold text-foreground">
+						{m.auth_register_title()}
+					</h1>
+					<p class="mt-2 text-sm text-muted-foreground">
+						{m.auth_has_account()}
+						<a href="/login" class="font-medium text-primary hover:underline"
+							>{m.auth_login_link()}</a
+						>
+					</p>
+				</div>
+
+				<form {...register} class="space-y-5">
 					<input type="hidden" name="redirectUrl" value={data.redirectUrl} />
-					<div class="space-y-2">
-						<Label for="username">{m.auth_username_label()}</Label>
+
+					<div class="space-y-1.5">
+						<Label for="username" class="font-display font-medium"
+							>{m.auth_username_label()}</Label
+						>
 						<Input
 							id="username"
 							{...register.fields.username.as('text')}
 							autocomplete="username"
 							required
+							class="h-11"
 						/>
 						{#each register.fields.username.issues() as issue}
-							<p class="text-destructive">{issue.message}</p>
+							<p class="text-xs text-destructive">{issue.message}</p>
 						{/each}
 					</div>
-					<div class="space-y-2">
-						<Label for="email">{m.auth_email_label()}</Label>
+
+					<div class="space-y-1.5">
+						<Label for="email" class="font-display font-medium">{m.auth_email_label()}</Label>
 						<Input
 							id="email"
 							{...register.fields.email.as('email')}
 							autocomplete="email"
 							required
+							class="h-11"
 						/>
 						{#each register.fields.email.issues() as issue}
-							<p class="text-destructive">{issue.message}</p>
+							<p class="text-xs text-destructive">{issue.message}</p>
 						{/each}
 					</div>
-					<div class="space-y-2">
-						<Label for="_password">{m.auth_password_label()}</Label>
+
+					<div class="space-y-1.5">
+						<Label for="_password" class="font-display font-medium"
+							>{m.auth_password_label()}</Label
+						>
 						<Input
 							id="_password"
 							{...register.fields._password.as('password')}
 							autocomplete="new-password"
 							required
+							class="h-11"
 						/>
 						{#each register.fields._password.issues() as issue}
-							<p class="text-destructive">{issue.message}</p>
+							<p class="text-xs text-destructive">{issue.message}</p>
 						{/each}
 					</div>
-					<Button type="submit" class="w-full">{m.auth_register_button()}</Button>
+
+					<Button
+						type="submit"
+						class="h-11 w-full font-display font-semibold shadow-md shadow-primary/20"
+					>
+						{m.auth_register_button()}
+					</Button>
 				</form>
-			</CardContent>
-			<CardFooter class="flex justify-center">
-				<p class="text-center">{m.auth_has_account()} <a href="/login" class="text-primary hover:underline">{m.auth_login_link()}</a></p>
-			</CardFooter>
-		</Card>
+			</div>
+		</div>
 	</div>
-</main>
+</div>
