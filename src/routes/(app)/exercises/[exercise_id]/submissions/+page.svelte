@@ -10,7 +10,7 @@
 		CheckIcon,
 		EyeIcon,
 		PlayIcon,
-	} from 'lucide-svelte';
+	} from '@lucide/svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';

@@ -22,10 +22,10 @@
 		Info,
 		PlayCircle,
 		FileCheck
-	} from 'lucide-svelte';
+	} from '@lucide/svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { slide } from 'svelte/transition';
-	import { ArrowUp, ArrowDown } from 'lucide-svelte';
+	import { ArrowUp, ArrowDown } from '@lucide/svelte';
 	import { Search } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
 

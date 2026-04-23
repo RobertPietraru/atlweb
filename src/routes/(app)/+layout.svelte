@@ -10,7 +10,7 @@
 		BrainCircuit,
 		Languages
 	} from '@lucide/svelte';
-	import { Sun, Moon } from 'lucide-svelte';
+	import { Sun, Moon } from '@lucide/svelte';
 	import { page } from '$app/state';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';

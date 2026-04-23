@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
 	import * as m from '$lib/paraglide/messages.js';
-	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from 'lucide-svelte';
+	import { ArrowUpRightIcon, BookOpenIcon, PlayIcon } from '@lucide/svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	let { data } = $props();
 </script>

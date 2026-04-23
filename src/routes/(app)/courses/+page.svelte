@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
-	import { ArrowUpRightIcon, BookOpenIcon } from 'lucide-svelte';
+	import { ArrowUpRightIcon, BookOpenIcon } from '@lucide/svelte';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';

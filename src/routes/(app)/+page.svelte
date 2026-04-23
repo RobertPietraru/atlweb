@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { ArrowRightIcon, BookOpenIcon, UsersIcon, Github } from 'lucide-svelte';
+	import { ArrowRightIcon, BookOpenIcon, UsersIcon, Github } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
 </script>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ArrowUpRightIcon, LibraryBig, UsersRound } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { BrainCircuit } from 'lucide-svelte';
+	import { BrainCircuit } from '@lucide/svelte';
 
 	let { data } = $props();
 </script>

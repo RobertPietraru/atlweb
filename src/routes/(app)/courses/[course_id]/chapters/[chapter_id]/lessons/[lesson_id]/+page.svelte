@@ -6,12 +6,12 @@
 	import { page } from '$app/state';
 	import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { LogOut, LogIn, UserRound, Settings, X } from 'lucide-svelte';
+	import { LogOut, LogIn, UserRound, Settings, X } from '@lucide/svelte';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import { Sun, Moon } from 'lucide-svelte';
+	import { Sun, Moon } from '@lucide/svelte';
 	import { slide } from 'svelte/transition';
 
-	import { PlayIcon, BookOpenIcon, MenuIcon, BookOpen, FileCheck, PlayCircle } from 'lucide-svelte';
+	import { PlayIcon, BookOpenIcon, MenuIcon, BookOpen, FileCheck, PlayCircle } from '@lucide/svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte.js';

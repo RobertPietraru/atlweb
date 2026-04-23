@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 
 	import { Card, CardContent, CardFooter } from '$lib/components/ui/card';
-	import { ArrowUpRightIcon, BookOpenIcon } from 'lucide-svelte';
+	import { ArrowUpRightIcon, BookOpenIcon } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	let { data } = $props();
 

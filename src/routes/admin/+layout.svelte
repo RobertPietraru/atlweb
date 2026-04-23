@@ -3,7 +3,7 @@
 
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { ShieldUser, LogOut, UserRound, Loader2, BookOpen } from '@lucide/svelte';
-	import { Sun, Moon } from 'lucide-svelte';
+	import { Sun, Moon } from '@lucide/svelte';
 	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
