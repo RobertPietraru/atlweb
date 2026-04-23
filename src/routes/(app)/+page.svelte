@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { BookOpenIcon, BrainCircuitIcon, UsersIcon, ArrowRightIcon } from '@lucide/svelte';
+	import { ArrowRightIcon, BookOpenIcon, ZapIcon, GiftIcon, LayersIcon, CodeIcon, CheckCircle2Icon } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
 </script>
 
@@ -60,62 +60,168 @@
 	</div>
 </section>
 
-<!-- Features -->
+<!-- How it works -->
 <section class="mx-auto max-w-[1280px] px-6 pb-24">
-	<div class="grid gap-6 md:grid-cols-3">
-		<!-- Card 1 -->
-		<div class="group rounded-xl border bg-card p-8 shadow-sm transition-all duration-200 hover:border-primary hover:shadow-md">
-			<div class="mb-5 inline-flex rounded-xl bg-primary/10 p-3">
-				<BookOpenIcon class="h-6 w-6 text-primary" />
-			</div>
-			<h3 class="mb-2 font-display text-lg font-semibold text-foreground">
-				{m.home_interactive_courses_title()}
-			</h3>
-			<p class="text-sm leading-relaxed text-muted-foreground">
-				{m.home_interactive_courses_description()}
-			</p>
-		</div>
+	<div class="mb-14 text-center">
+		<h2 class="mb-3 font-display text-3xl font-bold text-foreground">{m.home_how_title()}</h2>
+		<p class="text-muted-foreground">{m.home_how_subtitle()}</p>
+	</div>
 
-		<!-- Card 2 -->
-		<div class="group rounded-xl border bg-card p-8 shadow-sm transition-all duration-200 hover:border-primary hover:shadow-md">
-			<div class="mb-5 inline-flex rounded-xl bg-primary/10 p-3">
-				<BrainCircuitIcon class="h-6 w-6 text-primary" />
-			</div>
-			<h3 class="mb-2 font-display text-lg font-semibold text-foreground">
-				{m.home_practical_exercises_title()}
-			</h3>
-			<p class="text-sm leading-relaxed text-muted-foreground">
-				{m.home_practical_exercises_description()}
-			</p>
-		</div>
+	<div class="relative grid gap-8 md:grid-cols-3">
+		<!-- connector lines on desktop -->
+		<div class="pointer-events-none absolute left-[33%] right-[33%] top-7 hidden h-px bg-border md:block"></div>
 
-		<!-- Card 3 -->
-		<div class="group rounded-xl border bg-card p-8 shadow-sm transition-all duration-200 hover:border-primary hover:shadow-md">
-			<div class="mb-5 inline-flex rounded-xl bg-primary/10 p-3">
-				<UsersIcon class="h-6 w-6 text-primary" />
+		{#each [
+			{ num: '01', title: m.home_step1_title(), desc: m.home_step1_desc(), icon: BookOpenIcon },
+			{ num: '02', title: m.home_step2_title(), desc: m.home_step2_desc(), icon: LayersIcon },
+			{ num: '03', title: m.home_step3_title(), desc: m.home_step3_desc(), icon: ZapIcon }
+		] as step}
+			<div class="flex flex-col items-center text-center md:items-center">
+				<div class="relative mb-6 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary/30 bg-background ring-4 ring-background">
+					<step.icon class="h-6 w-6 text-primary" />
+					<span class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{step.num}</span>
+				</div>
+				<h3 class="mb-2 font-display text-lg font-semibold text-foreground">{step.title}</h3>
+				<p class="max-w-xs text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
 			</div>
-			<h3 class="mb-2 font-display text-lg font-semibold text-foreground">
-				{m.home_community_title()}
-			</h3>
-			<p class="text-sm leading-relaxed text-muted-foreground">
-				{m.home_community_description()}
-			</p>
+		{/each}
+	</div>
+</section>
+
+<!-- Code example section -->
+<section class="bg-muted/30 border-y border-border py-24">
+	<div class="mx-auto max-w-[1280px] px-6">
+		<div class="grid items-center gap-16 lg:grid-cols-2">
+			<div>
+				<div class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+					<CodeIcon class="h-6 w-6" />
+				</div>
+				<h2 class="mb-4 font-display text-4xl font-bold tracking-tight text-foreground">
+					{m.home_editor_title()}
+				</h2>
+				<p class="mb-8 text-lg text-muted-foreground">
+					{m.home_editor_subtitle()}
+				</p>
+
+				<ul class="space-y-4">
+					{#each [
+						{ title: m.home_editor_feature1_title(), desc: m.home_editor_feature1_desc() },
+						{ title: m.home_editor_feature2_title(), desc: m.home_editor_feature2_desc() },
+						{ title: m.home_editor_feature3_title(), desc: m.home_editor_feature3_desc() }
+					] as feature}
+						<li class="flex gap-3">
+							<CheckCircle2Icon class="mt-1 h-5 w-5 text-primary" />
+							<div>
+								<span class="font-semibold text-foreground">{feature.title}:</span>
+								<span class="text-muted-foreground"> {feature.desc}</span>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			</div>
+
+			<div class="relative">
+				<div class="absolute -inset-4 rounded-xl bg-gradient-to-r from-primary/20 to-blue-500/20 blur-2xl"></div>
+				
+				<div class="relative overflow-hidden rounded-xl border bg-card shadow-2xl">
+					<div class="flex items-center justify-between border-b bg-muted/50 px-4 py-2">
+						<div class="flex gap-1.5">
+							<div class="h-3 w-3 rounded-full bg-red-500/80"></div>
+							<div class="h-3 w-3 rounded-full bg-amber-500/80"></div>
+							<div class="h-3 w-3 rounded-full bg-emerald-500/80"></div>
+						</div>
+						<div class="text-xs font-medium text-muted-foreground">script.js</div>
+						<div class="w-12"></div>
+					</div>
+
+					<div class="flex font-mono text-sm leading-relaxed p-4">
+						<div class="mr-4 flex flex-col text-right text-muted-foreground/40 select-none">
+							<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+						</div>
+						<div class="flex-1 overflow-x-auto">
+							<div>
+								<span class="text-blue-600 dark:text-blue-400">function</span>
+								<span class="text-violet-700 dark:text-violet-400"> greet</span>
+								<span class="text-foreground">(</span>
+								<span class="text-amber-700 dark:text-amber-300">name</span>
+								<span class="text-foreground">) &#123;</span>
+							</div>
+							<div class="pl-4">
+								<span class="text-blue-600 dark:text-blue-400">const</span>
+								<span class="text-foreground"> msg = </span>
+								<span class="text-green-700 dark:text-emerald-400">`Hello, $&#123;</span>
+								<span class="text-amber-700 dark:text-amber-300">name</span>
+								<span class="text-green-700 dark:text-emerald-400">&#125;!`</span>
+								<span class="text-foreground">;</span>
+							</div>
+							<div class="pl-4">
+								<span class="text-blue-600 dark:text-blue-400">return</span>
+								<span class="text-foreground"> msg;</span>
+							</div>
+							<div><span class="text-foreground">&#125;</span></div>
+							<div class="h-4"></div>
+							<div>
+								<span class="text-violet-700 dark:text-violet-400">greet</span>
+								<span class="text-foreground">(</span>
+								<span class="text-green-700 dark:text-emerald-400">"World"</span>
+								<span class="text-foreground">);</span>
+								<span class="ml-1 inline-block h-4 w-0.5 translate-y-0.5 animate-pulse bg-primary"></span>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-4 border-t bg-muted/30 px-4 py-1.5 text-[10px] text-muted-foreground">
+						<div>JavaScript</div>
+						<div class="ml-auto">UTF-8</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </section>
 
-<!-- CTA banner -->
-<section class="border-t bg-primary/5">
-	<div class="mx-auto max-w-[1280px] px-6 py-20 text-center">
-		<h2 class="mb-4 font-display text-3xl font-bold text-foreground">
-			{m.home_start_learning()}
-		</h2>
-		<p class="mx-auto mb-8 max-w-md text-muted-foreground">
-			{m.home_subtitle()}
-		</p>
-		<Button href="/courses" size="lg" class="gap-2 px-10 font-display font-semibold shadow-md shadow-primary/20">
-			{m.home_start_learning()}
-			<ArrowRightIcon class="h-4 w-4" />
-		</Button>
+<!-- Why learn here -->
+<section class="border-y bg-muted/30">
+	<div class="mx-auto max-w-[1280px] px-6 py-20">
+		<div class="grid gap-10 md:grid-cols-3">
+			<div class="flex flex-col gap-3">
+				<div class="mb-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+					<GiftIcon class="h-5 w-5 text-primary" />
+				</div>
+				<h3 class="font-display text-lg font-semibold text-foreground">{m.home_why_free_title()}</h3>
+				<p class="text-sm leading-relaxed text-muted-foreground">{m.home_why_free_desc()}</p>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<div class="mb-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+					<ZapIcon class="h-5 w-5 text-primary" />
+				</div>
+				<h3 class="font-display text-lg font-semibold text-foreground">{m.home_why_feedback_title()}</h3>
+				<p class="text-sm leading-relaxed text-muted-foreground">{m.home_why_feedback_desc()}</p>
+			</div>
+
+			<div class="flex flex-col gap-3">
+				<div class="mb-1 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+					<LayersIcon class="h-5 w-5 text-primary" />
+				</div>
+				<h3 class="font-display text-lg font-semibold text-foreground">{m.home_why_beginner_title()}</h3>
+				<p class="text-sm leading-relaxed text-muted-foreground">{m.home_why_beginner_desc()}</p>
+			</div>
+		</div>
 	</div>
+</section>
+
+
+<!-- CTA -->
+<section class="mx-auto max-w-[1280px] px-6 py-28 text-center">
+	<h2 class="mb-4 font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+		{m.home_cta_title()}
+	</h2>
+	<p class="mx-auto mb-10 max-w-sm text-lg text-muted-foreground">
+		{m.home_cta_desc()}
+	</p>
+	<Button href="/courses" size="lg" class="gap-2 px-10 font-display font-semibold shadow-md shadow-primary/20">
+		{m.home_start_learning()}
+		<ArrowRightIcon class="h-4 w-4" />
+	</Button>
 </section>
