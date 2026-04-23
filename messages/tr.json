@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Anında geri bildirim",
     "home_editor_feature2_desc": "Yazarken kodunun çalıştığını gör.",
     "home_editor_feature3_title": "Tarayıcıda çalışır",
-    "home_editor_feature3_desc": "Kurulum yok. Yapılandırma yok. Sadece aç ve kodlamaya başla."
+    "home_editor_feature3_desc": "Kurulum yok. Yapılandırma yok. Sadece aç ve kodlamaya başla.",
+    "auth_login_loading": "Giriş yapılıyor...",
+    "auth_register_loading": "Kaydediliyor...",
+    "admin_course_create_loading": "Oluşturuluyor...",
+    "admin_user_create_loading": "Oluşturuluyor...",
+    "admin_user_update_info_success": "Kullanıcı bilgileri başarıyla güncellendi"
 }

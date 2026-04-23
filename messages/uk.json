@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Миттєвий зворотній зв'язок",
     "home_editor_feature2_desc": "Дивись, як код запускається в міру набору.",
     "home_editor_feature3_title": "Працює в браузері",
-    "home_editor_feature3_desc": "Без встановлення. Без налаштування. Просто відкрий і починай програмувати."
+    "home_editor_feature3_desc": "Без встановлення. Без налаштування. Просто відкрий і починай програмувати.",
+    "auth_login_loading": "Вхід...",
+    "auth_register_loading": "Реєстрація...",
+    "admin_course_create_loading": "Створення...",
+    "admin_user_create_loading": "Створення...",
+    "admin_user_update_info_success": "Інформацію користувача успішно оновлено"
 }

@@ -1,12 +1,11 @@
 import { command, getRequestEvent } from '$app/server';
-import { redirect, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
 import { adminService } from '$lib/injection';
-import { i18n } from '$lib/i18n';
 
 export const createLesson = command(
 	v.object({ courseId: v.string(), chapterId: v.string() }),
-	async ({ courseId, chapterId }) => {
+	async ({ courseId: _courseId, chapterId }) => {
 		const event = getRequestEvent();
 
 		if (!event.locals.user?.permissions.includes('lesson.edit') || !event.locals.user.permissions.includes('lesson.create')) {
@@ -14,7 +13,7 @@ export const createLesson = command(
 		}
 
 		const lessonId = await adminService.createLesson(chapterId);
-		redirect(302, i18n.resolveRoute(`/admin/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`));
+		return { lessonId };
 	}
 );
 

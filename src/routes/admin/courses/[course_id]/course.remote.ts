@@ -1,19 +1,14 @@
 import { command, getRequestEvent } from '$app/server';
-import { redirect, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
 import { adminService } from '$lib/injection';
-import { i18n } from '$lib/i18n';
 
 export const createChapter = command(
 	v.object({ courseId: v.string() }),
 	async ({ courseId }) => {
 		const event = getRequestEvent();
 
-		if (!event.locals.user) {
-			redirect(302, i18n.resolveRoute('/login'));
-		}
-
-		if (!event.locals.user.permissions.includes('course.edit') || !event.locals.user.permissions.includes('course.create')) {
+		if (!event.locals.user?.permissions.includes('course.edit')) {
 			error(403, 'Nu ai permisiunea să creezi un capitol');
 		}
 
@@ -22,7 +17,7 @@ export const createChapter = command(
 			description: 'Descrierea capitolului'
 		});
 
-		redirect(302, i18n.resolveRoute(`/admin/courses/${courseId}/chapters/${id}`));
+		return { id };
 	}
 );
 

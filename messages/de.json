@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Sofortiges Feedback",
     "home_editor_feature2_desc": "Sieh deinen Code laufen, sobald du tippst.",
     "home_editor_feature3_title": "Läuft im Browser",
-    "home_editor_feature3_desc": "Keine Installation. Keine Konfiguration. Einfach öffnen und mit dem Programmieren beginnen."
+    "home_editor_feature3_desc": "Keine Installation. Keine Konfiguration. Einfach öffnen und mit dem Programmieren beginnen.",
+    "auth_login_loading": "Anmelden...",
+    "auth_register_loading": "Registrieren...",
+    "admin_course_create_loading": "Wird erstellt...",
+    "admin_user_create_loading": "Wird erstellt...",
+    "admin_user_update_info_success": "Benutzerinformationen erfolgreich aktualisiert"
 }

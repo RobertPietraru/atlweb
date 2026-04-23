@@ -5,6 +5,10 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { createCourse } from './create.remote';
+	import { Loader2Icon } from '@lucide/svelte';
+	import { enhance } from '$app/forms';
+
+	let submitting = $state(false);
 </script>
 
 <div class="flex min-h-screen items-center justify-center bg-background">
@@ -13,16 +17,27 @@
 			<CardTitle class="text-center text-2xl font-bold">{m.admin_course_create_title()}</CardTitle>
 		</CardHeader>
 		<CardContent>
-			<form {...createCourse} class="space-y-4">
+			<form
+				{...createCourse}
+				use:enhance={() => {
+					submitting = true;
+					return async ({ update }) => {
+						await update();
+						submitting = false;
+					};
+				}}
+				class="space-y-4"
+			>
 				<div class="space-y-2">
 					<Label for="name">{m.admin_course_name()}</Label>
 					<Input
 						id="name"
 						{...createCourse.fields.name.as('text')}
+						disabled={submitting}
 						required
 					/>
 					{#each createCourse.fields.name.issues() as issue}
-						<p class="text-destructive">{issue.message}</p>
+						<p class="text-xs text-destructive">{issue.message}</p>
 					{/each}
 				</div>
 				<div class="space-y-2">
@@ -30,13 +45,19 @@
 					<Input
 						id="description"
 						{...createCourse.fields.description.as('text')}
+						disabled={submitting}
 						required
 					/>
 					{#each createCourse.fields.description.issues() as issue}
-						<p class="text-destructive">{issue.message}</p>
+						<p class="text-xs text-destructive">{issue.message}</p>
 					{/each}
 				</div>
-				<Button type="submit" class="w-full">{m.admin_course_create_button()}</Button>
+				<Button type="submit" class="w-full gap-2" disabled={submitting}>
+					{#if submitting}
+						<Loader2Icon class="h-4 w-4 animate-spin" />
+					{/if}
+					{submitting ? m.admin_course_create_loading() : m.admin_course_create_button()}
+				</Button>
 			</form>
 		</CardContent>
 		<CardFooter class="flex justify-center">

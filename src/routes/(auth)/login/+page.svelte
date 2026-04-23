@@ -4,9 +4,12 @@
 	import { Label } from '$lib/components/ui/label';
 	import { login } from './login.remote';
 	import * as m from '$lib/paraglide/messages.js';
-	import { BookOpenIcon } from '@lucide/svelte';
+	import { BookOpenIcon, Loader2Icon } from '@lucide/svelte';
+	import { enhance } from '$app/forms';
 
 	let { data } = $props();
+
+	let submitting = $state(false);
 </script>
 
 <div class="flex min-h-screen">
@@ -55,7 +58,17 @@
 					</p>
 				</div>
 
-				<form {...login} class="space-y-5">
+				<form
+					{...login}
+					use:enhance={() => {
+						submitting = true;
+						return async ({ update }) => {
+							await update();
+							submitting = false;
+						};
+					}}
+					class="space-y-5"
+				>
 					<input type="hidden" name="redirectUrl" value={data.redirectUrl} />
 
 					<div class="space-y-1.5">
@@ -65,6 +78,7 @@
 							{...login.fields.email.as('email')}
 							autocomplete="email"
 							required
+							disabled={submitting}
 							class="h-11"
 						/>
 						{#each login.fields.email.issues() as issue}
@@ -79,6 +93,7 @@
 							{...login.fields._password.as('password')}
 							autocomplete="current-password"
 							required
+							disabled={submitting}
 							class="h-11"
 						/>
 						{#each login.fields._password.issues() as issue}
@@ -88,9 +103,13 @@
 
 					<Button
 						type="submit"
-						class="h-11 w-full font-display font-semibold shadow-md shadow-primary/20"
+						disabled={submitting}
+						class="h-11 w-full gap-2 font-display font-semibold shadow-md shadow-primary/20"
 					>
-						{m.auth_login_button()}
+						{#if submitting}
+							<Loader2Icon class="h-4 w-4 animate-spin" />
+						{/if}
+						{submitting ? m.auth_login_loading() : m.auth_login_button()}
 					</Button>
 				</form>
 			</div>

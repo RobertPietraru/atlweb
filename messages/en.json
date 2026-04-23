@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Instant Feedback",
     "home_editor_feature2_desc": "See your code run as soon as you type.",
     "home_editor_feature3_title": "Runs in the browser",
-    "home_editor_feature3_desc": "No setup. No installs. Just open and start coding."
+    "home_editor_feature3_desc": "No setup. No installs. Just open and start coding.",
+    "auth_login_loading": "Logging in...",
+    "auth_register_loading": "Registering...",
+    "admin_course_create_loading": "Creating...",
+    "admin_user_create_loading": "Creating...",
+    "admin_user_update_info_success": "User information updated successfully"
 }

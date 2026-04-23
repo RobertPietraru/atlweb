@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Trenutna povratna informacija",
     "home_editor_feature2_desc": "Gledaj kako se kod izvršava dok kucaš.",
     "home_editor_feature3_title": "Radi u pregledaču",
-    "home_editor_feature3_desc": "Bez instalacije. Bez podešavanja. Samo otvori i počni da programiraš."
+    "home_editor_feature3_desc": "Bez instalacije. Bez podešavanja. Samo otvori i počni da programiraš.",
+    "auth_login_loading": "Prijava...",
+    "auth_register_loading": "Registracija...",
+    "admin_course_create_loading": "Kreiranje...",
+    "admin_user_create_loading": "Kreiranje...",
+    "admin_user_update_info_success": "Informacije o korisniku su uspešno ažurirane"
 }

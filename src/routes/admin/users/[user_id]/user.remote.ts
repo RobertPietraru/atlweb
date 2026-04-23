@@ -1,10 +1,9 @@
 import { form, command, getRequestEvent } from '$app/server';
-import { invalid, redirect, error } from '@sveltejs/kit';
+import { invalid, error } from '@sveltejs/kit';
 import * as v from 'valibot';
 import { adminService } from '$lib/injection';
 import { permissionsList } from '$lib/server/db/schema';
 import type * as table from '$lib/server/db/schema';
-import { i18n } from '$lib/i18n';
 
 export const updateUser = form(
 	v.object({
@@ -65,6 +64,5 @@ export const deleteUser = command(
 		}
 
 		await adminService.deleteUser(userId);
-		redirect(302, i18n.resolveRoute('/admin/users'));
 	}
 );

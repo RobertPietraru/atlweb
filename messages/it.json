@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Feedback istantaneo",
     "home_editor_feature2_desc": "Guarda il tuo codice eseguirsi non appena scrivi.",
     "home_editor_feature3_title": "Funziona nel browser",
-    "home_editor_feature3_desc": "Nessuna installazione. Nessuna configurazione. Apri e inizia a programmare."
+    "home_editor_feature3_desc": "Nessuna installazione. Nessuna configurazione. Apri e inizia a programmare.",
+    "auth_login_loading": "Accesso in corso...",
+    "auth_register_loading": "Registrazione...",
+    "admin_course_create_loading": "Creazione...",
+    "admin_user_create_loading": "Creazione...",
+    "admin_user_update_info_success": "Informazioni utente aggiornate con successo"
 }

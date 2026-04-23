@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Retour instantané",
     "home_editor_feature2_desc": "Voyez votre code s'exécuter dès que vous tapez.",
     "home_editor_feature3_title": "Fonctionne dans le navigateur",
-    "home_editor_feature3_desc": "Pas d'installation. Pas de configuration. Ouvrez et commencez à coder."
+    "home_editor_feature3_desc": "Pas d'installation. Pas de configuration. Ouvrez et commencez à coder.",
+    "auth_login_loading": "Connexion...",
+    "auth_register_loading": "Inscription...",
+    "admin_course_create_loading": "Création...",
+    "admin_user_create_loading": "Création...",
+    "admin_user_update_info_success": "Informations de l'utilisateur mises à jour avec succès"
 }

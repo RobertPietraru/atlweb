@@ -4,9 +4,12 @@
 	import { Label } from '$lib/components/ui/label';
 	import { register } from './register.remote';
 	import * as m from '$lib/paraglide/messages.js';
-	import { BookOpenIcon } from '@lucide/svelte';
+	import { BookOpenIcon, Loader2Icon } from '@lucide/svelte';
+	import { enhance } from '$app/forms';
 
 	let { data } = $props();
+
+	let submitting = $state(false);
 </script>
 
 <div class="flex min-h-screen">
@@ -54,7 +57,17 @@
 					</p>
 				</div>
 
-				<form {...register} class="space-y-5">
+				<form
+					{...register}
+					use:enhance={() => {
+						submitting = true;
+						return async ({ update }) => {
+							await update();
+							submitting = false;
+						};
+					}}
+					class="space-y-5"
+				>
 					<input type="hidden" name="redirectUrl" value={data.redirectUrl} />
 
 					<div class="space-y-1.5">
@@ -66,6 +79,7 @@
 							{...register.fields.username.as('text')}
 							autocomplete="username"
 							required
+							disabled={submitting}
 							class="h-11"
 						/>
 						{#each register.fields.username.issues() as issue}
@@ -80,6 +94,7 @@
 							{...register.fields.email.as('email')}
 							autocomplete="email"
 							required
+							disabled={submitting}
 							class="h-11"
 						/>
 						{#each register.fields.email.issues() as issue}
@@ -96,6 +111,7 @@
 							{...register.fields._password.as('password')}
 							autocomplete="new-password"
 							required
+							disabled={submitting}
 							class="h-11"
 						/>
 						{#each register.fields._password.issues() as issue}
@@ -105,9 +121,13 @@
 
 					<Button
 						type="submit"
-						class="h-11 w-full font-display font-semibold shadow-md shadow-primary/20"
+						disabled={submitting}
+						class="h-11 w-full gap-2 font-display font-semibold shadow-md shadow-primary/20"
 					>
-						{m.auth_register_button()}
+						{#if submitting}
+							<Loader2Icon class="h-4 w-4 animate-spin" />
+						{/if}
+						{submitting ? m.auth_register_loading() : m.auth_register_button()}
 					</Button>
 				</form>
 			</div>

@@ -1,26 +1,30 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
-	import { Card, CardContent } from '$lib/components/ui/card';
 	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as m from '$lib/paraglide/messages.js';
 	import { createLesson, updateChapter, manageLessons } from './chapter.remote';
+	import { Loader2, ChevronUp, ChevronDown, PlusIcon, SaveIcon, PencilIcon, XIcon } from '@lucide/svelte';
+	import { untrack } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data } = $props();
-	let lessons = $state(data.chapter.lessons.map((l) => ({ ...l })));
-	let initialLessons = data.chapter.lessons;
+	let lessons = $state(untrack(() => data.chapter.lessons.map((l) => ({ ...l }))));
+	let initialLessons = untrack(() => data.chapter.lessons);
 	let hasChanges = $derived(JSON.stringify(lessons) !== JSON.stringify(initialLessons));
 
-	let loading = $state(false);
+	let savingInfo = $state(false);
+	let savingOrder = $state(false);
+	let creatingLesson = $state(false);
 	let isEditing = $state(false);
-	let editForm = $state({
+	let editForm = $state(untrack(() => ({
 		name: data.chapter.name,
 		description: data.chapter.description
-	});
+	})));
 
-	function calculateNewOrder(index: number, direction: 'up' | 'down'): number {
+	function moveLesson(index: number, direction: 'up' | 'down') {
 		if (direction === 'up' && index > 0) {
 			const temp = lessons[index];
 			lessons[index] = lessons[index - 1];
@@ -31,26 +35,26 @@
 			lessons[index + 1] = temp;
 		}
 		lessons = lessons.map((l, idx) => ({ ...l, order: idx + 1 }));
-		return lessons[index].order;
 	}
 
 	async function saveLessonOrder() {
-		loading = true;
+		savingOrder = true;
 		try {
 			await manageLessons({
 				chapterId: data.chapter.id,
 				lessons: lessons.map((l) => l.id)
 			});
 			initialLessons = [...lessons];
-		} catch (err) {
+			toast.success(m.admin_chapter_save_info_success(), { position: 'bottom-left' });
+		} catch {
 			toast.error(m.admin_chapter_save_lesson_order_error(), { position: 'bottom-left' });
 		} finally {
-			loading = false;
+			savingOrder = false;
 		}
 	}
 
 	async function saveChapterInfo() {
-		loading = true;
+		savingInfo = true;
 		try {
 			await updateChapter({
 				chapterId: data.chapter.id,
@@ -61,131 +65,157 @@
 			data.chapter.description = editForm.description;
 			isEditing = false;
 			toast.success(m.admin_chapter_save_info_success(), { position: 'bottom-left' });
-		} catch (err) {
+		} catch {
 			toast.error(m.admin_chapter_save_info_error(), { position: 'bottom-left' });
 		} finally {
-			loading = false;
+			savingInfo = false;
+		}
+	}
+
+	async function handleCreateLesson() {
+		creatingLesson = true;
+		try {
+			await createLesson({ courseId: data.courseId, chapterId: data.chapter.id });
+			await invalidateAll();
+			lessons = data.chapter.lessons.map((l) => ({ ...l }));
+			initialLessons = [...data.chapter.lessons];
+		} finally {
+			creatingLesson = false;
 		}
 	}
 
 	function deleteLesson(index: number) {
 		lessons = lessons.filter((_, i) => i !== index);
-		hasChanges = true;
 	}
 </script>
 
-<div class="container mx-auto max-w-4xl py-12" class:pointer-events-none={loading}>
-	<header class="mb-12">
-		<h1 class="text-4xl font-bold tracking-tight">{m.admin_chapter_title({ name: data.chapter.name })}</h1>
-	</header>
+<div class="mx-auto max-w-3xl">
+	<div class="mb-8">
+		<h1 class="font-display text-3xl font-bold tracking-tight">
+			{m.admin_chapter_title({ name: data.chapter.name })}
+		</h1>
+	</div>
 
-	<div class="grid gap-12">
-		<section>
-			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_chapter_basic_info()}</h2>
+	<div class="grid gap-8">
+		<!-- Basic info -->
+		<section class="rounded-xl border bg-card shadow-sm">
+			<div class="flex items-center justify-between border-b px-6 py-4">
+				<h2 class="font-display text-base font-semibold">{m.admin_chapter_basic_info()}</h2>
 				{#if !isEditing}
-					<Button variant="outline" onclick={() => (isEditing = true)}>{m.admin_chapter_edit()}</Button>
+					<Button variant="ghost" size="sm" onclick={() => (isEditing = true)} class="gap-1.5">
+						<PencilIcon class="h-3.5 w-3.5" />
+						{m.admin_chapter_edit()}
+					</Button>
 				{/if}
 			</div>
-			<Card>
-				<CardContent class="space-y-6 pt-6">
-					{#if isEditing}
-						<div>
-							<Label for="name">{m.admin_chapter_name()}</Label>
-							<Input id="name" bind:value={editForm.name} />
-						</div>
-						<div>
-							<Label for="description">{m.admin_chapter_description()}</Label>
-							<Textarea id="description" bind:value={editForm.description} />
-						</div>
-						<div class="flex gap-2">
-							<Button variant="default" onclick={saveChapterInfo} disabled={loading}>{m.admin_chapter_save()}</Button>
-							<Button variant="outline" onclick={() => (isEditing = false)} disabled={loading}>
-								{m.admin_chapter_cancel()}
-							</Button>
-						</div>
-					{:else}
-						<div>
-							<Label class="text-sm text-muted-foreground">{m.admin_chapter_name()}</Label>
-							<p class="mt-1 text-lg font-medium">{data.chapter.name}</p>
-						</div>
-						<div>
-							<Label class="text-sm text-muted-foreground">{m.admin_chapter_description()}</Label>
-							<p class="mt-1 text-lg leading-relaxed">{data.chapter.description}</p>
-						</div>
-					{/if}
-				</CardContent>
-			</Card>
+			<div class="space-y-5 p-6">
+				{#if isEditing}
+					<div class="space-y-1.5">
+						<Label for="name">{m.admin_chapter_name()}</Label>
+						<Input id="name" bind:value={editForm.name} disabled={savingInfo} />
+					</div>
+					<div class="space-y-1.5">
+						<Label for="description">{m.admin_chapter_description()}</Label>
+						<Textarea id="description" bind:value={editForm.description} disabled={savingInfo} />
+					</div>
+					<div class="flex gap-2">
+						<Button onclick={saveChapterInfo} disabled={savingInfo} class="gap-2">
+							{#if savingInfo}
+								<Loader2 class="h-4 w-4 animate-spin" />
+							{:else}
+								<SaveIcon class="h-4 w-4" />
+							{/if}
+							{m.admin_chapter_save()}
+						</Button>
+						<Button variant="outline" onclick={() => (isEditing = false)} disabled={savingInfo} class="gap-2">
+							<XIcon class="h-4 w-4" />
+							{m.admin_chapter_cancel()}
+						</Button>
+					</div>
+				{:else}
+					<div>
+						<p class="mb-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">{m.admin_chapter_name()}</p>
+						<p class="font-medium">{data.chapter.name}</p>
+					</div>
+					<div>
+						<p class="mb-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">{m.admin_chapter_description()}</p>
+						<p class="leading-relaxed text-muted-foreground">{data.chapter.description}</p>
+					</div>
+				{/if}
+			</div>
 		</section>
 
-		<section>
-			<div class="mb-6 flex items-center justify-between">
-				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_chapter_lessons()}</h2>
-				<div class="flex gap-2">
-					<Button
-						onclick={() => createLesson({ courseId: data.courseId, chapterId: data.chapter.id })}
-					>
-						{m.admin_chapter_add_lesson()}
-					</Button>
-				</div>
+		<!-- Lessons -->
+		<section class="rounded-xl border bg-card shadow-sm">
+			<div class="flex items-center justify-between border-b px-6 py-4">
+				<h2 class="font-display text-base font-semibold">{m.admin_chapter_lessons()}</h2>
+				<Button onclick={handleCreateLesson} disabled={creatingLesson} size="sm" class="gap-2">
+					{#if creatingLesson}
+						<Loader2 class="h-4 w-4 animate-spin" />
+					{:else}
+						<PlusIcon class="h-4 w-4" />
+					{/if}
+					{m.admin_chapter_add_lesson()}
+				</Button>
 			</div>
 
-			{#if hasChanges}
-				<Button variant="default" onclick={saveLessonOrder} disabled={loading} class="w-full">
-					{m.admin_chapter_save()}
-				</Button>
-			{/if}
+			<div class="p-6">
+				{#if hasChanges}
+					<Button
+						variant="default"
+						onclick={saveLessonOrder}
+						disabled={savingOrder}
+						class="mb-4 w-full gap-2"
+					>
+						{#if savingOrder}
+							<Loader2 class="h-4 w-4 animate-spin" />
+						{:else}
+							<SaveIcon class="h-4 w-4" />
+						{/if}
+						{m.admin_chapter_save()}
+					</Button>
+				{/if}
 
-			{#if lessons.length === 0}
-				<Card>
-					<CardContent class="pt-6">
-						<p class="text-center text-muted-foreground">{m.admin_chapter_no_lessons()}</p>
-					</CardContent>
-				</Card>
-			{:else}
-				<div class="space-y-4">
-					{#each lessons as lesson, index}
-						<Card>
-							<CardContent class="flex items-center justify-between p-4">
-								<div class="flex items-center gap-4">
-									<div class="flex flex-col gap-1">
-										{#if index > 0}
-											<Button
-												variant="ghost"
-												size="icon"
-												class="h-6 w-6"
-												onclick={() => calculateNewOrder(index, 'up')}
-											>
-												↑
-											</Button>
-										{/if}
-										{#if index < lessons.length - 1}
-											<Button
-												variant="ghost"
-												size="icon"
-												class="h-6 w-6"
-												onclick={() => calculateNewOrder(index, 'down')}
-											>
-												↓
-											</Button>
-										{/if}
-									</div>
-									<h3 class="text-lg font-medium">{lesson.name}</h3>
+				{#if lessons.length === 0}
+					<p class="py-8 text-center text-sm text-muted-foreground">{m.admin_chapter_no_lessons()}</p>
+				{:else}
+					<div class="space-y-2">
+						{#each lessons as lesson, index}
+							<div class="flex items-center gap-3 rounded-lg border bg-background px-4 py-3">
+								<div class="flex flex-col gap-0.5">
+									<button
+										class="rounded p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
+										disabled={index === 0}
+										onclick={() => moveLesson(index, 'up')}
+									>
+										<ChevronUp class="h-4 w-4" />
+									</button>
+									<button
+										class="rounded p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
+										disabled={index === lessons.length - 1}
+										onclick={() => moveLesson(index, 'down')}
+									>
+										<ChevronDown class="h-4 w-4" />
+									</button>
 								</div>
-								<div class="flex gap-2">
+								<span class="min-w-0 flex-1 font-medium">{lesson.name}</span>
+								<div class="flex shrink-0 gap-2">
 									<Button
 										variant="outline"
+										size="sm"
 										href="/admin/courses/{data.courseId}/chapters/{data.chapter.id}/lessons/{lesson.id}"
 									>
 										{m.admin_chapter_edit_lesson()}
 									</Button>
-									<Button variant="destructive" onclick={() => deleteLesson(index)}>{m.admin_chapter_delete_lesson()}</Button>
+									<Button variant="destructive" size="sm" onclick={() => deleteLesson(index)}>
+										{m.admin_chapter_delete_lesson()}
+									</Button>
 								</div>
-							</CardContent>
-						</Card>
-					{/each}
-				</div>
-			{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
 		</section>
 	</div>
 </div>

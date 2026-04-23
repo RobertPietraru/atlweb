@@ -2,6 +2,26 @@
 	import { Button } from '$lib/components/ui/button';
 	import { ArrowRightIcon, BookOpenIcon, ZapIcon, GiftIcon, LayersIcon, CodeIcon, CheckCircle2Icon } from '@lucide/svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+
+	let displayed = $state('');
+	let cursorVisible = $state(true);
+	let typing = $state(true);
+
+	onMount(() => {
+		const full = m.home_title();
+		let i = 0;
+		const tick = () => {
+			if (i < full.length) {
+				displayed = full.slice(0, ++i);
+				setTimeout(tick, 48);
+			} else {
+				typing = false;
+				setTimeout(() => { cursorVisible = false; }, 1800);
+			}
+		};
+		setTimeout(tick, 350);
+	});
 </script>
 
 <!-- Hero -->
@@ -25,9 +45,12 @@
 
 			<h1 class="mb-6 font-display text-5xl font-bold leading-tight tracking-tight text-foreground md:text-6xl">
 				{m.brand_name()} —
-				<span class="bg-gradient-to-r from-primary via-blue-500 to-blue-400 bg-clip-text text-transparent">
-					{m.home_title()}
-				</span>
+				<span class="bg-gradient-to-r from-primary via-blue-500 to-blue-400 bg-clip-text text-transparent">{displayed}</span><span
+					class="inline-block w-[3px] translate-y-[2px] rounded-sm bg-primary align-middle transition-opacity duration-500"
+					class:opacity-0={!cursorVisible}
+					class:cursor-blink={!typing}
+					style="height: 0.85em"
+				></span>
 			</h1>
 
 			<p class="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-muted-foreground">
@@ -225,3 +248,13 @@
 		<ArrowRightIcon class="h-4 w-4" />
 	</Button>
 </section>
+
+<style>
+	.cursor-blink {
+		animation: blink 1s step-end infinite;
+	}
+	@keyframes blink {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0; }
+	}
+</style>

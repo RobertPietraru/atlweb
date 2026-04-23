@@ -6,13 +6,18 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { updateUser, updatePermissions, deleteUser } from './user.remote';
 	import { toast } from 'svelte-sonner';
+	import { enhance } from '$app/forms';
+	import { Loader2 } from '@lucide/svelte';
+	import { goto } from '$app/navigation';
+	import { i18n } from '$lib/i18n';
 
 	let { data } = $props();
 
 	let selectedPermissions = $state<string[]>([...data.user.permissions]);
 	let updatingPermissions = $state(false);
+	let updatingUserInfo = $state(false);
 	let deleting = $state(false);
-	let isLoading = $derived(updatingPermissions || deleting);
+	let isLoading = $derived(updatingPermissions || deleting || updatingUserInfo);
 
 	const groupedPermissions: Record<string, string[]> = data.allPermissions.reduce(
 		(acc: Record<string, string[]>, permission: string) => {
@@ -42,6 +47,7 @@
 		deleting = true;
 		try {
 			await deleteUser({ userId: data.user.id });
+			await goto(i18n.resolveRoute('/admin/users'));
 		} catch {
 			toast.error('Failed to delete user');
 			deleting = false;
@@ -63,7 +69,20 @@
 	<div class="grid gap-8 md:grid-cols-2">
 		<div>
 			<h2 class="mb-4 text-xl font-semibold">{m.admin_user_basic_info()}</h2>
-			<form {...updateUser} class="space-y-4">
+			<form
+				{...updateUser}
+				use:enhance={() => {
+					updatingUserInfo = true;
+					return async ({ result, update }) => {
+						await update();
+						updatingUserInfo = false;
+						if (result.type === 'success') {
+							toast.success(m.admin_user_update_info_success());
+						}
+					};
+				}}
+				class="space-y-4"
+			>
 				<input type="hidden" name="userId" value={data.user.id} />
 				<div class="space-y-2">
 					<Label for="username">{m.admin_user_username()}</Label>
@@ -89,8 +108,11 @@
 					{/each}
 				</div>
 
-				<Button type="submit" disabled={isLoading}>
-					{m.admin_user_update_info()}
+				<Button type="submit" disabled={isLoading} class="gap-2">
+					{#if updatingUserInfo}
+						<Loader2 class="h-4 w-4 animate-spin" />
+					{/if}
+					{updatingUserInfo ? m.admin_user_update_info_loading() : m.admin_user_update_info()}
 				</Button>
 			</form>
 

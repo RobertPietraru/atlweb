@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Мгновенная обратная связь",
     "home_editor_feature2_desc": "Смотри, как код запускается по мере набора.",
     "home_editor_feature3_title": "Работает в браузере",
-    "home_editor_feature3_desc": "Без установки. Без настройки. Просто открой и начни программировать."
+    "home_editor_feature3_desc": "Без установки. Без настройки. Просто открой и начни программировать.",
+    "auth_login_loading": "Вход...",
+    "auth_register_loading": "Регистрация...",
+    "admin_course_create_loading": "Создание...",
+    "admin_user_create_loading": "Создание...",
+    "admin_user_update_info_success": "Информация о пользователе успешно обновлена"
 }

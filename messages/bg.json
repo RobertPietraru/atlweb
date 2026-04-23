@@ -245,5 +245,10 @@
     "home_editor_feature2_title": "Незабавна обратна връзка",
     "home_editor_feature2_desc": "Виж кода си да работи в момента, в който пишеш.",
     "home_editor_feature3_title": "Работи в браузъра",
-    "home_editor_feature3_desc": "Без инсталация. Без настройка. Просто отвори и започни да програмираш."
+    "home_editor_feature3_desc": "Без инсталация. Без настройка. Просто отвори и започни да програмираш.",
+    "auth_login_loading": "Влизане...",
+    "auth_register_loading": "Регистрация...",
+    "admin_course_create_loading": "Създаване...",
+    "admin_user_create_loading": "Създаване...",
+    "admin_user_update_info_success": "Информацията за потребителя е актуализирана успешно"
 }
