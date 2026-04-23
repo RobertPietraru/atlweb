@@ -3,11 +3,10 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Card, CardContent } from '$lib/components/ui/card';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
-	import { deserialize } from '$app/forms';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import * as m from '$lib/paraglide/messages.js';
+	import { createChapter, updateCourse, manageChapters } from './course.remote';
 
 	let { data } = $props();
 	let chapters = $state(data.course.chapters.map((ch) => ({ ...ch })));
@@ -32,7 +31,6 @@
 			chapters[index] = chapters[index + 1];
 			chapters[index + 1] = temp;
 		}
-		// Recalculate all orders to be sequential
 		chapters = chapters.map((ch, idx) => ({ ...ch, order: idx + 1 }));
 		return chapters[index].order;
 	}
@@ -40,32 +38,13 @@
 	async function saveChapterOrder() {
 		loading = true;
 		try {
-			const response = await fetch('?/manageChapters', {
-				method: 'POST',
-				body: JSON.stringify({
-					chapters: chapters.map(ch => ch.id)
-				})
+			await manageChapters({
+				courseId: data.course.id,
+				chapters: chapters.map((ch) => ch.id)
 			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				initialChapters = [...chapters];
-				hasChanges = false;
-			} else if (result.type === 'failure') {
-				console.error('Error saving chapter order:', result.data?.message);
-				toast.error(
-					(result.data?.message as string | undefined | null) ?? 
-					m.admin_course_save_chapter_order_error(),
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			console.error('Error saving chapter order:', error);
-			toast.error(m.admin_course_save_chapter_order_error(), {
-				position: 'bottom-left'
-			});
+			initialChapters = [...chapters];
+		} catch (err) {
+			toast.error(m.admin_course_save_chapter_order_error(), { position: 'bottom-left' });
 		} finally {
 			loading = false;
 		}
@@ -74,37 +53,17 @@
 	async function saveCourseInfo() {
 		saving = true;
 		try {
-			const formData = new FormData();
-			formData.append('name', editForm.name);
-			formData.append('description', editForm.description);
-			const response = await fetch('?/update', {
-				method: 'POST',
-				body: formData
+			await updateCourse({
+				courseId: data.course.id,
+				name: editForm.name,
+				description: editForm.description
 			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				data.course.name = editForm.name;
-				data.course.description = editForm.description;
-				isEditing = false;
-				toast.success(m.admin_course_save_info_success(), {
-					position: 'bottom-left'
-				});
-			} else if (result.type === 'failure') {
-				console.error('Error saving course info:', result.data?.message);
-				toast.error(
-					(result.data?.message as string | undefined | null) ?? 
-					m.admin_course_save_info_error(),
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			console.error('Error saving course info:', error);
-			toast.error(m.admin_course_save_info_error(), {
-				position: 'bottom-left'
-			});
+			data.course.name = editForm.name;
+			data.course.description = editForm.description;
+			isEditing = false;
+			toast.success(m.admin_course_save_info_success(), { position: 'bottom-left' });
+		} catch (err) {
+			toast.error(m.admin_course_save_info_error(), { position: 'bottom-left' });
 		} finally {
 			saving = false;
 		}
@@ -164,9 +123,12 @@
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_course_chapters()}</h2>
 				<div class="flex gap-2">
-					<form action="?/createChapter" method="POST">
-						<Button id="add-chapter-button" type="submit">{m.admin_course_add_chapter()}</Button>
-					</form>
+					<Button
+						id="add-chapter-button"
+						onclick={() => createChapter({ courseId: data.course.id })}
+					>
+						{m.admin_course_add_chapter()}
+					</Button>
 				</div>
 			</div>
 
@@ -219,10 +181,7 @@
 									>
 										{m.admin_course_edit_chapter()}
 									</Button>
-									<Button 
-										variant="destructive"
-										onclick={() => deleteChapter(index)}
-									>
+									<Button variant="destructive" onclick={() => deleteChapter(index)}>
 										{m.admin_course_delete_chapter()}
 									</Button>
 								</div>
@@ -234,4 +193,3 @@
 		</section>
 	</div>
 </div>
-

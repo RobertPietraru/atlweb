@@ -2,13 +2,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '$lib/components/ui/card';
-	import SuperDebug, { superForm } from 'sveltekit-superforms';
+	import { login } from './login.remote';
 	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
-	const { form, message, errors } = superForm(data.form);
 </script>
 
 <main class="min-h-[100vh] w-full px-8 py-4">
@@ -22,37 +20,31 @@
 				<CardTitle class="text-center text-2xl font-bold">{m.auth_login_title()}</CardTitle>
 			</CardHeader>
 			<CardContent>
-				{#if $message}
-					<Alert variant="destructive" class="mb-4">
-						<AlertDescription>{$message}</AlertDescription>
-					</Alert>
-				{/if}
-				<form method="POST" class="space-y-4">
+				<form {...login} class="space-y-4">
+					<input type="hidden" name="redirectUrl" value={data.redirectUrl} />
 					<div class="space-y-2">
 						<Label for="email">{m.auth_email_label()}</Label>
 						<Input
 							id="email"
-							name="email"
-							type="email"
-							aria-invalid={$errors.email ? 'true' : 'false'}
+							{...login.fields.email.as('email')}
 							autocomplete="email"
 							required
-							bind:value={$form.email}
 						/>
-						<p class="text-destructive">{$errors.email}</p>
+						{#each login.fields.email.issues() as issue}
+							<p class="text-destructive">{issue.message}</p>
+						{/each}
 					</div>
 					<div class="space-y-2">
-						<Label for="password">{m.auth_password_label()}</Label>
+						<Label for="_password">{m.auth_password_label()}</Label>
 						<Input
-							id="password"
-							name="password"
-							type="password"
-							aria-invalid={$errors.password ? 'true' : 'false'}
-							bind:value={$form.password}
+							id="_password"
+							{...login.fields._password.as('password')}
 							autocomplete="current-password"
 							required
 						/>
-						<p class="text-destructive">{$errors.password}</p>
+						{#each login.fields._password.issues() as issue}
+							<p class="text-destructive">{issue.message}</p>
+						{/each}
 					</div>
 					<Button type="submit" class="w-full">{m.auth_login_button()}</Button>
 				</form>

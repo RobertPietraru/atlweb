@@ -3,10 +3,10 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import { toast } from 'svelte-sonner';
-	import { deserialize } from '$app/forms';
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as m from '$lib/paraglide/messages.js';
+	import { createLesson, updateChapter, manageLessons } from './chapter.remote';
 
 	let { data } = $props();
 	let lessons = $state(data.chapter.lessons.map((l) => ({ ...l })));
@@ -30,7 +30,6 @@
 			lessons[index] = lessons[index + 1];
 			lessons[index + 1] = temp;
 		}
-		// Recalculate all orders to be sequential
 		lessons = lessons.map((l, idx) => ({ ...l, order: idx + 1 }));
 		return lessons[index].order;
 	}
@@ -38,32 +37,13 @@
 	async function saveLessonOrder() {
 		loading = true;
 		try {
-			const response = await fetch('?/manageLessons', {
-				method: 'POST',
-				body: JSON.stringify({
-					lessons: lessons.map((l) => l.id)
-				})
+			await manageLessons({
+				chapterId: data.chapter.id,
+				lessons: lessons.map((l) => l.id)
 			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				initialLessons = [...lessons];
-				hasChanges = false;
-			} else if (result.type === 'failure') {
-				console.error('Error saving lesson order:', result.data?.message);
-				toast.error(
-					(result.data?.message as string | undefined | null) ??
-						m.admin_chapter_save_lesson_order_error(),
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			console.error('Error saving lesson order:', error);
-			toast.error(m.admin_chapter_save_lesson_order_error(), {
-				position: 'bottom-left'
-			});
+			initialLessons = [...lessons];
+		} catch (err) {
+			toast.error(m.admin_chapter_save_lesson_order_error(), { position: 'bottom-left' });
 		} finally {
 			loading = false;
 		}
@@ -72,36 +52,17 @@
 	async function saveChapterInfo() {
 		loading = true;
 		try {
-			const formData = new FormData();
-			formData.append('name', editForm.name);
-			formData.append('description', editForm.description);
-			const response = await fetch('?/update', {
-				method: 'POST',
-				body: formData
+			await updateChapter({
+				chapterId: data.chapter.id,
+				name: editForm.name,
+				description: editForm.description
 			});
-
-			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				data.chapter.name = editForm.name;
-				data.chapter.description = editForm.description;
-				isEditing = false;
-				toast.success(m.admin_chapter_save_info_success(), {
-					position: 'bottom-left'
-				});
-			} else if (result.type === 'failure') {
-				toast.error(
-					(result.data?.message as string | undefined | null) ?? 
-						m.admin_chapter_save_info_error(),
-					{
-						position: 'bottom-left'
-					}
-				);
-			}
-		} catch (error) {
-			console.error('Error updating chapter:', error);
-			toast.error(m.admin_chapter_save_info_error(), {
-				position: 'bottom-left'
-			});
+			data.chapter.name = editForm.name;
+			data.chapter.description = editForm.description;
+			isEditing = false;
+			toast.success(m.admin_chapter_save_info_success(), { position: 'bottom-left' });
+		} catch (err) {
+			toast.error(m.admin_chapter_save_info_error(), { position: 'bottom-left' });
 		} finally {
 			loading = false;
 		}
@@ -161,9 +122,11 @@
 			<div class="mb-6 flex items-center justify-between">
 				<h2 class="text-2xl font-semibold tracking-tight">{m.admin_chapter_lessons()}</h2>
 				<div class="flex gap-2">
-					<form action="?/create" method="post">
-						<Button type="submit">{m.admin_chapter_add_lesson()}</Button>
-					</form>
+					<Button
+						onclick={() => createLesson({ courseId: data.courseId, chapterId: data.chapter.id })}
+					>
+						{m.admin_chapter_add_lesson()}
+					</Button>
 				</div>
 			</div>
 
@@ -212,8 +175,7 @@
 								<div class="flex gap-2">
 									<Button
 										variant="outline"
-										href="/admin/courses/{data.courseId}/chapters/{data.chapter
-											.id}/lessons/{lesson.id}"
+										href="/admin/courses/{data.courseId}/chapters/{data.chapter.id}/lessons/{lesson.id}"
 									>
 										{m.admin_chapter_edit_lesson()}
 									</Button>
