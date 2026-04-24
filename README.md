@@ -125,3 +125,5 @@ For support, email rob_piet@yahoo.com or open an issue in the GitHub repository.
 
 - National College "A. T. Laurian" Botoșani
 - All contributors and users of the platform
+
+https://canva.link/4k76wfx1bkqmvwi
